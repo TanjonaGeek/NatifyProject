@@ -1,0 +1,172 @@
+name: natify
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.1.3+4
+
+environment:
+  sdk: ^3.6.1
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.8
+  firebase_auth:
+  cloud_firestore:
+  firebase_storage:
+  flutter_story_editor: ^0.0.2
+  # zego_uikit_prebuilt_call: 
+  # zego_uikit_signaling_plugin: 
+  google_sign_in: ^6.2.0
+  flutter_riverpod:
+  equatable:
+  get_it:
+  get:
+  font_awesome_flutter: 
+  firebase_messaging:
+  flutter_notification_channel:
+  app_settings:
+  flutter_local_notifications:
+  loadmore_listview: 
+  shimmer: 
+  carousel_slider:
+  text_editor: 
+  screenshot: 
+  # photo_manager: ^3.5.2
+  image_picker: ^1.1.2
+  chewie: ^1.8.3
+  swipe_to: 
+  custom_clippers: 
+  just_audio: 
+  emoji_picker_flutter: ^3.0.0
+  enough_giphy_flutter: 
+  flutter_sound: ^9.6.0 
+  lottie: 
+  firebase_pagination: 
+  flutter_staggered_grid_view:
+  flutter_slidable: 
+  geolocator:
+  geocoding:
+  geoflutterfire2:
+  units_converter:
+  google_maps_flutter:
+  flutter_staggered_animations: 
+  googleapis_auth: 
+  connectivity_plus: 
+  flutter_chat_reactions: 
+  webview_flutter: ^4.10.0
+  dio:
+  # image_gallery_saver: 
+  custom_marker: 
+  flutter_admin_scaffold: 
+  animated_theme_switcher: 
+  animated_dashed_circle: 
+  oktoast: 
+  flutter_native_splash: 
+  device_info_plus: 
+  photo_manager: 3.6.4
+  cached_network_image: ^3.4.1
+  permission_handler: ^11.3.1
+  flutter_launcher_icons: ^0.14.3
+  flutter_dotenv: ^5.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^5.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/
+    - assets/images/
+    - assets/emojies/
+    - assets/theme_chat/
+    - assets/credentials/service_account_key.json
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/to/resolution-aware-images
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/to/asset-from-package
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/roboto/Roboto-Regular.ttf
+    - family: Merriweather
+      fonts:
+        - asset: assets/fonts/merriweather/Merriweather-Regular.ttf
+    - family: Mandimi One
+      fonts:
+        - asset: assets/fonts/madimiOne/MadimiOne-Regular.ttf
+    - family: Dancing Script
+      fonts:
+        - asset: assets/fonts/dancing_script/DancingScript-Regular.ttf
+    - family: Angkor
+      fonts:
+        - asset: assets/fonts/angkor/Angkor-Regular.ttf
+    - family: Montserrat
+      fonts:
+        - asset: assets/fonts/montserrat/Montserrat-Regular.ttf
+    - family: Lato
+      fonts:
+        - asset: assets/fonts/lato/Lato-Regular.ttf
+    - family: Oswald
+      fonts:
+        - asset: assets/fonts/oswald/Oswald-Regular.ttf
+    - family: Raleway
+      fonts:
+        - asset: assets/fonts/raleway/Raleway-Regular.ttf
+    - family: Lora
+      fonts:
+        - asset: assets/fonts/lora/Lora-Regular.ttf
+    - family: Pacifico
+      fonts:
+        - asset: assets/fonts/pacifico/Pacifico-Regular.ttf
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/to/font-from-package

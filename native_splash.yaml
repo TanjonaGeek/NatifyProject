@@ -1,0 +1,20 @@
+flutter_native_splash:
+  android: true
+  ios: true
+  web: false
+  
+  color: "#ffffff"
+  image: assets/logo-natify.png
+  branding: assets/textNatify.png
+  color_dark: "#121212"
+  image_dark: assets/logo-natify.png
+  branding_dark: assets/textNatify.png
+  branding_bottom_padding: 24
+
+  android_12:
+    image: assets/logo-natify.png
+    image_dark: assets/logo-natify.png
+    branding_dark: assets/textNatify.png
+    branding: assets/textNatify.png
+    color_dark: "#121212"
+    branding_bottom_padding: 24

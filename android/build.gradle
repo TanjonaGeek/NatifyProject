@@ -1,0 +1,62 @@
+buildscript {
+    ext.kotlin_version = '1.8.22'
+    repositories {
+        google()
+        mavenCentral()
+        // jcenter()
+    }
+
+    dependencies {
+         // Version du plugin Android Gradle (compatible avec AGP 8.1.0)
+        classpath "com.android.tools.build:gradle:8.3.2"
+
+        // Version de Kotlin (1.8.22, comme trouvé dans settings.gradle)
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    subprojects {
+    afterEvaluate { project ->
+        // check only for "com.android.library" to not modify
+        // your "app" subproject. All plugins will have "com.android.library" plugin, and only your app "com.android.application"
+        // Change your application's namespace in main build.gradle and in main android block.
+
+        if (project.plugins.hasPlugin("com.android.library")) {
+            project.android {
+                compileSdkVersion 34
+                buildToolsVersion "34.0.0"
+                if (namespace == null) {
+                    namespace project.group
+                }
+            }
+        }
+    }
+}
+//     subprojects {
+//         afterEvaluate { project ->
+//             if (project.hasProperty("android") && project.plugins.hasPlugin("kotlin-android")) {
+//                 project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+//                     kotlinOptions {
+//                         jvmTarget = "1.8"
+//                     }
+//                 }
+//             }
+//         }
+// }
+}
+
+rootProject.buildDir = "../build"
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(":app")
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
