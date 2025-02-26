@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest  # Utilisation d'un environnement macOS
+    runs-on: macos-latest  # Utilisation d'un environnement macOS g
 
     steps:
       - name: Checkout repository
