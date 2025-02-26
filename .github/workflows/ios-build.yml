@@ -25,7 +25,9 @@ jobs:
       - name: Install CocoaPods dependencies
         run: |
           cd ios
-          pod install
+          pod init || true
+          pod repo update
+          pod install --verbose
           cd ..
 
       - name: Decode provisioning profile
