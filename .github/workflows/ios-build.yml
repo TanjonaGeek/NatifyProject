@@ -22,9 +22,6 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Check Integrity of project.pbxproj
-        run: cat ios/Runner.xcodeproj/project.pbxproj
-
 
       - name: Force iOS 13+ in Podfiles
         run: |
@@ -75,10 +72,10 @@ jobs:
   
       - name: Inject Provisioning Profile in Xcode Project
         run: |
-          if grep -q "PROVISIONING_PROFILE_SPECIFIER" ios/Runner.xcodeproj/project.pbxproj; then
-            sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = ""; /PROVISIONING_PROFILE_SPECIFIER = "profile.mobileprovision"; /g' ios/Runner.xcodeproj/project.pbxproj
+          if grep -q "isa = PBXProject;" ios/Runner.xcodeproj/project.pbxproj; then
+            sed -i '' 's/isa = PBXProject;/isa = PBXProject; PROVISIONING_PROFILE_SPECIFIER = "profile.mobileprovision";/' ios/Runner.xcodeproj/project.pbxproj
           else
-            echo 'PROVISIONING_PROFILE_SPECIFIER = "profile.mobileprovision";' >> ios/Runner.xcodeproj/project.pbxproj
+            echo "Erreur: PBXProject non trouvé dans project.pbxproj"
           fi
           cat ios/Runner.xcodeproj/project.pbxproj | grep PROVISIONING_PROFILE_SPECIFIER
 
