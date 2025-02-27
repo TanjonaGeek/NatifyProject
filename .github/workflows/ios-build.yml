@@ -78,8 +78,14 @@ jobs:
       
       - name: Inject Development Team ID into Xcode project
         run: |
-          sed -i '' 's/DEVELOPMENT_TEAM = "";/DEVELOPMENT_TEAM = 9PW89SQJ4U;/g' ios/Runner.xcodeproj/project.pbxproj
+          sed -i '' 's/DEVELOPMENT_TEAM = "";*/DEVELOPMENT_TEAM = 9PW89SQJ4U;/g' ios/Runner.xcodeproj/project.pbxproj
+          sed -i '' 's/ProvisioningStyle = Automatic;/ProvisioningStyle = Manual;/g' ios/Runner.xcodeproj/project.pbxproj
           cat ios/Runner.xcodeproj/project.pbxproj | grep DEVELOPMENT_TEAM
+
+      - name: Vérifier si le développement Team ID est bien modifié
+        run: |
+          cat ios/Runner.xcodeproj/project.pbxproj | grep DEVELOPMENT_TEAM
+        
       
       # - name: Setup Provisioning Profile
       #   run: |
