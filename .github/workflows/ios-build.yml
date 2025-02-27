@@ -29,6 +29,7 @@ jobs:
           sed -i -e 's/^# *platform :ios, .*/platform :ios, "14.0"/' Podfile || echo 'platform :ios, "14.0"' >> Podfile
           cat Podfile  # Affiche le fichier Podfile pour vérification
           cd ..
+          
 
       - name: Install CocoaPods dependencies
         run: |
