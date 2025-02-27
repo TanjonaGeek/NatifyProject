@@ -71,8 +71,15 @@ jobs:
       
       - name: Setup Provisioning Profile
         run: |
-            mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-            cp provisioning.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+              mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+              if [ -f provisioning.mobileprovision ]; then
+                cp provisioning.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+                echo "Provisioning profile copied successfully!"
+              else
+                echo "ERROR: provisioning.mobileprovision not found!"
+                exit 1
+              fi
+          
     
   
       # - name: Inject Provisioning Profile in Xcode Project
