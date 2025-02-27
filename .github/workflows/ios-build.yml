@@ -69,7 +69,12 @@ jobs:
             mkdir -p assets/credentials
             echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > assets/credentials/service_account_key.json
       
-      
+
+      - name: Check if PROVISIONING_PROFILE_SPECIFIER exists
+        run: |
+            cat ios/Runner.xcodeproj/project.pbxproj | grep PROVISIONING_PROFILE_SPECIFIER || echo "PROVISIONING_PROFILE_SPECIFIER non trouvé"
+
+            
       - name: Inject Provisioning Profile in Xcode Project
         run: |
             sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = ""; /PROVISIONING_PROFILE_SPECIFIER = "profile.mobileprovision"; /g' ios/Runner.xcodeproj/project.pbxproj
