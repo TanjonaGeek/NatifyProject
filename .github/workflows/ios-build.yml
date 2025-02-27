@@ -19,6 +19,10 @@ jobs:
           flutter-version: 3.27.3  # Mets ta version de Flutter ici
           cache: true
 
+      - name: Debug project.pbxproj Structure
+        run: head -n 10 ios/Runner.xcodeproj/project.pbxproj
+  
+
       - name: Install dependencies
         run: flutter pub get
 
