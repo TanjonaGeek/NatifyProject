@@ -30,11 +30,11 @@ jobs:
       
       - name: Decode provisioning profile
         run: |
-            echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > Natify_Provisionning_Profile.mobileprovision
+            echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > provisioning.mobileprovision
             mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-            mv Natify_Provisionning_Profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+            mv provisioning.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
             ls -la  # Vérifie si le fichier a bien été créé
-            file Natify_Provisionning_Profile.mobileprovision  # Vérifie le type de fichier
+            file provisioning.mobileprovision  # Vérifie le type de fichier
             echo "✅ Provisioning profile copied successfully!"
       
 
