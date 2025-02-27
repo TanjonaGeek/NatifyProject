@@ -26,7 +26,7 @@ jobs:
       - name: Debug Provisioning Profile
         run: |
           echo "Provisioning profile content size:"
-          echo "${{ secrets.APPLE_PROVISIONING_PROFILE }}" | wc -c
+          echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | wc -c
       
 
       - name: Force iOS 13+ in Podfiles
