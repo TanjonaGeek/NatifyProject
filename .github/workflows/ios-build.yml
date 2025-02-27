@@ -21,25 +21,6 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-      
-
-      - name: Debug Provisioning Profile
-        run: |
-          echo "Provisioning profile content size:"
-          echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | wc -c
-      
-      
-      - name: Décrypter et vérifier le Provisioning Profile
-        run: |
-          echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > provisioning.mobileprovision
-          ls -la  # Vérifie si le fichier est bien créé
-          file provisioning.mobileprovision  # Vérifie son type
-
-      - name: Copier le Provisioning Profile dans Xcode
-        run: |
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp provisioning.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
-          echo "✅ Provisioning profile copied successfully!"
 
       - name: Force iOS 13+ in Podfiles
         run: |
@@ -57,16 +38,18 @@ jobs:
           pod install --verbose
           cd ..
 
-      # - name: Decode provisioning profile
-      #   run: |
-      #     echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > profile.mobileprovision
-      #     mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-      #     mv profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
-      
-      # - name: Verify Provisioning Profile File
-      #   run: |
-      #       ls -la
-      #       file provisioning.mobileprovision
+      - name: Décrypter et vérifier le Provisioning Profile
+        run: |
+            echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > provisioning.mobileprovision
+            ls -la  # Vérifie si le fichier est bien créé
+            file provisioning.mobileprovision  # Vérifie son type
+  
+      - name: Copier le Provisioning Profile dans Xcode
+        run: |
+            mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+            cp provisioning.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+            echo "✅ Provisioning profile copied successfully!"
+  
 
       - name: Import certificate
         run: |
@@ -91,6 +74,12 @@ jobs:
         run: |
             mkdir -p assets/credentials
             echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > assets/credentials/service_account_key.json
+      
+      
+      - name: Inject Development Team ID into Xcode project
+        run: |
+          sed -i '' 's/DEVELOPMENT_TEAM = "";/DEVELOPMENT_TEAM = 9PW89SQJ4U;/g' ios/Runner.xcodeproj/project.pbxproj
+          cat ios/Runner.xcodeproj/project.pbxproj | grep DEVELOPMENT_TEAM
       
       # - name: Setup Provisioning Profile
       #   run: |
