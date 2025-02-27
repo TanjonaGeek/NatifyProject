@@ -81,6 +81,7 @@ jobs:
             xcodebuild -project Runner.xcodeproj -target Runner -configuration Release \
             CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM=9PW89SQJ4U
             cd ..
+            
         
       - name: Inject Development Team in Xcode project
         run: |
