@@ -75,38 +75,7 @@ jobs:
             mkdir -p assets/credentials
             echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > assets/credentials/service_account_key.json
       
-      
-      - name: Inject Development Team and Provisioning Profile into Xcode project
-        run: |
-              echo "🛠 Vérification et ajout des paramètres de signature"
-              
-              # Vérifier si DEVELOPMENT_TEAM est présent, sinon l'ajouter
-              if ! grep -q "DEVELOPMENT_TEAM" ios/Runner.xcodeproj/project.pbxproj; then
-                echo "🔍 DEVELOPMENT_TEAM absent, ajout en cours..."
-                sed -i '' '/TargetAttributes = {/ a\
-                  DEVELOPMENT_TEAM = 9PW89SQJ4U;
-                ' ios/Runner.xcodeproj/project.pbxproj
-                echo "✅ DEVELOPMENT_TEAM ajouté !"
-              else
-                echo "✅ DEVELOPMENT_TEAM déjà présent"
-              fi
           
-              # Vérifier si PROVISIONING_PROFILE_SPECIFIER est présent, sinon l'ajouter
-              if ! grep -q "PROVISIONING_PROFILE_SPECIFIER" ios/Runner.xcodeproj/project.pbxproj; then
-                echo "🔍 PROVISIONING_PROFILE_SPECIFIER absent, ajout en cours..."
-                sed -i '' '/DEVELOPMENT_TEAM = 9PW89SQJ4U;/ a\
-                  PROVISIONING_PROFILE_SPECIFIER = "provisioning";
-                ' ios/Runner.xcodeproj/project.pbxproj
-                echo "✅ PROVISIONING_PROFILE_SPECIFIER ajouté !"
-              else
-                echo "✅ PROVISIONING_PROFILE_SPECIFIER déjà présent"
-              fi
-          
-              echo "🔍 Vérification finale"
-              cat ios/Runner.xcodeproj/project.pbxproj | grep DEVELOPMENT_TEAM || echo "❌ DEVELOPMENT_TEAM toujours absent"
-              cat ios/Runner.xcodeproj/project.pbxproj | grep PROVISIONING_PROFILE_SPECIFIER || echo "❌ PROVISIONING_PROFILE_SPECIFIER toujours absent"
-          
-        
       
       # - name: Setup Provisioning Profile
       #   run: |
@@ -131,12 +100,12 @@ jobs:
       #     cat ios/Runner.xcodeproj/project.pbxproj | grep PROVISIONING_PROFILE_SPECIFIER
 
       
-      # - name: Set Development Team in Xcode project
-      #   run: |
-      #       cd ios
-      #       xcodebuild -project Runner.xcodeproj -target Runner -configuration Release \
-      #       CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM=9PW89SQJ4U
-      #       cd ..
+      - name: Set Development Team in Xcode project
+        run: |
+            cd ios
+            xcodebuild -project Runner.xcodeproj -target Runner -configuration Release \
+            CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM=9PW89SQJ4U
+            cd ..
             
         
       # - name: Inject Development Team in Xcode project
