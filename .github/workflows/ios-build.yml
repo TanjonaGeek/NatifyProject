@@ -33,8 +33,12 @@ jobs:
       - name: Force iOS 13+ in Podfile
         run: |
           cd ios
-          sed -i -e 's/platform :ios, .*/platform :ios, "13.0"/' Podfile || echo 'platform :ios, "13.0"' >> Podfile
-          cat Podfile  # Affiche le fichier Podfile pour vérification
+          if [ -f "Podfile" ]; then
+            sed -i -e 's/platform :ios, .*/platform :ios, "13.0"/' Podfile
+          else
+            echo 'platform :ios, "13.0"' > Podfile
+          fi
+          cat Podfile  # Vérification
           cd ..
 
       - name: Decode provisioning profile
