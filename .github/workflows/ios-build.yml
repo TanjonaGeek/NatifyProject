@@ -22,11 +22,22 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
       
-        
+
       - name: Debug Provisioning Profile
         run: |
           echo "Provisioning profile content size:"
           echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | wc -c
+      
+      - name: Decode provisioning profile
+        run: |
+            echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > profile.mobileprovision
+            mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+            mv profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+        
+      - name: Verify Provisioning Profile File
+        run: |
+              ls -la
+              file provisioning.mobileprovision
       
 
       - name: Force iOS 13+ in Podfiles
@@ -45,11 +56,16 @@ jobs:
           pod install --verbose
           cd ..
 
-      - name: Decode provisioning profile
-        run: |
-          echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > profile.mobileprovision
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          mv profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+      # - name: Decode provisioning profile
+      #   run: |
+      #     echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > profile.mobileprovision
+      #     mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+      #     mv profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+      
+      # - name: Verify Provisioning Profile File
+      #   run: |
+      #       ls -la
+      #       file provisioning.mobileprovision
 
       - name: Import certificate
         run: |
