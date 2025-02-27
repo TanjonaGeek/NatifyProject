@@ -21,9 +21,9 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-        
 
-      - name: Force iOS 13+ in Podfile
+
+      - name: Force iOS 13+ in Podfiles
         run: |
           cd ios
           sed -i -e 's/^# *platform :ios, .*/platform :ios, "13.0"/' Podfile || echo 'platform :ios, "13.0"' >> Podfile
