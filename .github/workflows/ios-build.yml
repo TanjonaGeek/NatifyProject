@@ -28,15 +28,18 @@ jobs:
           echo "Provisioning profile content size:"
           echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | wc -c
       
-      - name: Decode provisioning profile
-        run: |
-            echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > provisioning.mobileprovision
-            mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-            mv provisioning.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
-            ls -la  # Vérifie si le fichier a bien été créé
-            file provisioning.mobileprovision  # Vérifie le type de fichier
-            echo "✅ Provisioning profile copied successfully!"
       
+      - name: Décrypter et vérifier le Provisioning Profile
+        run: |
+          echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > provisioning.mobileprovision
+          ls -la  # Vérifie si le fichier est bien créé
+          file provisioning.mobileprovision  # Vérifie son type
+
+      - name: Copier le Provisioning Profile dans Xcode
+        run: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp provisioning.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+          echo "✅ Provisioning profile copied successfully!"
 
       - name: Force iOS 13+ in Podfiles
         run: |
