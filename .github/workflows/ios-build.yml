@@ -19,8 +19,10 @@ jobs:
           flutter-version: 3.27.3  # Mets ta version de Flutter ici
           cache: true
 
-      - name: Debug project.pbxproj Structure
-        run: head -n 10 ios/Runner.xcodeproj/project.pbxproj
+      - name: Check project.pbxproj Syntax
+        run: |
+            cat ios/Runner.xcodeproj/project.pbxproj | grep '=' | grep -v ';'
+  
   
 
       - name: Install dependencies
@@ -76,10 +78,10 @@ jobs:
   
       - name: Inject Provisioning Profile in Xcode Project
         run: |
-          if grep -q "PROVISIONING_PROFILE_SPECIFIER" ios/Runner.xcodeproj/project.pbxproj; then
-            sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = ""; /PROVISIONING_PROFILE_SPECIFIER = "profile.mobileprovision"; /g' ios/Runner.xcodeproj/project.pbxproj
+          if grep -q "isa = PBXProject;" ios/Runner.xcodeproj/project.pbxproj; then
+            sed -i '' 's/isa = PBXProject;/isa = PBXProject; PROVISIONING_PROFILE_SPECIFIER = "profile.mobileprovision";/' ios/Runner.xcodeproj/project.pbxproj
           else
-            echo 'PROVISIONING_PROFILE_SPECIFIER = "profile.mobileprovision";' >> ios/Runner.xcodeproj/project.pbxproj
+            echo "Erreur: PBXProject non trouvé dans project.pbxproj"
           fi
           cat ios/Runner.xcodeproj/project.pbxproj | grep PROVISIONING_PROFILE_SPECIFIER
 
