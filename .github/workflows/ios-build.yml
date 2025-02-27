@@ -24,6 +24,15 @@ jobs:
             cat ios/Runner.xcodeproj/project.pbxproj | grep '=' | grep -v ';'
   
   
+      - name: Set Code Signing and Provisioning Profile
+        run: |
+              cd ios
+              xcodebuild -project Runner.xcodeproj -target Runner -configuration Release \
+              CODE_SIGN_STYLE=Manual \
+              DEVELOPMENT_TEAM=9PW89SQJ4U \
+              PROVISIONING_PROFILE_SPECIFIER="profile.mobileprovision" \
+              CODE_SIGN_IDENTITY="Apple Distribution"
+              cd ..
 
       - name: Install dependencies
         run: flutter pub get
@@ -99,15 +108,6 @@ jobs:
       #       sed -i '' 's/DEVELOPMENT_TEAM = ""; /DEVELOPMENT_TEAM = "9PW89SQJ4U"; /g' ios/Runner.xcodeproj/project.pbxproj
       #       cat ios/Runner.xcodeproj/project.pbxproj | grep DEVELOPMENT_TEAM
 
-      - name: Set Code Signing and Provisioning Profile
-        run: |
-          cd ios
-          xcodebuild -project Runner.xcodeproj -target Runner -configuration Release \
-          CODE_SIGN_STYLE=Manual \
-          DEVELOPMENT_TEAM=9PW89SQJ4U \
-          PROVISIONING_PROFILE_SPECIFIER="profile.mobileprovision" \
-          CODE_SIGN_IDENTITY="Apple Distribution"
-          cd ..
 
       - name: Build iOS
         run: flutter build ipa --release
