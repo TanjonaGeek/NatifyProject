@@ -30,14 +30,12 @@ jobs:
       
       - name: Decode provisioning profile
         run: |
-            echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > profile.mobileprovision
+            echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > Natify_Provisionning_Profile.mobileprovision
             mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-            mv profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
-        
-      - name: Verify Provisioning Profile File
-        run: |
-              ls -la
-              file provisioning.mobileprovision
+            mv Natify_Provisionning_Profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+            ls -la  # Vérifie si le fichier a bien été créé
+            file Natify_Provisionning_Profile.mobileprovision  # Vérifie le type de fichier
+            echo "✅ Provisioning profile copied successfully!"
       
 
       - name: Force iOS 13+ in Podfiles
