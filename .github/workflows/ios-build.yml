@@ -9,6 +9,7 @@ jobs:
   build:
     runs-on: macos-latest  # Utilisation d'un environnement macOS g
 
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
