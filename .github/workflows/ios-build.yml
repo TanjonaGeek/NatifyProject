@@ -22,11 +22,12 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Check required iOS version for google_maps_flutter_ios
+      - name: Force iOS 13+ in Podfile
         run: |
-            cd ios
-            pod spec cat google_maps_flutter_ios | grep "ios.deployment_target"
-            cd ..
+          cd ios
+          sed -i -e 's/platform :ios, .*/platform :ios, "13.0"/' Podfile || echo 'platform :ios, "13.0"' >> Podfile
+          cat Podfile  # Affiche le fichier Podfile pour vérification
+          cd ..
 
       - name: Install CocoaPods dependencies
         run: |
@@ -34,13 +35,6 @@ jobs:
           pod init || true
           pod repo update
           pod install --verbose
-          cd ..
-    
-      - name: Force iOS 13+ in Podfile
-        run: |
-          cd ios
-          sed -i -e 's/platform :ios, .*/platform :ios, "13.0"/' Podfile || echo 'platform :ios, "13.0"' >> Podfile
-          cat Podfile  # Affiche le fichier Podfile pour vérification
           cd ..
 
       - name: Decode provisioning profile
