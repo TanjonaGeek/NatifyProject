@@ -72,26 +72,36 @@ jobs:
   
       - name: Inject Provisioning Profile in Xcode Project
         run: |
-          if grep -q "isa = PBXProject;" ios/Runner.xcodeproj/project.pbxproj; then
-            sed -i '' 's/isa = PBXProject;/isa = PBXProject; PROVISIONING_PROFILE_SPECIFIER = "profile.mobileprovision";/' ios/Runner.xcodeproj/project.pbxproj
+          if grep -q "PROVISIONING_PROFILE_SPECIFIER" ios/Runner.xcodeproj/project.pbxproj; then
+            sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = ""; /PROVISIONING_PROFILE_SPECIFIER = "profile.mobileprovision"; /g' ios/Runner.xcodeproj/project.pbxproj
           else
-            echo "Erreur: PBXProject non trouvé dans project.pbxproj"
+            echo 'PROVISIONING_PROFILE_SPECIFIER = "profile.mobileprovision";' >> ios/Runner.xcodeproj/project.pbxproj
           fi
           cat ios/Runner.xcodeproj/project.pbxproj | grep PROVISIONING_PROFILE_SPECIFIER
 
       
-      - name: Set Development Team in Xcode project
-        run: |
-            cd ios
-            xcodebuild -project Runner.xcodeproj -target Runner -configuration Release \
-            CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM=9PW89SQJ4U
-            cd ..
+      # - name: Set Development Team in Xcode project
+      #   run: |
+      #       cd ios
+      #       xcodebuild -project Runner.xcodeproj -target Runner -configuration Release \
+      #       CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM=9PW89SQJ4U
+      #       cd ..
             
         
-      - name: Inject Development Team in Xcode project
+      # - name: Inject Development Team in Xcode project
+      #   run: |
+      #       sed -i '' 's/DEVELOPMENT_TEAM = ""; /DEVELOPMENT_TEAM = "9PW89SQJ4U"; /g' ios/Runner.xcodeproj/project.pbxproj
+      #       cat ios/Runner.xcodeproj/project.pbxproj | grep DEVELOPMENT_TEAM
+
+      - name: Set Code Signing and Provisioning Profile
         run: |
-            sed -i '' 's/DEVELOPMENT_TEAM = ""; /DEVELOPMENT_TEAM = "9PW89SQJ4U"; /g' ios/Runner.xcodeproj/project.pbxproj
-            cat ios/Runner.xcodeproj/project.pbxproj | grep DEVELOPMENT_TEAM
+          cd ios
+          xcodebuild -project Runner.xcodeproj -target Runner -configuration Release \
+          CODE_SIGN_STYLE=Manual \
+          DEVELOPMENT_TEAM=9PW89SQJ4U \
+          PROVISIONING_PROFILE_SPECIFIER="profile.mobileprovision" \
+          CODE_SIGN_IDENTITY="Apple Distribution"
+          cd ..
 
       - name: Build iOS
         run: flutter build ipa --release
