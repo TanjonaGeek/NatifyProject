@@ -86,7 +86,7 @@ jobs:
             -destination 'generic/platform=iOS' \
             DEVELOPMENT_TEAM=9PW89SQJ4U \
             CODE_SIGN_STYLE=Manual \
-            PROVISIONING_PROFILE_SPECIFIER=Natify_Provisioning_Profile
+            PROVISIONING_PROFILE_SPECIFIER=provisioning
 
           echo "✅ Xcode Team ID et signature configurés !"
 
