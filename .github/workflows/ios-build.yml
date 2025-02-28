@@ -71,8 +71,13 @@ jobs:
       
       - name: Debug Provisioning Profile Certificate
         run: |
-            security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep -A5 '<key>DeveloperCertificates</key>'
-        
+          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep -A5 '<key>DeveloperCertificates</key>'
+      
+
+      - name: Check Installed Certificates
+        run: |
+          echo "🔍 Vérification des certificats installés"
+          security find-identity -v -p codesigning
           
       - name: Set Development Team and Profile in Xcode
         run: |
