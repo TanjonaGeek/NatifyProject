@@ -28,6 +28,24 @@ jobs:
           sed -i -e 's/^# *platform :ios, .*/platform :ios, "14.0"/' Podfile || echo 'platform :ios, "14.0"' >> Podfile
           cat Podfile  # Affiche le fichier Podfile pour vérification
           cd ..
+      
+
+      - name: Décrypter et vérifier le Provisioning Profile
+        run: |
+              echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > provisioning.mobileprovision
+              ls -la  # Vérifie si le fichier est bien créé
+              file provisioning.mobileprovision  # Vérifie son type
+    
+      - name: Copier le Provisioning Profile dans Xcode
+        run: |
+              mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+              cp provisioning.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+              echo "✅ Provisioning profile copied successfully!"
+          
+      - name: List Installed Provisioning Profiles
+        run: |
+              security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep UUID
+            
           
 
       - name: Install CocoaPods dependencies
@@ -49,6 +67,11 @@ jobs:
             mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
             cp provisioning.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
             echo "✅ Provisioning profile copied successfully!"
+        
+      - name: List Installed Provisioning Profiles
+        run: |
+            security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep UUID
+          
   
 
       - name: Import certificate
@@ -75,23 +98,23 @@ jobs:
             mkdir -p assets/credentials
             echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > assets/credentials/service_account_key.json
       
-      - name: Install Xcode Command Line Tools
-        run: |
-          sudo xcode-select --install || echo "Xcode command line tools already installed"
+      # - name: Install Xcode Command Line Tools
+      #   run: |
+      #     sudo xcode-select --install || echo "Xcode command line tools already installed"
       
-      - name: Set Development Team and Profile in Xcode
-        run: |
-            PROFILE_NAME=$(ls ~/Library/MobileDevice/Provisioning\ Profiles/ | head -n 1 | sed 's/.mobileprovision//')
-            echo "Using provisioning profile: $PROFILE_NAME"
+      # - name: Set Development Team and Profile in Xcode
+      #   run: |
+      #       PROFILE_NAME=$(ls ~/Library/MobileDevice/Provisioning\ Profiles/ | head -n 1 | sed 's/.mobileprovision//')
+      #       echo "Using provisioning profile: $PROFILE_NAME"
         
-            xcodebuild -project ios/Runner.xcodeproj \
-              -scheme Runner \
-              -destination 'generic/platform=iOS' \
-              DEVELOPMENT_TEAM=9PW89SQJ4U \
-              CODE_SIGN_STYLE=Manual \
-              PROVISIONING_PROFILE="$PROFILE_NAME"
+      #       xcodebuild -project ios/Runner.xcodeproj \
+      #         -scheme Runner \
+      #         -destination 'generic/platform=iOS' \
+      #         DEVELOPMENT_TEAM=9PW89SQJ4U \
+      #         CODE_SIGN_STYLE=Manual \
+      #         PROVISIONING_PROFILE="$PROFILE_NAME"
         
-            echo "✅ Xcode Team ID et signature configurés !"
+      #       echo "✅ Xcode Team ID et signature configurés !"
         
 
 
