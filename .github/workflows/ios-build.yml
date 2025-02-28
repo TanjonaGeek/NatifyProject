@@ -44,10 +44,13 @@ jobs:
           
       - name: List Installed Provisioning Profiles
         run: |
-              security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep UUID
+          echo "📂 Liste des fichiers dans ~/Library/MobileDevice/Provisioning Profiles/"
+          ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
+      
+          echo "🔍 Détails du provisioning profile"
+          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep -A2 '<key>UUID</key>'
             
-          
-
+        
       - name: Install CocoaPods dependencies
         run: |
           cd ios
