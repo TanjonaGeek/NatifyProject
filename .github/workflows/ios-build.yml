@@ -68,7 +68,12 @@ jobs:
       
           echo "🔍 Détails du provisioning profile"
           security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep -A2 '<key>UUID</key>'
-           
+      
+      - name: Debug Provisioning Profile Certificate
+        run: |
+            security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep -A5 '<key>DeveloperCertificates</key>'
+        
+          
       - name: Set Development Team and Profile in Xcode
         run: |
           echo "🔍 Utilisation du Provisioning Profile UUID : 7d0550e1-9670-47a2-b6b4-e9ae067af02a"
