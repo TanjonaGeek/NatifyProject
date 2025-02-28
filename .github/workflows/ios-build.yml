@@ -78,6 +78,19 @@ jobs:
         run: |
           echo "🔍 Vérification des certificats installés"
           security find-identity -v -p codesigning
+      
+      - name: Extract Installed Certificate Fingerprint
+        run: |
+          security find-certificate -a -p | openssl x509 -inform PEM -noout -fingerprint -sha1
+
+
+      - name: Extract Provisioning Profile Certificate Fingerprint
+        run: |
+            security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | \
+            awk -F '[<>]' '/<key>DeveloperCertificates<\/key>/ {getline; print $3}' | base64 --decode | \
+            openssl x509 -inform DER -noout -fingerprint -sha1
+        
+        
           
       - name: Set Development Team and Profile in Xcode
         run: |
