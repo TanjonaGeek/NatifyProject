@@ -49,7 +49,20 @@ jobs:
       
           echo "🔍 Détails du provisioning profile"
           security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep -A2 '<key>UUID</key>'
-            
+           
+      - name: Set Development Team and Profile in Xcode
+        run: |
+          echo "🔍 Utilisation du Provisioning Profile UUID : 7d0550e1-9670-47a2-b6b4-e9ae067af02a"
+      
+          xcodebuild -project ios/Runner.xcodeproj \
+            -scheme Runner \
+            -destination 'generic/platform=iOS' \
+            DEVELOPMENT_TEAM=9PW89SQJ4U \
+            CODE_SIGN_STYLE=Manual \
+            PROVISIONING_PROFILE=7d0550e1-9670-47a2-b6b4-e9ae067af02a
+      
+          echo "✅ Xcode Team ID et signature configurés avec succès !"
+        
         
       - name: Install CocoaPods dependencies
         run: |
@@ -58,24 +71,6 @@ jobs:
           pod repo update
           pod install --verbose
           cd ..
-
-      - name: Décrypter et vérifier le Provisioning Profile
-        run: |
-            echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > provisioning.mobileprovision
-            ls -la  # Vérifie si le fichier est bien créé
-            file provisioning.mobileprovision  # Vérifie son type
-  
-      - name: Copier le Provisioning Profile dans Xcode
-        run: |
-            mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-            cp provisioning.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
-            echo "✅ Provisioning profile copied successfully!"
-        
-      - name: List Installed Provisioning Profiles
-        run: |
-            security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep UUID
-          
-  
 
       - name: Import certificate
         run: |
