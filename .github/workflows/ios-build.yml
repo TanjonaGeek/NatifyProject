@@ -75,53 +75,21 @@ jobs:
             mkdir -p assets/credentials
             echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > assets/credentials/service_account_key.json
       
-          
-      
-      # - name: Setup Provisioning Profile
-      #   run: |
-      #         mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-      #         if [ -f provisioning.mobileprovision ]; then
-      #           cp provisioning.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
-      #           echo "Provisioning profile copied successfully!"
-      #         else
-      #           echo "ERROR: provisioning.mobileprovision not found!"
-      #           exit 1
-      #         fi
-          
-    
-  
-      # - name: Inject Provisioning Profile in Xcode Project
-      #   run: |
-      #     if grep -q "isa = PBXProject;" ios/Runner.xcodeproj/project.pbxproj; then
-      #       sed -i '' 's/isa = PBXProject;/isa = PBXProject; PROVISIONING_PROFILE_SPECIFIER = "profile.mobileprovision";/' ios/Runner.xcodeproj/project.pbxproj
-      #     else
-      #       echo "Erreur: PBXProject non trouvé dans project.pbxproj"
-      #     fi
-      #     cat ios/Runner.xcodeproj/project.pbxproj | grep PROVISIONING_PROFILE_SPECIFIER
-
-      
-      - name: Set Development Team in Xcode project
+      - name: Install Xcode Command Line Tools
         run: |
-            cd ios
-            xcodebuild -project Runner.xcodeproj -target Runner -configuration Release \
-            CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM=9PW89SQJ4U
-            cd ..
-            
-        
-      # - name: Inject Development Team in Xcode project
-      #   run: |
-      #       sed -i '' 's/DEVELOPMENT_TEAM = ""; /DEVELOPMENT_TEAM = "9PW89SQJ4U"; /g' ios/Runner.xcodeproj/project.pbxproj
-      #       cat ios/Runner.xcodeproj/project.pbxproj | grep DEVELOPMENT_TEAM
+          sudo xcode-select --install || echo "Xcode command line tools already installed"
+      
+      - name: Set Development Team ID in Xcode project
+        run: |
+          xcodebuild -project ios/Runner.xcodeproj \
+            -scheme Runner \
+            -destination 'generic/platform=iOS' \
+            DEVELOPMENT_TEAM=9PW89SQJ4U \
+            CODE_SIGN_STYLE=Manual \
+            PROVISIONING_PROFILE_SPECIFIER=Natify_Provisioning_Profile
 
-      # - name: Set Code Signing and Provisioning Profile
-      #   run: |
-      #     cd ios
-      #     xcodebuild -project Runner.xcodeproj -target Runner -configuration Release \
-      #     CODE_SIGN_STYLE=Manual \
-      #     DEVELOPMENT_TEAM=9PW89SQJ4U \
-      #     PROVISIONING_PROFILE_SPECIFIER="profile.mobileprovision" \
-      #     CODE_SIGN_IDENTITY="Apple Distribution"
-      #     cd ..
+          echo "✅ Xcode Team ID et signature configurés !"
+
 
       - name: Build iOS
         run: flutter build ipa --release
