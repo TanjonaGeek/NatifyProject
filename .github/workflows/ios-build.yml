@@ -101,6 +101,8 @@ jobs:
               echo "❌ ERREUR : Aucun certificat trouvé dans le provisioning profile !"
               exit 1
             fi
+
+            
         
             # Convertir le certificat en format PEM
             echo "$CERT_BASE64" | base64 --decode > developer_cert.der
