@@ -86,16 +86,26 @@ jobs:
       
       - name: Extract Provisioning Profile Certificate Fingerprint
         run: |
-            security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | \
-            awk -F '[<>]' '/<key>DeveloperCertificates<\/key>/ {getline; print $3}' | base64 --decode | \
-            openssl x509 -inform DER -noout -fingerprint -sha1
+            echo "🔍 Extraction du certificat depuis le Provisioning Profile"
+            
+            # Extraire le fichier .mobileprovision
+            PROFILE_PATH=$(ls ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | head -n 1)
+            echo "📂 Profil utilisé : $PROFILE_PATH"
+            
+            # Extraire et décoder les certificats du profil
+            security cms -D -i "$PROFILE_PATH" > decoded_profile.plist
+            CERT_BASE64=$(plutil -extract DeveloperCertificates.0 xml1 -o - decoded_profile.plist | sed -n 's/.*<data>\(.*\)<\/data>.*/\1/p' | tr -d '\n')
         
-
-      - name: Extract Provisioning Profile Certificate Fingerprint
-        run: |
-            security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | \
-            awk -F '[<>]' '/<key>DeveloperCertificates<\/key>/ {getline; print $3}' | base64 --decode | \
-            openssl x509 -inform DER -noout -fingerprint -sha1
+            # Vérifier si on a bien récupéré un certificat
+            if [ -z "$CERT_BASE64" ]; then
+              echo "❌ ERREUR : Aucun certificat trouvé dans le provisioning profile !"
+              exit 1
+            fi
+        
+            # Convertir le certificat en format PEM
+            echo "$CERT_BASE64" | base64 --decode > developer_cert.der
+            openssl x509 -inform DER -in developer_cert.der -noout -fingerprint -sha1
+        
         
         
           
