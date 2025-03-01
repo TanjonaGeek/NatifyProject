@@ -107,12 +107,12 @@ jobs:
           PROFILE_NAME=$(ls ~/Library/MobileDevice/Provisioning\ Profiles/ | head -n 1 | sed 's/.mobileprovision//')
           echo "Using provisioning profile: $PROFILE_NAME"
           
-          # xcodebuild -project ios/Runner.xcodeproj \
-          #   -scheme Runner \
-          #   -destination 'generic/platform=iOS' \
-          #   CODE_SIGN_STYLE=Manual \
-          #   DEVELOPMENT_TEAM=9PW89SQJ4U \
-          #   PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME"
+          xcodebuild -project ios/Runner.xcodeproj \
+            -scheme Runner \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGN_STYLE=Manual \
+            DEVELOPMENT_TEAM=9PW89SQJ4U \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME"
  
 
       - name: Install CocoaPods dependencies
