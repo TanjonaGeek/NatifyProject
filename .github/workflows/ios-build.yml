@@ -102,13 +102,13 @@ jobs:
       - name: Verify Code Signing Identity
         run: security find-identity -v -p codesigning
 
-      - name: Get Correct Provisioning Profile Name
+      - name: List Available Provisioning Profiles and Team IDs
         run: |
-          PROFILE_PATH=$(ls ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | head -n 1)
-          PROFILE_NAME=$(basename "$PROFILE_PATH" .mobileprovision)
-          echo "🔍 Using provisioning profile: $PROFILE_NAME"
-          echo "PROFILE_NAME=$PROFILE_NAME" >> $GITHUB_ENV
-
+          for profile in ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision; do
+            echo "🔍 Checking profile: $profile"
+            security cms -D -i "$profile" | plutil -extract TeamIdentifier xml1 -o - - | grep -A 1 "<array>" | tail -n 1
+          done
+      
       
       - name: Apply Provisioning Profile in Xcode
         run: |
