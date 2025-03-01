@@ -20,6 +20,7 @@ import 'package:get_it/get_it.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+// com.natify.natifyapp
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
