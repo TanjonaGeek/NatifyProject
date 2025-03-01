@@ -118,12 +118,23 @@ jobs:
       
       - name: Apply Provisioning Profile in Xcode
         run: |
-          xcodebuild -project ios/Runner.xcodeproj \
-            -scheme Runner \
-            -destination 'generic/platform=iOS' \
-            CODE_SIGN_STYLE=Manual \
-            DEVELOPMENT_TEAM=9PW89SQJ4U \
-            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME"
+          # xcodebuild -project ios/Runner.xcodeproj \
+          #   -scheme Runner \
+          #   -destination 'generic/platform=iOS' \
+          #   CODE_SIGN_STYLE=Manual \
+          #   DEVELOPMENT_TEAM=9PW89SQJ4U \
+          #   PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME"
+
+          xcodebuild clean build \
+          -workspace ios/Runner.xcworkspace \
+          -scheme Runner \
+          -sdk iphoneos \
+          -configuration Release \
+          -allowProvisioningUpdates \
+          -destination generic/platform=iOS \
+          CODE_SIGN_STYLE=Manual \
+          PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
+          DEVELOPMENT_TEAM=9PW89SQJ4U
  
 
       - name: Install CocoaPods dependencies
