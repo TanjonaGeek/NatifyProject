@@ -29,6 +29,26 @@ jobs:
           cat Podfile  # Affiche le fichier Podfile pour vérification
           cd ..
 
+
+      - name: Set up Xcode tools
+        run: |
+          sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+          sudo xcodebuild -license accept
+
+      - name: Set up certificates and provisioning profiles
+        env:
+          CERTIFICATE_P12: secrets.IOS_CERTIFICATE_BASE64
+          CERTIFICATE_PASSWORD: secrets.IOS_CERTIFICATE_PASSWORD
+          TEAM_ID: 9PW89SQJ4U  # Utiliser le secret pour le Team ID
+        run: |
+          # Crée un répertoire pour les certificats et profils
+          # mkdir -p ~/certs
+
+      - name: Set Team ID in Xcode project
+        run: |
+          # Met à jour le fichier .xcodeproj pour inclure le Team ID automatiquement
+          sed -i ” "s/DEVELOPMENT_TEAM = ;/DEVELOPMENT_TEAM =9PW89SQJ4U;/" ios/Runner.xcodeproj/project.pbxproj
+
       - name: Import certificate
         run: |
           echo "${{ secrets.IOS_CERTIFICATE_BASE64 }}" | base64 --decode > certificate.p12
@@ -60,71 +80,7 @@ jobs:
               mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
               cp provisioning.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
               echo "✅ Provisioning profile copied successfully!"
-          
-      - name: List Installed Provisioning Profiles
-        run: |
-          echo "📂 Liste des fichiers dans ~/Library/MobileDevice/Provisioning Profiles/"
-          ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
-      
-          echo "🔍 Détails du provisioning profile"
-          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep -A2 '<key>UUID</key>'
-      
-      - name: Debug Provisioning Profile Certificate
-        run: |
-          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep -A5 '<key>DeveloperCertificates</key>'
-      
-
-      - name: Check Installed Certificates
-        run: |
-          echo "🔍 Vérification des certificats installés"
-          security find-identity -v -p codesigning
-      
-      - name: Extract Installed Certificate Fingerprint
-        run: |
-          security find-certificate -a -p | openssl x509 -inform PEM -noout -fingerprint -sha1
-
-      
-      - name: Extract Provisioning Profile Certificate Fingerprint
-        run: |
-            echo "🔍 Extraction du certificat depuis le Provisioning Profile"
-            
-            # Extraire le fichier .mobileprovision
-            PROFILE_PATH=$(ls ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | head -n 1)
-            echo "📂 Profil utilisé : $PROFILE_PATH"
-            
-            # Extraire et décoder les certificats du profil
-            security cms -D -i "$PROFILE_PATH" > decoded_profile.plist
-            CERT_BASE64=$(plutil -extract DeveloperCertificates.0 xml1 -o - decoded_profile.plist | sed -n 's/.*<data>\(.*\)<\/data>.*/\1/p' | tr -d '\n')
-        
-            # Vérifier si on a bien récupéré un certificat
-            if [ -z "$CERT_BASE64" ]; then
-              echo "❌ ERREUR : Aucun certificat trouvé dans le provisioning profile !"
-              exit 1
-            fi
-
-            
-        
-            # Convertir le certificat en format PEM
-            echo "$CERT_BASE64" | base64 --decode > developer_cert.der
-            openssl x509 -inform DER -in developer_cert.der -noout -fingerprint -sha1
-        
-        
-        
-          
-      - name: Set Development Team and Profile in Xcode
-        run: |
-          echo "🔍 Utilisation du Provisioning Profile UUID : 7d0550e1-9670-47a2-b6b4-e9ae067af02a"
-      
-          xcodebuild -project ios/Runner.xcodeproj \
-            -scheme Runner \
-            -destination 'generic/platform=iOS' \
-            DEVELOPMENT_TEAM=9PW89SQJ4U \
-            CODE_SIGN_STYLE=Manual \
-            PROVISIONING_PROFILE=7d0550e1-9670-47a2-b6b4-e9ae067af02a
-      
-          echo "✅ Xcode Team ID et signature configurés avec succès !"
-        
-        
+ 
       - name: Install CocoaPods dependencies
         run: |
           cd ios
