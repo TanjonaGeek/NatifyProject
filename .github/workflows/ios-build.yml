@@ -95,13 +95,16 @@ jobs:
 
       - name: Set Correct Provisioning Profile Name and UUID
         run: |
-          PROFILE_PATH=$(ls ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | head -n 1)
-          PROFILE_NAME=$(security cms -D -i "$PROFILE_PATH" | plutil -extract Name xml1 -o - - | sed 's/<string>//g' | sed 's/<\/string>//g' | tr -d ' ')
-          PROFILE_UUID=$(security cms -D -i "$PROFILE_PATH" | plutil -extract UUID xml1 -o - - | sed 's/<string>//g' | sed 's/<\/string>//g' | tr -d ' ')
-          echo "✅ Using provisioning profile: $PROFILE_NAME (UUID: $PROFILE_UUID)"
-          echo "PROFILE_NAME=$PROFILE_NAME" >> $GITHUB_ENV
-          echo "PROFILE_UUID=$PROFILE_UUID" >> $GITHUB_ENV
-
+              PROFILE_PATH=$(ls ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | head -n 1)
+              
+              PROFILE_NAME=$(security cms -D -i "$PROFILE_PATH" | grep -A1 '<key>Name</key>' | tail -n 1 | sed 's/<string>//g' | sed 's/<\/string>//g' | tr -d ' ')
+              
+              PROFILE_UUID=$(security cms -D -i "$PROFILE_PATH" | grep -A1 '<key>UUID</key>' | tail -n 1 | sed 's/<string>//g' | sed 's/<\/string>//g' | tr -d ' ')
+          
+              echo "✅ Using provisioning profile: $PROFILE_NAME (UUID: $PROFILE_UUID)"
+              echo "PROFILE_NAME=$PROFILE_NAME" >> $GITHUB_ENV
+              echo "PROFILE_UUID=$PROFILE_UUID" >> $GITHUB_ENV
+          
       - name: Inject Provisioning Profile into Xcode Project
         run: |
           sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = "[^"]*"/PROVISIONING_PROFILE_SPECIFIER = "$(PROFILE_NAME)"/g' ios/Runner.xcodeproj/project.pbxproj
