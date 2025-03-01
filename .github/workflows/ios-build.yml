@@ -118,9 +118,6 @@ jobs:
       
       - name: Apply Provisioning Profile in Xcode
         run: |
-          PROFILE_NAME=$(ls ~/Library/MobileDevice/Provisioning\ Profiles/ | head -n 1 | sed 's/.mobileprovision//')
-          echo "Using provisioning profile: $PROFILE_NAME"
-          
           xcodebuild -project ios/Runner.xcodeproj \
             -scheme Runner \
             -destination 'generic/platform=iOS' \
