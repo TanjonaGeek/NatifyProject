@@ -75,18 +75,24 @@ jobs:
               cp provisioning.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
               echo "✅ Provisioning profile copied successfully!"
       
-      - name: Configure Xcode Signing
+      - name: Ensure Xcode project has a DEVELOPMENT_TEAM
         run: |
-            /usr/libexec/PlistBuddy -c "Set :DEVELOPMENT_TEAM 9PW89SQJ4U" "ios/Runner.xcodeproj/project.pbxproj" || echo "PlistBuddy update failed"
-            /usr/libexec/PlistBuddy -c "Print" "ios/Runner.xcodeproj/project.pbxproj" | grep DEVELOPMENT_TEAM || echo "No DEVELOPMENT_TEAM found"
-            
+          if ! grep -q "DEVELOPMENT_TEAM" ios/Runner.xcodeproj/project.pbxproj; then
+            echo "No DEVELOPMENT_TEAM found, adding it..."
+            sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;\n    DEVELOPMENT_TEAM = 9PW89SQJ4U;/g' ios/Runner.xcodeproj/project.pbxproj
+          else
+            echo "DEVELOPMENT_TEAM already exists."
+          fi
+          cat ios/Runner.xcodeproj/project.pbxproj | grep DEVELOPMENT_TEAM || echo "Still no DEVELOPMENT_TEAM found"
+      
       - name: Enable Automatic Signing
         run: |
-            xcodebuild -project ios/Runner.xcodeproj \
-            -scheme Runner \
-            -destination 'generic/platform=iOS' \
-            CODE_SIGN_STYLE=Automatic \
-            DEVELOPMENT_TEAM=9PW89SQJ4U
+          xcodebuild -project ios/Runner.xcodeproj \
+          -scheme Runner \
+          -destination 'generic/platform=iOS' \
+          -allowProvisioningUpdates \
+          CODE_SIGN_STYLE=Automatic \
+          DEVELOPMENT_TEAM=9PW89SQJ4U
 
 
       - name: Verify Code Signing Identity
