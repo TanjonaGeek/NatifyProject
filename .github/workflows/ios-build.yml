@@ -37,6 +37,12 @@ jobs:
         run: |
           sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
           sudo xcodebuild -license accept
+        
+      - name: Reset Xcode Signing Settings
+        run: |
+          rm -rf ~/Library/Developer/Xcode/DerivedData
+          rm -rf ~/Library/MobileDevice/Provisioning\ Profiles/*
+          echo "✅ Reset Xcode derived data and provisioning profiles"
 
       - name: Import certificate
         env:
@@ -74,68 +80,52 @@ jobs:
               mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
               cp provisioning.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
               echo "✅ Provisioning profile copied successfully!"
+
       
-
-      # - name: Ensure Xcode project has a DEVELOPMENT_TEAM
-      #   run: |
-      #         if ! grep -q "DEVELOPMENT_TEAM" ios/Runner.xcodeproj/project.pbxproj; then
-      #           echo "No DEVELOPMENT_TEAM found, adding it..."
-      #           sed -i '' '/CODE_SIGN_STYLE = Automatic;/a\
-      #           DEVELOPMENT_TEAM = 9PW89SQJ4U;' ios/Runner.xcodeproj/project.pbxproj
-      #         else
-      #           echo "DEVELOPMENT_TEAM already exists."
-      #         fi
-      #         cat ios/Runner.xcodeproj/project.pbxproj | grep DEVELOPMENT_TEAM || echo "Still no DEVELOPMENT_TEAM found"
-            
+      - name: Verify Installed Provisioning Profiles
+        run: |
+            echo "🔍 Listing all provisioning profiles..."
+            ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
+            for profile in ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision; do
+              echo "🔍 Checking profile: $profile"
+              security cms -D -i "$profile" | plutil -extract Name xml1 -o - - | sed 's/<string>//g' | sed 's/<\/string>//g' | tr -d ' '
+              security cms -D -i "$profile" | plutil -extract TeamIdentifier xml1 -o - - | grep -A 1 "<array>" | tail -n 1
+            done
 
 
-      # - name: Enable Automatic Signing
-      #   run: |
-      #     xcodebuild -project ios/Runner.xcodeproj \
-      #     -scheme Runner \
-      #     -destination 'generic/platform=iOS' \
-      #     -allowProvisioningUpdates \
-      #     CODE_SIGN_STYLE=Automatic \
-      #     DEVELOPMENT_TEAM=9PW89SQJ4U
+      - name: Set Correct Provisioning Profile Name and UUID
+        run: |
+          PROFILE_PATH=$(ls ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | head -n 1)
+          PROFILE_NAME=$(security cms -D -i "$PROFILE_PATH" | plutil -extract Name xml1 -o - - | sed 's/<string>//g' | sed 's/<\/string>//g' | tr -d ' ')
+          PROFILE_UUID=$(security cms -D -i "$PROFILE_PATH" | plutil -extract UUID xml1 -o - - | sed 's/<string>//g' | sed 's/<\/string>//g' | tr -d ' ')
+          echo "✅ Using provisioning profile: $PROFILE_NAME (UUID: $PROFILE_UUID)"
+          echo "PROFILE_NAME=$PROFILE_NAME" >> $GITHUB_ENV
+          echo "PROFILE_UUID=$PROFILE_UUID" >> $GITHUB_ENV
 
-
+      - name: Inject Provisioning Profile into Xcode Project
+        run: |
+          sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = "[^"]*"/PROVISIONING_PROFILE_SPECIFIER = "$(PROFILE_NAME)"/g' ios/Runner.xcodeproj/project.pbxproj
+          sed -i '' 's/PROVISIONING_PROFILE = "[^"]*"/PROVISIONING_PROFILE = "$(PROFILE_UUID)"/g' ios/Runner.xcodeproj/project.pbxproj
+          sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' ios/Runner.xcodeproj/project.pbxproj
+          echo "✅ Updated project.pbxproj with correct provisioning profile and manual signing"
+        
+          
+      
       - name: Verify Code Signing Identity
         run: security find-identity -v -p codesigning
 
-      - name: List Available Provisioning Profiles and Team IDs
-        run: |
-          for profile in ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision; do
-            echo "🔍 Checking profile: $profile"
-            security cms -D -i "$profile" | plutil -extract TeamIdentifier xml1 -o - - | grep -A 1 "<array>" | tail -n 1
-          done
-      
-      - name: Set Provisioning Profile Name
-        run: |
-          PROFILE_NAME="provisioning"
-          echo "✅ Using provisioning profile: $PROFILE_NAME"
-          echo "PROFILE_NAME=$PROFILE_NAME" >> $GITHUB_ENV
-        
-      
-      - name: Apply Provisioning Profile in Xcode
-        run: |
-          # xcodebuild -project ios/Runner.xcodeproj \
-          #   -scheme Runner \
-          #   -destination 'generic/platform=iOS' \
-          #   CODE_SIGN_STYLE=Manual \
-          #   DEVELOPMENT_TEAM=9PW89SQJ4U \
-          #   PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME"
 
-          xcodebuild clean build \
-          -workspace ios/Runner.xcworkspace \
-          -scheme Runner \
-          -sdk iphoneos \
-          -configuration Release \
-          -allowProvisioningUpdates \
-          -destination generic/platform=iOS \
-          CODE_SIGN_STYLE=Manual \
-          PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
-          DEVELOPMENT_TEAM=9PW89SQJ4U
- 
+      - name: Apply Correct Provisioning Profile in Xcode
+        run: |
+          xcodebuild clean -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release
+          xcodebuild -project ios/Runner.xcodeproj \
+            -scheme Runner \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGN_STYLE=Manual \
+            DEVELOPMENT_TEAM=9PW89SQJ4U \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
+            PROVISIONING_PROFILE="$PROFILE_UUID"
+
 
       - name: Install CocoaPods dependencies
         run: |
