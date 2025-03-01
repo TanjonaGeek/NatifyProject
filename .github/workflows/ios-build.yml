@@ -101,6 +101,14 @@ jobs:
 
       - name: Verify Code Signing Identity
         run: security find-identity -v -p codesigning
+
+      - name: Get Correct Provisioning Profile Name
+        run: |
+          PROFILE_PATH=$(ls ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | head -n 1)
+          PROFILE_NAME=$(basename "$PROFILE_PATH" .mobileprovision)
+          echo "🔍 Using provisioning profile: $PROFILE_NAME"
+          echo "PROFILE_NAME=$PROFILE_NAME" >> $GITHUB_ENV
+
       
       - name: Apply Provisioning Profile in Xcode
         run: |
