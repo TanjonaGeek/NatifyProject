@@ -109,6 +109,12 @@ jobs:
             security cms -D -i "$profile" | plutil -extract TeamIdentifier xml1 -o - - | grep -A 1 "<array>" | tail -n 1
           done
       
+      - name: Set Provisioning Profile Name
+        run: |
+          PROFILE_NAME="provisioning"
+          echo "✅ Using provisioning profile: $PROFILE_NAME"
+          echo "PROFILE_NAME=$PROFILE_NAME" >> $GITHUB_ENV
+        
       
       - name: Apply Provisioning Profile in Xcode
         run: |
