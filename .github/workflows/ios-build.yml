@@ -109,9 +109,9 @@ jobs:
             -destination 'generic/platform=iOS' \
             -allowProvisioningUpdates \
             DEVELOPMENT_TEAM=9PW89SQJ4U \
-            CODE_SIGN_STYLE=Automatic
+            CODE_SIGN_STYLE=Manual 
  
-            
+
       - name: Install CocoaPods dependencies
         run: |
           cd ios
