@@ -44,7 +44,7 @@ jobs:
           rm -rf ~/Library/MobileDevice/Provisioning\ Profiles/*
           echo "✅ Reset Xcode derived data and provisioning profiles"
 
-      - name: Import certificate
+      - name: Import certificates
         env:
           CERTIFICATE_P12: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
           CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
