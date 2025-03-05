@@ -26,7 +26,18 @@ default_platform(:ios)
 platform :ios do
   desc "Build iOS App"
   lane :build do
-    gym(scheme: "NatifyApp", export_method: "app-store")
+    gym(
+      scheme: "Runner",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "com.natify.natifyapp" => "match AppStore com.natify.natifyapp"
+        },
+        signingStyle: "automatic",
+        teamID: "9PW89SQJ4U" # Remplace par ton Team ID Apple Developer
+      }
+    )
   end
 end
+
 
