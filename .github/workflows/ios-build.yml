@@ -22,6 +22,7 @@ jobs:
       - name: Install Fastlane
         run: gem install fastlane
       
+      
       - name: Create and Configure Keychain
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
@@ -31,8 +32,17 @@ jobs:
           security list-keychains -s build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "$MATCH_PASSWORD" build.keychain
+          
+          echo "📥 Importation du certificat .p12"
+          security import ~/Library/MobileDevice/Provisioning\ Profiles/distribution.p12 -k build.keychain -P "$MATCH_PASSWORD" -T /usr/bin/codesign
+          
+          echo "📥 Importation du certificat .cer"
+          security import ~/Library/MobileDevice/Provisioning\ Profiles/distribution.cer -k build.keychain -T /usr/bin/codesign
 
-          echo "✅ Keychain configuré avec succès"
+          echo "✅ Vérification des identités installées"
+          security find-identity -v -p codesigning
+
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$MATCH_PASSWORD" build.keychain
 
       - name: Fetch Certificates via Match
         env:
@@ -43,7 +53,7 @@ jobs:
           fastlane match appstore --keychain_name build.keychain --keychain_password "$MATCH_PASSWORD"  # Exécute Match sur MacOS uniquement
 
 
-          
+
       - name: Install dependencies
         run: flutter pub get
       
