@@ -1,0 +1,79 @@
+voila le resultat de l'etape
+# 1️⃣ Création et configuration du keychain AVANT Fastlane Match
+
+Run echo "Suppression des anciens keychains"
+  echo "Suppression des anciens keychains"
+  security delete-keychain build.keychain || true
+  
+  echo "Création et configuration d'un keychain temporaire"
+  security create-keychain -p "$MATCH_PASSWORD" build.keychain
+  security default-keychain -s build.keychain
+  security unlock-keychain -p "$MATCH_PASSWORD" build.keychain
+  security set-keychain-settings -lut 21600 build.keychain
+  
+  echo "Keychain configuré avec succès"
+  shell: /bin/bash -e ***0***
+  env:
+    FLUTTER_ROOT: /Users/runner/hostedtoolcache/flutter/stable-3.27.3-arm64
+    PUB_CACHE: /Users/runner/.pub-cache
+    MATCH_PASSWORD: ***
+    Suppression des anciens keychains
+security: SecKeychainDelete: The specified keychain could not be found.
+    Création et configuration d'un keychain temporaire
+    Keychain configuré avec succès
+
+ # 2️⃣ Téléchargement des certificats via Fastlane Match en forçant l'utilisation du keychain
+
+[13:07:54]: Installing certificate...
+[13:07:55]: There are no local code signing identities found.
+You can run `security find-identity -v -p codesigning /Users/runner/Library/Keychains/build.keychain-db` to get this output.
+This Stack Overflow thread has more information: https://stackoverflow.com/q/35390072/774.
+(Check in Keychain Access for an expired WWDR certificate: https://stackoverflow.com/a/35409835/774 has more info.)
+[13:07:55]: Setting key partition list... (this can take a minute if there are a lot of keys installed)
+[13:07:56]: security: SecItemCopyMatching: The specified item could not be found in the keychain.
+
+# 3️⃣ Vérification des fichiers téléchargés (Debug)
+
+Run echo "Vérification des certificats téléchargés"
+  echo "Vérification des certificats téléchargés"
+  ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
+  ls -la ~/Library/Keychains/
+  shell: /bin/bash -e ***0***
+  env:
+    FLUTTER_ROOT: /Users/runner/hostedtoolcache/flutter/stable-3.27.3-arm64
+    PUB_CACHE: /Users/runner/.pub-cache
+    Vérification des certificats téléchargés
+total 32
+drwxr-xr-x  3 runner  staff     96 Mar  5 13:07 .
+drwxr-xr-x  3 runner  staff     96 Mar  5 13:07 ..
+-rw-r--r--  1 runner  staff  12394 Mar  5 13:07 72a2f5b9-0ebe-475d-8b4c-161e1270afbb.mobileprovision
+total 176
+drwx--x--x   7 runner  staff    224 Mar  5 13:07 .
+drwx------@ 81 runner  staff   2592 Mar  5 13:07 ..
+-r--r--r--   1 runner  staff      0 Mar  5 13:07 .fl1C67CD18
+-r--r--r--   1 runner  staff      0 Jan 20 03:51 .fl34AC2A0A
+drwx------   6 runner  staff    192 Mar  5 12:59 580DF914-427B-59B9-8058-0678C25B0FB6
+-rw-r--r--   1 runner  staff  44744 Mar  5 13:07 build.keychain-db
+-rw-r--r--   1 runner  staff  42780 Mar  5 13:04 login.keychain-db
+
+# 4️⃣ Vérification des identités de signature (Debug)
+Run echo "Vérification des identités de signature installées"
+  echo "Vérification des identités de signature installées"
+  security find-identity -v -p codesigning build.keychain
+  shell: /bin/bash -e ***0***
+  env:
+    FLUTTER_ROOT: /Users/runner/hostedtoolcache/flutter/stable-3.27.3-arm64
+    PUB_CACHE: /Users/runner/.pub-cache
+  Vérification des identités de signature installées
+  1) 4A9A7EB7F06C9EDE0E2B79EAAE197F540FEAD0D6 "Apple Distribution: Sitrakiniaina Thomas Rakotonaivo (9PW89SQJ4U)"
+     1 valid identities found
+
+# 5️⃣ Rechargement des identités de signature (pour s'assurer qu'elles sont prises en compte)
+Run echo "Rechargement des identités de signature"
+  echo "Rechargement des identités de signature"
+  sudo killall -HUP syspolicyd
+  shell: /bin/bash -e ***0***
+  env:
+    FLUTTER_ROOT: /Users/runner/hostedtoolcache/flutter/stable-3.27.3-arm64
+    PUB_CACHE: /Users/runner/.pub-cache
+  Rechargement des identités de signature
