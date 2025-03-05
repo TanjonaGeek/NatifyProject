@@ -20,8 +20,13 @@ jobs:
           cache: true
       - name: Install Fastlane
         run: gem install fastlane
-      - name: Run Fastlane Match
-        run: fastlane match appstore
+      - name: Fetch Certificates via Match
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        run: |
+          cd ios
+          fastlane match appstore  # Exécute Match sur MacOS uniquement
+
 
       - name: Install dependencies
         run: flutter pub get
