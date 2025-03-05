@@ -21,6 +21,19 @@ jobs:
 
       - name: Install Fastlane
         run: gem install fastlane
+      
+      - name: Create and Configure Keychain
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        run: |
+          echo "🔑 Création d'un keychain temporaire"
+          security create-keychain -p "$MATCH_PASSWORD" build.keychain
+          security list-keychains -s build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$MATCH_PASSWORD" build.keychain
+
+          echo "✅ Keychain configuré avec succès"
+
       - name: Fetch Certificates via Match
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
@@ -56,18 +69,6 @@ jobs:
             mkdir -p assets/credentials
             echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > assets/credentials/service_account_key.json
       
-      - name: Install Certificates in Keychain
-        run: |
-          security create-keychain -p "" build.keychain
-          security list-keychains -s build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "" build.keychain
-          security import ~/Library/Keychains/login.keychain-db -k build.keychain -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
-
-      - name: Debug Vérifier les certificats téléchargés
-        run: ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
-
       - name: Build iOS App
         run: |
             cd ios

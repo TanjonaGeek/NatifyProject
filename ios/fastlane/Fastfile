@@ -21,7 +21,12 @@ default_platform(:ios)
 platform :ios do
   desc "Build iOS App"
   lane :build do
-    match(type: "appstore", readonly: false, force_for_new_devices: true)
+    match(
+      type: "appstore",
+      readonly: false,
+      keychain_name: "build.keychain",
+      keychain_password: ENV['MATCH_PASSWORD']
+    )
 
     gym(
       scheme: "Runner",
@@ -36,5 +41,6 @@ platform :ios do
     )
   end
 end
+
 
 
