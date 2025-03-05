@@ -1,5 +1,5 @@
 # Congrulations03476!
-git_url("https://${ENV['MATCH_GIT_TOKEN']}@github.com/TanjonaGeek/natify-certificat.git")
+git_url("https://${MATCH_GIT_TOKEN}@github.com/TanjonaGeek/natify-certificat.git")
 
 storage_mode("git") # On utilise GitHub pour stocker les certificats
 
