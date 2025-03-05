@@ -27,22 +27,16 @@ jobs:
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         run: |
-          echo "🔑 Création d'un keychain temporaire"
+          echo "🚀 Suppression des anciens keychains"
+          security delete-keychain build.keychain || true
+
+          echo "🔑 Création et configuration d'un keychain temporaire"
           security create-keychain -p "$MATCH_PASSWORD" build.keychain
-          security list-keychains -s build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "$MATCH_PASSWORD" build.keychain
-          
-          echo "📥 Importation du certificat .p12"
-          security import ~/Library/MobileDevice/Provisioning\ Profiles/distribution.p12 -k build.keychain -P "$MATCH_PASSWORD" -T /usr/bin/codesign
-          
-          echo "📥 Importation du certificat .cer"
-          security import ~/Library/MobileDevice/Provisioning\ Profiles/distribution.cer -k build.keychain -T /usr/bin/codesign
+          security set-keychain-settings -lut 21600 build.keychain
 
-          echo "✅ Vérification des identités installées"
-          security find-identity -v -p codesigning
-
-          security set-key-partition-list -S apple-tool:,apple: -s -k "$MATCH_PASSWORD" build.keychain
+          echo "✅ Keychain configuré avec succès"
 
       - name: Fetch Certificates via Match
         env:
@@ -52,6 +46,17 @@ jobs:
           cd ios
           fastlane match appstore --keychain_name build.keychain --keychain_password "$MATCH_PASSWORD"  # Exécute Match sur MacOS uniquement
 
+       # 3️⃣ Vérification des fichiers téléchargés (Debug)
+      - name: Vérifier les fichiers téléchargés
+        run: |
+          echo "🔍 Vérification des certificats téléchargés"
+          ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
+
+     # 4️⃣ Vérification des identités de signature (Debug)
+      - name: Vérifier les identités de signature
+        run: |
+          echo "🔍 Vérification des identités de signature installées"
+          security find-identity -v -p codesigning build.keychain
 
 
       - name: Install dependencies
