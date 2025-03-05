@@ -50,13 +50,11 @@ jobs:
           security default-keychain -s build.keychain
           security unlock-keychain -p "$MATCH_PASSWORD" build.keychain
 
-          echo "✅ Ajout des permissions pour la signature"
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MATCH_PASSWORD" build.keychain
-
-
           echo "🚀 Exécution de Fastlane Match"
           bundle install
           bundle exec fastlane match appstore --keychain_name build.keychain --keychain_password "$MATCH_PASSWORD"
+          echo "✅ Ajout des permissions pour la signature"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MATCH_PASSWORD" build.keychain
 
       # 3️⃣ Vérification des fichiers téléchargés (Debug)
       - name: Vérifier les fichiers téléchargés
