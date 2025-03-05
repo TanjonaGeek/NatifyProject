@@ -25,7 +25,7 @@ jobs:
         run: |
             if [ -z "$MATCH_GIT_TOKEN" ]; then echo "❌ MATCH_GIT_TOKEN n'est pas chargé"; exit 1; fi
             echo "✅ MATCH_GIT_TOKEN est chargé (masqué pour la sécurité)"
-            
+
       - name: Install Fastlane
         run: gem install fastlane
       - name: Fetch Certificates via Match
@@ -51,103 +51,103 @@ jobs:
           cd ..
 
 
-      - name: Set up Xcode tools
-        run: |
-          sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
-          sudo xcodebuild -license accept
+      # - name: Set up Xcode tools
+      #   run: |
+      #     sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+      #     sudo xcodebuild -license accept
         
-      - name: Reset Xcode Signing Settings
-        run: |
-          rm -rf ~/Library/Developer/Xcode/DerivedData
-          rm -rf ~/Library/MobileDevice/Provisioning\ Profiles/*
-          echo "✅ Reset Xcode derived data and provisioning profiles"
+      # - name: Reset Xcode Signing Settings
+      #   run: |
+      #     rm -rf ~/Library/Developer/Xcode/DerivedData
+      #     rm -rf ~/Library/MobileDevice/Provisioning\ Profiles/*
+      #     echo "✅ Reset Xcode derived data and provisioning profiles"
 
-      - name: Import certificates
-        env:
-          CERTIFICATE_P12: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
-          CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
-        run: |
-          echo "${{ secrets.IOS_CERTIFICATE_BASE64 }}" | base64 --decode > certificate.p12
-          file certificate.p12  # Vérifier que c'est bien un fichier P12
+      # - name: Import certificates
+      #   env:
+      #     CERTIFICATE_P12: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
+      #     CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+      #   run: |
+      #     echo "${{ secrets.IOS_CERTIFICATE_BASE64 }}" | base64 --decode > certificate.p12
+      #     file certificate.p12  # Vérifier que c'est bien un fichier P12
           
-          # Créer et configurer le keychain
-          security create-keychain -p "" build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "" build.keychain
+      #     # Créer et configurer le keychain
+      #     security create-keychain -p "" build.keychain
+      #     security default-keychain -s build.keychain
+      #     security unlock-keychain -p "" build.keychain
           
-          # Importer le certificat avec debug activé
-          security import certificate.p12 -k build.keychain -P "${{ secrets.IOS_CERTIFICATE_PASSWORD }}" -A -T /usr/bin/codesign -T /usr/bin/security || cat certificate.p12
+      #     # Importer le certificat avec debug activé
+      #     security import certificate.p12 -k build.keychain -P "${{ secrets.IOS_CERTIFICATE_PASSWORD }}" -A -T /usr/bin/codesign -T /usr/bin/security || cat certificate.p12
           
-          # Lister les certificats pour vérifier l'importation
-          security list-keychains -s build.keychain
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "" build.keychain
+      #     # Lister les certificats pour vérifier l'importation
+      #     security list-keychains -s build.keychain
+      #     security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "" build.keychain
   
   
       
 
-      - name: Décrypter et vérifier le Provisioning Profile
-        env:
-          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
-        run: |
-              echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > provisioning.mobileprovision
-              ls -la  # Vérifie si le fichier est bien créé
-              file provisioning.mobileprovision  # Vérifie son type
+      # - name: Décrypter et vérifier le Provisioning Profile
+      #   env:
+      #     IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+      #   run: |
+      #         echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > provisioning.mobileprovision
+      #         ls -la  # Vérifie si le fichier est bien créé
+      #         file provisioning.mobileprovision  # Vérifie son type
     
-      - name: Copier le Provisioning Profile dans Xcode
-        run: |
-              mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-              cp provisioning.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
-              echo "✅ Provisioning profile copied successfully!"
+      # - name: Copier le Provisioning Profile dans Xcode
+      #   run: |
+      #         mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+      #         cp provisioning.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+      #         echo "✅ Provisioning profile copied successfully!"
 
       
-      - name: Verify Installed Provisioning Profiles
-        run: |
-            echo "🔍 Listing all provisioning profiles..."
-            ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
-            for profile in ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision; do
-              echo "🔍 Checking profile: $profile"
-              security cms -D -i "$profile" | plutil -extract Name xml1 -o - - | sed 's/<string>//g' | sed 's/<\/string>//g' | tr -d ' '
-              security cms -D -i "$profile" | plutil -extract TeamIdentifier xml1 -o - - | grep -A 1 "<array>" | tail -n 1
-            done
+      # - name: Verify Installed Provisioning Profiles
+      #   run: |
+      #       echo "🔍 Listing all provisioning profiles..."
+      #       ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
+      #       for profile in ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision; do
+      #         echo "🔍 Checking profile: $profile"
+      #         security cms -D -i "$profile" | plutil -extract Name xml1 -o - - | sed 's/<string>//g' | sed 's/<\/string>//g' | tr -d ' '
+      #         security cms -D -i "$profile" | plutil -extract TeamIdentifier xml1 -o - - | grep -A 1 "<array>" | tail -n 1
+      #       done
 
 
-      - name: Set Correct Provisioning Profile Name and UUID
-        run: |
-              PROFILE_PATH=$(ls ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | head -n 1)
+      # - name: Set Correct Provisioning Profile Name and UUID
+      #   run: |
+      #         PROFILE_PATH=$(ls ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | head -n 1)
               
-              PROFILE_NAME=$(security cms -D -i "$PROFILE_PATH" | grep -A1 '<key>Name</key>' | tail -n 1 | sed 's/<string>//g' | sed 's/<\/string>//g' | tr -d ' ')
+      #         PROFILE_NAME=$(security cms -D -i "$PROFILE_PATH" | grep -A1 '<key>Name</key>' | tail -n 1 | sed 's/<string>//g' | sed 's/<\/string>//g' | tr -d ' ')
               
-              PROFILE_UUID=$(security cms -D -i "$PROFILE_PATH" | grep -A1 '<key>UUID</key>' | tail -n 1 | sed 's/<string>//g' | sed 's/<\/string>//g' | tr -d ' ')
+      #         PROFILE_UUID=$(security cms -D -i "$PROFILE_PATH" | grep -A1 '<key>UUID</key>' | tail -n 1 | sed 's/<string>//g' | sed 's/<\/string>//g' | tr -d ' ')
           
-              echo "✅ Using provisioning profile: $PROFILE_NAME (UUID: $PROFILE_UUID)"
-              echo "PROFILE_NAME=$PROFILE_NAME" >> $GITHUB_ENV
-              echo "PROFILE_UUID=$PROFILE_UUID" >> $GITHUB_ENV
+      #         echo "✅ Using provisioning profile: $PROFILE_NAME (UUID: $PROFILE_UUID)"
+      #         echo "PROFILE_NAME=$PROFILE_NAME" >> $GITHUB_ENV
+      #         echo "PROFILE_UUID=$PROFILE_UUID" >> $GITHUB_ENV
           
-      - name: Inject Provisioning Profile into Xcode Project
-        run: |
-          sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = "[^"]*"/PROVISIONING_PROFILE_SPECIFIER = "$(PROFILE_NAME)"/g' ios/Runner.xcodeproj/project.pbxproj
-          sed -i '' 's/PROVISIONING_PROFILE = "[^"]*"/PROVISIONING_PROFILE = "$(PROFILE_UUID)"/g' ios/Runner.xcodeproj/project.pbxproj
-          sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' ios/Runner.xcodeproj/project.pbxproj
-          echo "✅ Updated project.pbxproj with correct provisioning profile and manual signing"
+      # - name: Inject Provisioning Profile into Xcode Project
+      #   run: |
+      #     sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = "[^"]*"/PROVISIONING_PROFILE_SPECIFIER = "$(PROFILE_NAME)"/g' ios/Runner.xcodeproj/project.pbxproj
+      #     sed -i '' 's/PROVISIONING_PROFILE = "[^"]*"/PROVISIONING_PROFILE = "$(PROFILE_UUID)"/g' ios/Runner.xcodeproj/project.pbxproj
+      #     sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' ios/Runner.xcodeproj/project.pbxproj
+      #     echo "✅ Updated project.pbxproj with correct provisioning profile and manual signing"
         
           
       
-      - name: Verify Code Signing Identity
-        run: security find-identity -v -p codesigning
+      # - name: Verify Code Signing Identity
+      #   run: security find-identity -v -p codesigning
 
 
 
         
-      - name: Apply Correct Provisioning Profile in Xcode github
-        run: |
-          xcodebuild clean -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release
-          xcodebuild -project ios/Runner.xcodeproj \
-            -scheme Runner \
-            -destination 'generic/platform=iOS' \
-            CODE_SIGN_STYLE=Manual \
-            DEVELOPMENT_TEAM=9PW89SQJ4U \
-            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
-            PROVISIONING_PROFILE="$PROFILE_UUID"
+      # - name: Apply Correct Provisioning Profile in Xcode github
+      #   run: |
+      #     xcodebuild clean -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release
+      #     xcodebuild -project ios/Runner.xcodeproj \
+      #       -scheme Runner \
+      #       -destination 'generic/platform=iOS' \
+      #       CODE_SIGN_STYLE=Manual \
+      #       DEVELOPMENT_TEAM=9PW89SQJ4U \
+      #       PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
+      #       PROVISIONING_PROFILE="$PROFILE_UUID"
 
 
       - name: Install CocoaPods dependencies
@@ -183,8 +183,10 @@ jobs:
         
 
 
-      - name: Build iOS
-        run: flutter build ipa --release
+      - name: Build iOS App
+        run: |
+          cd ios
+          fastlane build
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
