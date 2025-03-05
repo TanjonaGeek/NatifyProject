@@ -18,6 +18,10 @@ jobs:
         with:
           flutter-version: 3.27.3  # Mets ta version de Flutter ici
           cache: true
+      - name: Install Fastlane
+        run: gem install fastlane
+      - name: Run Fastlane Match
+        run: fastlane match appstore
 
       - name: Install dependencies
         run: flutter pub get
