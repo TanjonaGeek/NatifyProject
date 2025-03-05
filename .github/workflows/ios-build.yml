@@ -18,6 +18,14 @@ jobs:
         with:
           flutter-version: 3.27.3  # Mets ta version de Flutter ici
           cache: true
+      
+      - name: Debug Vérifier que MATCH_GIT_TOKEN est bien chargé
+        env:
+            MATCH_GIT_TOKEN: ${{ secrets.MATCH_GIT_TOKEN }}
+        run: |
+            if [ -z "$MATCH_GIT_TOKEN" ]; then echo "❌ MATCH_GIT_TOKEN n'est pas chargé"; exit 1; fi
+            echo "✅ MATCH_GIT_TOKEN est chargé (masqué pour la sécurité)"
+            
       - name: Install Fastlane
         run: gem install fastlane
       - name: Fetch Certificates via Match
