@@ -23,40 +23,55 @@ jobs:
         run: gem install fastlane
       
       
+       # 1️⃣ Création et configuration du keychain AVANT Fastlane Match
       - name: Create and Configure Keychain
         env:
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+         MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         run: |
-          echo "🚀 Suppression des anciens keychains"
-          security delete-keychain build.keychain || true
+         echo "🚀 Suppression des anciens keychains"
+         security delete-keychain build.keychain || true
 
-          echo "🔑 Création et configuration d'un keychain temporaire"
-          security create-keychain -p "$MATCH_PASSWORD" build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "$MATCH_PASSWORD" build.keychain
-          security set-keychain-settings -lut 21600 build.keychain
+         echo "🔑 Création et configuration d'un keychain temporaire"
+         security create-keychain -p "$MATCH_PASSWORD" build.keychain
+         security default-keychain -s build.keychain
+         security unlock-keychain -p "$MATCH_PASSWORD" build.keychain
+         security set-keychain-settings -lut 21600 build.keychain
 
-          echo "✅ Keychain configuré avec succès"
+         echo "✅ Keychain configuré avec succès"
 
+      # 2️⃣ Téléchargement des certificats via Fastlane Match en forçant l'utilisation du keychain
       - name: Fetch Certificates via Match
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_TOKEN: ${{ secrets.MATCH_GIT_TOKEN }}
         run: |
           cd ios
-          fastlane match appstore --keychain_name build.keychain --keychain_password "$MATCH_PASSWORD"  # Exécute Match sur MacOS uniquement
+          echo "🔑 Forçage du keychain par défaut pour Fastlane"
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$MATCH_PASSWORD" build.keychain
 
-       # 3️⃣ Vérification des fichiers téléchargés (Debug)
+          echo "🚀 Exécution de Fastlane Match"
+          bundle install
+          bundle exec fastlane match appstore --keychain_name build.keychain --keychain_password "$MATCH_PASSWORD"
+
+      # 3️⃣ Vérification des fichiers téléchargés (Debug)
       - name: Vérifier les fichiers téléchargés
         run: |
           echo "🔍 Vérification des certificats téléchargés"
           ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
+          ls -la ~/Library/Keychains/
 
-     # 4️⃣ Vérification des identités de signature (Debug)
+      # 4️⃣ Vérification des identités de signature (Debug)
       - name: Vérifier les identités de signature
         run: |
           echo "🔍 Vérification des identités de signature installées"
           security find-identity -v -p codesigning build.keychain
+
+      # 5️⃣ Rechargement des identités de signature (pour s'assurer qu'elles sont prises en compte)
+      - name: Reload Code Signing Identities
+        run: |
+          echo "🔄 Rechargement des identités de signature"
+          sudo killall -HUP syspolicyd
 
 
       - name: Install dependencies
