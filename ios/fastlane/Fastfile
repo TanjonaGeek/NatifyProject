@@ -20,10 +20,8 @@ default_platform(:ios)
 platform :ios do
   desc "Build iOS App"
   lane :build do
-    # Récupère les certificats et les provisioning profiles
-    match(type: "appstore", readonly: false)
+    match(type: "appstore", readonly: false, force_for_new_devices: true)
 
-    # Compile et signe l’application
     gym(
       scheme: "Runner",
       export_method: "app-store",
@@ -37,4 +35,5 @@ platform :ios do
     )
   end
 end
+
 
