@@ -16,6 +16,6 @@ api_key_content = File.binread(File.expand_path("./fastlane/AuthKey.p8", __dir__
 api_key(
   key_id: "MBL459T6PA", # Remplace par ton API Key ID
   issuer_id: "dbfb81f6-f5ea-4815-af1d-acf1214e50e8", # Remplace par ton Issuer ID
-  key: api_key_content # Chemin vers ta clé API
+  key: api_key_content, # Chemin vers ta clé API
   in_house: false
 )
