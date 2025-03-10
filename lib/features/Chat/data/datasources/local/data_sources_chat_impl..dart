@@ -22,6 +22,31 @@ class DataSourceChatImpl implements DataSourceChat {
   @override
   Future<void> BloquePersonne(String uidUser) async {
     try {
+      String uidMe = auth.currentUser!.uid;
+      final userSnapshot = await firestore
+          .collection('users')
+          .where('uid', isEqualTo: uidMe)
+          .limit(1) // Limitation à un seul document
+          .get();
+      if (userSnapshot.docs.isEmpty) {
+        return;
+      }
+      final userDoc = userSnapshot.docs.first;
+      final userData = userDoc.data();
+      final List<dynamic> userBlocked =
+          List.from(userData['friendBlocked'] ?? []);
+      final userBlockedData = userBlocked.firstWhere(
+        (element) => element == uidUser,
+        orElse: () => null,
+      );
+      if (userBlockedData == null) {
+        // If no reaction data exists, create it
+        userBlocked.add(uidUser);
+      }
+      await firestore
+          .collection('users')
+          .doc(uidMe)
+          .update({'friendBlocked': userBlocked});
       await firestore
           .collection('users')
           .doc(uidUser)
@@ -36,6 +61,31 @@ class DataSourceChatImpl implements DataSourceChat {
   @override
   Future<void> DebloquerPersonne(String uidUser) async {
     try {
+      String uidMe = auth.currentUser!.uid;
+      final userSnapshot = await firestore
+          .collection('users')
+          .where('uid', isEqualTo: uidMe)
+          .limit(1) // Limitation à un seul document
+          .get();
+      if (userSnapshot.docs.isEmpty) {
+        return;
+      }
+      final userDoc = userSnapshot.docs.first;
+      final userData = userDoc.data();
+      final List<dynamic> userBlocked =
+          List.from(userData['friendBlocked'] ?? []);
+      final userBlockedData = userBlocked.firstWhere(
+        (element) => element == uidUser,
+        orElse: () => null,
+      );
+      if (userBlockedData != null) {
+        // If no reaction data exists, create it
+        userBlocked.remove(uidUser);
+      }
+      await firestore
+          .collection('users')
+          .doc(uidMe)
+          .update({'friendBlocked': userBlocked});
       await firestore
           .collection('users')
           .doc(uidUser)

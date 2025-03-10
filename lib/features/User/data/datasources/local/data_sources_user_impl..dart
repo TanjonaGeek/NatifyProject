@@ -86,6 +86,7 @@ class DataSourceUserImpl implements DataSourceUser {
           abonnee: [],
           abonnement: [],
           invitation: [],
+          friendBlocked: [],
           position: null,
           hiddenPosition: false,
           alertLocation: false,

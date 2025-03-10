@@ -13,51 +13,47 @@ class Allmessagepage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return ThemeSwitchingArea(
       child: Scaffold(
-        body: Consumer(builder: (context, ref, child) {
-          return Column(
+        body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Container(
+            // color: Colors.grey.shade100,
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  // color: Colors.grey.shade100,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      const SizedBox(
-                        height: 1.0,
-                      ),
-                      SectionHeader(
-                        showFilterOption: false,
-                        nameSearch: '',
-                      ),
-                      const SizedBox(
-                        height: 15.0,
-                      ),
-                      ListUserOnline(),
-                    ],
-                  ),
+              children: <Widget>[
+                const SizedBox(
+                  height: 1.0,
                 ),
-                Divider(
-                  thickness: 0.3,
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10, right: 10),
-                  child: Text(
-                    "Messages récents".tr,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13.0,
-                    ),
-                  ),
+                SectionHeader(
+                  showFilterOption: false,
+                  nameSearch: '',
                 ),
                 const SizedBox(
-                  height: 10.0,
+                  height: 15.0,
                 ),
-                Expanded(child: ChatList())
-              ]);
-        }),
+                ListUserOnline(),
+              ],
+            ),
+          ),
+          Divider(
+            thickness: 0.3,
+          ),
+          SizedBox(
+            height: 5,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 10, right: 10),
+            child: Text(
+              "Messages récents".tr,
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 13.0,
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 10.0,
+          ),
+          Expanded(child: ChatList())
+        ]),
       ),
     );
   }

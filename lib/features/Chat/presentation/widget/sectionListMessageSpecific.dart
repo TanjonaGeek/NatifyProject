@@ -281,183 +281,522 @@ class _ListMessageDetailState extends ConsumerState<ListMessageDetail> {
   @override
   Widget build(BuildContext context) {
     return NotificationListener<ScrollNotification>(
-      onNotification: (ScrollNotification notification) {
-        if (notification is ScrollStartNotification) {
-          _userIsScrolling = true;
-        } else if (notification is ScrollEndNotification) {
-          _userIsScrolling = false;
-        }
-        return true;
-      },
-      child: FirestorePagination(
-          controller: _scrollController,
-          limit: 15, // Defaults to 10.
-          viewType: ViewType.list,
-          isLive: true,
-          reverse: true,
-          bottomLoader: SizedBox(),
-          initialLoader: SizedBox(),
-          query: firestore
+        onNotification: (ScrollNotification notification) {
+          if (notification is ScrollStartNotification) {
+            _userIsScrolling = true;
+          } else if (notification is ScrollEndNotification) {
+            _userIsScrolling = false;
+          }
+          return true;
+        },
+        child: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
               .collection('users')
-              .doc(uidUser)
-              .collection('chats')
               .doc(widget.uidUser)
+              .collection('chats')
+              .doc(FirebaseAuth.instance.currentUser!.uid)
               .collection('messages')
-              .orderBy('timeSent', descending: true),
-          itemBuilder: (context, documentSnapshot, index) {
-            final data = documentSnapshot.data() as Map<String, dynamic>?;
-            if (data == null) return Container();
-            final messageData = data;
-            DateTime datetimes =
-                DateTime.fromMillisecondsSinceEpoch(messageData['timeSent']);
-            var timeSent = DateFormat.Hm().format(datetimes);
-            String a = "à".tr;
-            var dateSentq = DateFormat.yMMMd().format(datetimes);
-            String dateSent = "$dateSentq $a $timeSent";
-            // Ajouter la date du message actuel à la liste
-            if (!messageDates.contains(datetimes)) {
-              messageDates.add(datetimes);
-            }
-            // Utilisation de SchedulerBinding pour s'assurer que la liste est bien affichée
-            if (initOpenChat == true) {
-              SchedulerBinding.instance.addPostFrameCallback((_) {
-                if (!_userIsScrolling) {
-                  _scrollToBottom(); // Forcer le défilement
-                }
-              });
-            } else {
-              SchedulerBinding.instance.addPostFrameCallback((_) {
-                if (!_userIsScrolling) {
-                  _scrollToBottomNotInit(); // Forcer le défilement
-                }
-              });
-            }
-            if (messageData['senderId'] == uidUser) {
-              return Column(
-                children: [
-                  InkWell(
-                    onTap: () {
-                      if (messageData['reactMessageReply'].isNotEmpty ||
-                          messageData['reactMessageSingle'].isNotEmpty) {
-                        showReactionMessage(
-                            widget.photo,
-                            widget.uidUser,
-                            widget.name,
-                            messageData['reactMessageReply'] as List<dynamic>,
-                            messageData['reactMessageSingle'] as List<dynamic>);
-                      }
-                    },
-                    onLongPress: () {
-                      if (!(messageData['text'] == "messageretirerforme" ||
-                          messageData['text'] == "messageretirerforall")) {
-                        // navigate with a custom [HeroDialogRoute] to [ReactionsDialogWidget]
-                        Navigator.of(context).push(
-                          HeroDialogRoute(
-                            builder: (context) {
-                              return ReactionsDialogWidget(
-                                  menuItemsWidth: 1,
-                                  menuItems: menuItems,
-                                  reactions: reactions,
-                                  id: messageData[
-                                      'messageId'], // unique id for message
-                                  messageWidget: MyMessageCardCopy(
-                                    colorMe: widget.colorMe,
-                                    colorSender: widget.colorSender,
-                                    messageId:
-                                        messageData['messageId']?.toString() ??
-                                            "",
-                                    key: ValueKey(messageData['messageId']),
-                                    message:
-                                        messageData['text']?.toString() ?? "",
-                                    date: timeSent,
-                                    type: messageData['type'] == 'audio'
-                                        ? MessageEnum.audio
-                                        : messageData['type'] == 'image'
-                                            ? MessageEnum.image
-                                            : messageData['type'] == 'video'
-                                                ? MessageEnum.video
-                                                : messageData['type'] == 'gif'
-                                                    ? MessageEnum.gif
-                                                    : MessageEnum.text,
-                                    repliedText: messageData['repliedMessage']
-                                            ?.toString() ??
-                                        "",
-                                    username:
-                                        messageData['repliedTo']?.toString() ??
-                                            "",
-                                    repliedMessageType: messageData[
-                                                'repliedMessageType'] ==
-                                            'audio'
-                                        ? MessageEnum.audio
-                                        : messageData['repliedMessageType'] ==
-                                                'image'
-                                            ? MessageEnum.image
-                                            : messageData[
+              .where('isSeen',
+                  isEqualTo: false) // Écoute seulement les messages non lus
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return FirestorePagination(
+                  controller: _scrollController,
+                  limit: 15, // Defaults to 10.
+                  viewType: ViewType.list,
+                  isLive: true,
+                  reverse: true,
+                  bottomLoader: SizedBox(),
+                  initialLoader: SizedBox(),
+                  query: firestore
+                      .collection('users')
+                      .doc(uidUser)
+                      .collection('chats')
+                      .doc(widget.uidUser)
+                      .collection('messages')
+                      .orderBy('timeSent', descending: true),
+                  itemBuilder: (context, documentSnapshot, index) {
+                    final data =
+                        documentSnapshot.data() as Map<String, dynamic>?;
+                    if (data == null) return Container();
+                    final messageData = data;
+                    DateTime datetimes = DateTime.fromMillisecondsSinceEpoch(
+                        messageData['timeSent']);
+                    var timeSent = DateFormat.Hm().format(datetimes);
+                    String a = "à".tr;
+                    var dateSentq = DateFormat.yMMMd().format(datetimes);
+                    String dateSent = "$dateSentq $a $timeSent";
+                    // Ajouter la date du message actuel à la liste
+                    if (!messageDates.contains(datetimes)) {
+                      messageDates.add(datetimes);
+                    }
+                    // Utilisation de SchedulerBinding pour s'assurer que la liste est bien affichée
+                    if (initOpenChat == true) {
+                      SchedulerBinding.instance.addPostFrameCallback((_) {
+                        if (!_userIsScrolling) {
+                          _scrollToBottom(); // Forcer le défilement
+                        }
+                      });
+                    } else {
+                      SchedulerBinding.instance.addPostFrameCallback((_) {
+                        if (!_userIsScrolling) {
+                          _scrollToBottomNotInit(); // Forcer le défilement
+                        }
+                      });
+                    }
+                    if (messageData['senderId'] == uidUser) {
+                      return Column(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              if (messageData['reactMessageReply'].isNotEmpty ||
+                                  messageData['reactMessageSingle']
+                                      .isNotEmpty) {
+                                showReactionMessage(
+                                    widget.photo,
+                                    widget.uidUser,
+                                    widget.name,
+                                    messageData['reactMessageReply']
+                                        as List<dynamic>,
+                                    messageData['reactMessageSingle']
+                                        as List<dynamic>);
+                              }
+                            },
+                            onLongPress: () {
+                              if (!(messageData['text'] ==
+                                      "messageretirerforme" ||
+                                  messageData['text'] ==
+                                      "messageretirerforall")) {
+                                // navigate with a custom [HeroDialogRoute] to [ReactionsDialogWidget]
+                                Navigator.of(context).push(
+                                  HeroDialogRoute(
+                                    builder: (context) {
+                                      return ReactionsDialogWidget(
+                                          menuItemsWidth: 1,
+                                          menuItems: menuItems,
+                                          reactions: reactions,
+                                          id: messageData[
+                                              'messageId'], // unique id for message
+                                          messageWidget: MyMessageCardCopy(
+                                            colorMe: widget.colorMe,
+                                            colorSender: widget.colorSender,
+                                            messageId: messageData['messageId']
+                                                    ?.toString() ??
+                                                "",
+                                            key: ValueKey(
+                                                messageData['messageId']),
+                                            message: messageData['text']
+                                                    ?.toString() ??
+                                                "",
+                                            date: timeSent,
+                                            type: messageData['type'] == 'audio'
+                                                ? MessageEnum.audio
+                                                : messageData['type'] == 'image'
+                                                    ? MessageEnum.image
+                                                    : messageData['type'] ==
+                                                            'video'
+                                                        ? MessageEnum.video
+                                                        : messageData['type'] ==
+                                                                'gif'
+                                                            ? MessageEnum.gif
+                                                            : MessageEnum.text,
+                                            repliedText:
+                                                messageData['repliedMessage']
+                                                        ?.toString() ??
+                                                    "",
+                                            username: messageData['repliedTo']
+                                                    ?.toString() ??
+                                                "",
+                                            repliedMessageType: messageData[
                                                         'repliedMessageType'] ==
-                                                    'video'
-                                                ? MessageEnum.video
+                                                    'audio'
+                                                ? MessageEnum.audio
                                                 : messageData[
                                                             'repliedMessageType'] ==
-                                                        'gif'
-                                                    ? MessageEnum.gif
-                                                    : MessageEnum.text,
-                                    onLeftSwipe: () => onMessageSwipe(
-                                      messageData,
-                                      true,
+                                                        'image'
+                                                    ? MessageEnum.image
+                                                    : messageData[
+                                                                'repliedMessageType'] ==
+                                                            'video'
+                                                        ? MessageEnum.video
+                                                        : messageData[
+                                                                    'repliedMessageType'] ==
+                                                                'gif'
+                                                            ? MessageEnum.gif
+                                                            : MessageEnum.text,
+                                            onLeftSwipe: () => onMessageSwipe(
+                                              messageData,
+                                              true,
+                                            ),
+                                            isSeen: messageData['isSeen'],
+                                          ), // message widget
+                                          onReactionTap: (reaction) async {
+                                            final List<ConnectivityResult>
+                                                connectivityResult =
+                                                await (Connectivity()
+                                                    .checkConnectivity());
+                                            bool isMessageReply =
+                                                messageData['repliedMessage'] ==
+                                                        ""
+                                                    ? false
+                                                    : true;
+                                            if (reaction == '➕') {
+                                              // show emoji picker container
+                                            } else {
+                                              if (connectivityResult.contains(
+                                                  ConnectivityResult.none)) {
+                                                showCustomSnackBar(
+                                                    "Pas de connexion internet");
+                                                return;
+                                              }
+                                              if (mounted) {
+                                                ref
+                                                    .read(chatStateNotifier(
+                                                            widget.uidUser)
+                                                        .notifier)
+                                                    .reactMessage(
+                                                        reaction,
+                                                        messageData[
+                                                            'messageId'],
+                                                        widget.uidUser,
+                                                        isMessageReply);
+                                              }
+                                            }
+                                          },
+                                          onContextMenuTap: (menuItem) async {
+                                            final List<ConnectivityResult>
+                                                connectivityResult =
+                                                await (Connectivity()
+                                                    .checkConnectivity());
+                                            int selectedIndex =
+                                                menuItems.indexOf(menuItem);
+                                            if (selectedIndex != -1) {
+                                              if (selectedIndex == 0) {
+                                                List<Map<String, dynamic>>
+                                                    dataMessage = [];
+                                                bool isMe =
+                                                    (messageData['senderId'] ==
+                                                            uidUser)
+                                                        ? true
+                                                        : false;
+                                                dataMessage.add({
+                                                  "idMessage":
+                                                      messageData['messageId'],
+                                                  "checkIsMe": isMe,
+                                                  "typeMessage": messageData[
+                                                              'type'] ==
+                                                          'audio'
+                                                      ? MessageEnum.audio
+                                                      : messageData['type'] ==
+                                                              'image'
+                                                          ? MessageEnum.image
+                                                          : messageData[
+                                                                      'type'] ==
+                                                                  'video'
+                                                              ? MessageEnum
+                                                                  .video
+                                                              : messageData[
+                                                                          'type'] ==
+                                                                      'gif'
+                                                                  ? MessageEnum
+                                                                      .gif
+                                                                  : MessageEnum
+                                                                      .text,
+                                                  "message":
+                                                      messageData['text'],
+                                                  "nameSender": widget.name
+                                                });
+                                                if (mounted) {
+                                                  ref
+                                                      .read(chatStateNotifier(
+                                                              widget.uidUser)
+                                                          .notifier)
+                                                      .getReplyMessage(
+                                                          dataMessage);
+                                                }
+                                              } else if (selectedIndex == 1) {
+                                                await Clipboard.setData(
+                                                    ClipboardData(
+                                                        text: messageData[
+                                                                    'text']
+                                                                ?.toString() ??
+                                                            ""));
+                                              } else if (selectedIndex == 2) {
+                                                if (connectivityResult.contains(
+                                                    ConnectivityResult.none)) {
+                                                  showCustomSnackBar(
+                                                      "Pas de connexion internet");
+                                                  return;
+                                                }
+                                                if (mounted) {
+                                                  int timesent =
+                                                      messageData['timeSent'];
+                                                  ref
+                                                      .read(chatStateNotifier(
+                                                              widget.uidUser)
+                                                          .notifier)
+                                                      .deleteMessage(
+                                                          messageData[
+                                                              'messageId'],
+                                                          widget.uidUser,
+                                                          timesent,
+                                                          true);
+                                                }
+                                              } else if (selectedIndex == 3) {
+                                                if (connectivityResult.contains(
+                                                    ConnectivityResult.none)) {
+                                                  showCustomSnackBar(
+                                                      "Pas de connexion internet");
+                                                  return;
+                                                }
+                                                if (mounted) {
+                                                  int timesent =
+                                                      messageData['timeSent'];
+                                                  ref
+                                                      .read(chatStateNotifier(
+                                                              widget.uidUser)
+                                                          .notifier)
+                                                      .deleteMessage(
+                                                          messageData[
+                                                              'messageId'],
+                                                          widget.uidUser,
+                                                          timesent,
+                                                          false);
+                                                }
+                                              } else if (selectedIndex == 4) {
+                                                bool isMe =
+                                                    (messageData['senderId'] ==
+                                                            uidUser)
+                                                        ? true
+                                                        : false;
+                                                _showMoreOption4(isMe,
+                                                    widget.name, dateSent);
+                                              }
+                                              // Gérer l'élément du menu selon l'index
+                                            } else {
+                                              print("Menu item not found");
+                                            }
+                                            // handle context menu item
+                                          },
+                                          widgetAlignment:
+                                              Alignment.centerLeft);
+                                    },
+                                  ),
+                                );
+                              }
+                            },
+                            child: messageData['text'] == "messageretirerforme"
+                                ? Padding(
+                                    padding:
+                                        const EdgeInsets.only(right: 7, top: 3),
+                                    child: Align(
+                                      alignment: Alignment.topRight,
+                                      child: Container(
+                                          height: 40,
+                                          width: 120,
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(15),
+                                                  topRight: Radius.circular(15),
+                                                  bottomLeft:
+                                                      Radius.circular(15),
+                                                  bottomRight:
+                                                      Radius.circular(15)),
+                                              color: newColorBlueElevate),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(2),
+                                            child: Center(
+                                                child: Text(
+                                              'Ce message a été retiré.'.tr,
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  color: Colors.white54,
+                                                  fontStyle: FontStyle.italic),
+                                            )),
+                                          )),
                                     ),
-                                    isSeen: messageData['isSeen'],
-                                  ), // message widget
-                                  onReactionTap: (reaction) async {
-                                    final List<ConnectivityResult>
-                                        connectivityResult =
-                                        await (Connectivity()
-                                            .checkConnectivity());
-                                    bool isMessageReply =
-                                        messageData['repliedMessage'] == ""
-                                            ? false
-                                            : true;
-                                    if (reaction == '➕') {
-                                      // show emoji picker container
-                                    } else {
-                                      if (connectivityResult
-                                          .contains(ConnectivityResult.none)) {
-                                        showCustomSnackBar(
-                                            "Pas de connexion internet");
-                                        return;
-                                      }
-                                      if (mounted) {
-                                        ref
-                                            .read(chatStateNotifier(
-                                                    widget.uidUser)
-                                                .notifier)
-                                            .reactMessage(
-                                                reaction,
-                                                messageData['messageId'],
-                                                widget.uidUser,
-                                                isMessageReply);
-                                      }
+                                  )
+                                : messageData['text'] == "messageretirerforall"
+                                    ? Padding(
+                                        padding: const EdgeInsets.only(
+                                            right: 7, top: 3),
+                                        child: Align(
+                                          alignment: Alignment.topRight,
+                                          child: Container(
+                                              height: 40,
+                                              width: 120,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                          topLeft: Radius
+                                                              .circular(15),
+                                                          topRight:
+                                                              Radius.circular(
+                                                                  15),
+                                                          bottomLeft:
+                                                              Radius.circular(
+                                                                  15),
+                                                          bottomRight:
+                                                              Radius.circular(
+                                                                  15)),
+                                                  color: newColorBlueElevate),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(2),
+                                                child: Center(
+                                                    child: Text(
+                                                  'Ce message a été retiré.'.tr,
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                      color: Colors.white54,
+                                                      fontStyle:
+                                                          FontStyle.italic),
+                                                )),
+                                              )),
+                                        ),
+                                      )
+                                    : MyMessageCard(
+                                        colorMe: widget.colorMe,
+                                        colorSender: widget.colorSender,
+                                        reactMessageReply: (messageData[
+                                                        'reactMessageReply']
+                                                    as List<dynamic>?)
+                                                ?.map((e) =>
+                                                    Map<String, String>.from(e))
+                                                .toList() ??
+                                            [],
+                                        reactMessageSingle: (messageData[
+                                                        'reactMessageSingle']
+                                                    as List<dynamic>?)
+                                                ?.map((e) =>
+                                                    Map<String, String>.from(e))
+                                                .toList() ??
+                                            [],
+                                        messageId: messageData['messageId']
+                                                ?.toString() ??
+                                            "",
+                                        key: ValueKey(messageData['messageId']),
+                                        message:
+                                            messageData['text']?.toString() ??
+                                                "",
+                                        date: timeSent,
+                                        type: messageData['type'] == 'audio'
+                                            ? MessageEnum.audio
+                                            : messageData['type'] == 'image'
+                                                ? MessageEnum.image
+                                                : messageData['type'] == 'video'
+                                                    ? MessageEnum.video
+                                                    : messageData['type'] ==
+                                                            'gif'
+                                                        ? MessageEnum.gif
+                                                        : MessageEnum.text,
+                                        repliedText:
+                                            messageData['repliedMessage']
+                                                    ?.toString() ??
+                                                "",
+                                        username: messageData['repliedTo']
+                                                ?.toString() ??
+                                            "",
+                                        repliedMessageType: messageData[
+                                                    'repliedMessageType'] ==
+                                                'audio'
+                                            ? MessageEnum.audio
+                                            : messageData[
+                                                        'repliedMessageType'] ==
+                                                    'image'
+                                                ? MessageEnum.image
+                                                : messageData[
+                                                            'repliedMessageType'] ==
+                                                        'video'
+                                                    ? MessageEnum.video
+                                                    : messageData[
+                                                                'repliedMessageType'] ==
+                                                            'gif'
+                                                        ? MessageEnum.gif
+                                                        : MessageEnum.text,
+                                        onLeftSwipe: () => onMessageSwipe(
+                                          messageData,
+                                          true,
+                                        ),
+                                        isSeen: messageData['isSeen'],
+                                      ),
+                          ),
+                          (index == 0)
+                              ? StreamBuilder(
+                                  stream: ref
+                                      .read(chatStateNotifier(widget.uidUser)
+                                          .notifier)
+                                      .getStatusTyping(widget.uidUser),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return SizedBox();
                                     }
-                                  },
-                                  onContextMenuTap: (menuItem) async {
-                                    final List<ConnectivityResult>
-                                        connectivityResult =
-                                        await (Connectivity()
-                                            .checkConnectivity());
-                                    int selectedIndex =
-                                        menuItems.indexOf(menuItem);
-                                    if (selectedIndex != -1) {
-                                      if (selectedIndex == 0) {
-                                        List<Map<String, dynamic>> dataMessage =
-                                            [];
-                                        bool isMe =
-                                            (messageData['senderId'] == uidUser)
-                                                ? true
-                                                : false;
-                                        dataMessage.add({
-                                          "idMessage": messageData['messageId'],
-                                          "checkIsMe": isMe,
-                                          "typeMessage": messageData['type'] ==
-                                                  'audio'
+                                    return snapshot.data == null
+                                        ? SizedBox()
+                                        : Align(
+                                            alignment: Alignment.bottomLeft,
+                                            child: Padding(
+                                              padding:
+                                                  EdgeInsets.only(left: 12),
+                                              child: TypingIndicator(
+                                                showIndicator: snapshot.data!,
+                                                photo: widget.photo,
+                                              ),
+                                            ),
+                                          );
+                                  })
+                              : SizedBox()
+                        ],
+                      );
+                    } else {
+                      return Column(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              if (messageData['reactMessageReply'].isNotEmpty ||
+                                  messageData['reactMessageSingle']
+                                      .isNotEmpty) {
+                                showReactionMessage(
+                                    widget.photo,
+                                    widget.uidUser,
+                                    widget.name,
+                                    messageData['reactMessageReply']
+                                        as List<dynamic>,
+                                    messageData['reactMessageSingle']
+                                        as List<dynamic>);
+                              }
+                            },
+                            onLongPress: () {
+                              // _showMoreOption(messageData,index,totalMessage,false);
+                              if (!(messageData['text'] ==
+                                      "messageretirerforme" ||
+                                  messageData['text'] ==
+                                      "messageretirerforall")) {
+                                // navigate with a custom [HeroDialogRoute] to [ReactionsDialogWidget]
+                                Navigator.of(context).push(
+                                  HeroDialogRoute(
+                                    builder: (context) {
+                                      return ReactionsDialogWidget(
+                                        menuItemsWidth: 1,
+                                        menuItems: menuItemsSender,
+                                        reactions: reactions,
+                                        id: messageData[
+                                            'messageId'], // unique id for message
+                                        messageWidget: SenderMessageCardCopy(
+                                          colorMe: widget.colorMe,
+                                          colorSender: widget.colorSender,
+                                          messageId: messageData['messageId']
+                                                  ?.toString() ??
+                                              "",
+                                          key: ValueKey(
+                                              messageData['messageId']),
+                                          message:
+                                              messageData['text']?.toString() ??
+                                                  "",
+                                          date: timeSent,
+                                          type: messageData['type'] == 'audio'
                                               ? MessageEnum.audio
                                               : messageData['type'] == 'image'
                                                   ? MessageEnum.image
@@ -468,347 +807,854 @@ class _ListMessageDetailState extends ConsumerState<ListMessageDetail> {
                                                               'gif'
                                                           ? MessageEnum.gif
                                                           : MessageEnum.text,
-                                          "message": messageData['text'],
-                                          "nameSender": widget.name
-                                        });
-                                        if (mounted) {
-                                          ref
-                                              .read(chatStateNotifier(
-                                                      widget.uidUser)
-                                                  .notifier)
-                                              .getReplyMessage(dataMessage);
-                                        }
-                                      } else if (selectedIndex == 1) {
-                                        await Clipboard.setData(ClipboardData(
-                                            text: messageData['text']
-                                                    ?.toString() ??
-                                                ""));
-                                      } else if (selectedIndex == 2) {
-                                        if (connectivityResult.contains(
-                                            ConnectivityResult.none)) {
-                                          showCustomSnackBar(
-                                              "Pas de connexion internet");
-                                          return;
-                                        }
-                                        if (mounted) {
-                                          int timesent =
-                                              messageData['timeSent'];
-                                          ref
-                                              .read(chatStateNotifier(
-                                                      widget.uidUser)
-                                                  .notifier)
-                                              .deleteMessage(
-                                                  messageData['messageId'],
-                                                  widget.uidUser,
-                                                  timesent,
-                                                  true);
-                                        }
-                                      } else if (selectedIndex == 3) {
-                                        if (connectivityResult.contains(
-                                            ConnectivityResult.none)) {
-                                          showCustomSnackBar(
-                                              "Pas de connexion internet");
-                                          return;
-                                        }
-                                        if (mounted) {
-                                          int timesent =
-                                              messageData['timeSent'];
-                                          ref
-                                              .read(chatStateNotifier(
-                                                      widget.uidUser)
-                                                  .notifier)
-                                              .deleteMessage(
-                                                  messageData['messageId'],
-                                                  widget.uidUser,
-                                                  timesent,
-                                                  false);
-                                        }
-                                      } else if (selectedIndex == 4) {
-                                        bool isMe =
-                                            (messageData['senderId'] == uidUser)
-                                                ? true
-                                                : false;
-                                        _showMoreOption4(
-                                            isMe, widget.name, dateSent);
-                                      }
-                                      // Gérer l'élément du menu selon l'index
-                                    } else {
-                                      print("Menu item not found");
-                                    }
-                                    // handle context menu item
-                                  },
-                                  widgetAlignment: Alignment.centerLeft);
-                            },
-                          ),
-                        );
-                      }
-                    },
-                    child: messageData['text'] == "messageretirerforme"
-                        ? Padding(
-                            padding: const EdgeInsets.only(right: 7, top: 3),
-                            child: Align(
-                              alignment: Alignment.topRight,
-                              child: Container(
-                                  height: 40,
-                                  width: 120,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(15),
-                                          topRight: Radius.circular(15),
-                                          bottomLeft: Radius.circular(15),
-                                          bottomRight: Radius.circular(15)),
-                                      color: newColorBlueElevate),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(2),
-                                    child: Center(
-                                        child: Text(
-                                      'Ce message a été retiré.'.tr,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          color: Colors.white54,
-                                          fontStyle: FontStyle.italic),
-                                    )),
-                                  )),
-                            ),
-                          )
-                        : messageData['text'] == "messageretirerforall"
-                            ? Padding(
-                                padding:
-                                    const EdgeInsets.only(right: 7, top: 3),
-                                child: Align(
-                                  alignment: Alignment.topRight,
-                                  child: Container(
-                                      height: 40,
-                                      width: 120,
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(15),
-                                              topRight: Radius.circular(15),
-                                              bottomLeft: Radius.circular(15),
-                                              bottomRight: Radius.circular(15)),
-                                          color: newColorBlueElevate),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(2),
-                                        child: Center(
-                                            child: Text(
-                                          'Ce message a été retiré.'.tr,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              color: Colors.white54,
-                                              fontStyle: FontStyle.italic),
-                                        )),
-                                      )),
-                                ),
-                              )
-                            : MyMessageCard(
-                                colorMe: widget.colorMe,
-                                colorSender: widget.colorSender,
-                                reactMessageReply:
-                                    (messageData['reactMessageReply']
-                                                as List<dynamic>?)
-                                            ?.map((e) =>
-                                                Map<String, String>.from(e))
-                                            .toList() ??
-                                        [],
-                                reactMessageSingle:
-                                    (messageData['reactMessageSingle']
-                                                as List<dynamic>?)
-                                            ?.map((e) =>
-                                                Map<String, String>.from(e))
-                                            .toList() ??
-                                        [],
-                                messageId:
-                                    messageData['messageId']?.toString() ?? "",
-                                key: ValueKey(messageData['messageId']),
-                                message: messageData['text']?.toString() ?? "",
-                                date: timeSent,
-                                type: messageData['type'] == 'audio'
-                                    ? MessageEnum.audio
-                                    : messageData['type'] == 'image'
-                                        ? MessageEnum.image
-                                        : messageData['type'] == 'video'
-                                            ? MessageEnum.video
-                                            : messageData['type'] == 'gif'
-                                                ? MessageEnum.gif
-                                                : MessageEnum.text,
-                                repliedText:
-                                    messageData['repliedMessage']?.toString() ??
-                                        "",
-                                username:
-                                    messageData['repliedTo']?.toString() ?? "",
-                                repliedMessageType: messageData[
-                                            'repliedMessageType'] ==
-                                        'audio'
-                                    ? MessageEnum.audio
-                                    : messageData['repliedMessageType'] ==
-                                            'image'
-                                        ? MessageEnum.image
-                                        : messageData['repliedMessageType'] ==
-                                                'video'
-                                            ? MessageEnum.video
-                                            : messageData[
-                                                        'repliedMessageType'] ==
-                                                    'gif'
-                                                ? MessageEnum.gif
-                                                : MessageEnum.text,
-                                onLeftSwipe: () => onMessageSwipe(
-                                  messageData,
-                                  true,
-                                ),
-                                isSeen: messageData['isSeen'],
-                              ),
-                  ),
-                  (index == 0)
-                      ? StreamBuilder(
-                          stream: ref
-                              .read(chatStateNotifier(widget.uidUser).notifier)
-                              .getStatusTyping(widget.uidUser),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return SizedBox();
-                            }
-                            return snapshot.data == null
-                                ? SizedBox()
-                                : Align(
-                                    alignment: Alignment.bottomLeft,
-                                    child: Padding(
-                                      padding: EdgeInsets.only(left: 12),
-                                      child: TypingIndicator(
-                                        showIndicator: snapshot.data!,
-                                        photo: widget.photo,
-                                      ),
-                                    ),
-                                  );
-                          })
-                      : SizedBox()
-                ],
-              );
-            } else {
-              return Column(
-                children: [
-                  InkWell(
-                    onTap: () {
-                      if (messageData['reactMessageReply'].isNotEmpty ||
-                          messageData['reactMessageSingle'].isNotEmpty) {
-                        showReactionMessage(
-                            widget.photo,
-                            widget.uidUser,
-                            widget.name,
-                            messageData['reactMessageReply'] as List<dynamic>,
-                            messageData['reactMessageSingle'] as List<dynamic>);
-                      }
-                    },
-                    onLongPress: () {
-                      // _showMoreOption(messageData,index,totalMessage,false);
-                      if (!(messageData['text'] == "messageretirerforme" ||
-                          messageData['text'] == "messageretirerforall")) {
-                        // navigate with a custom [HeroDialogRoute] to [ReactionsDialogWidget]
-                        Navigator.of(context).push(
-                          HeroDialogRoute(
-                            builder: (context) {
-                              return ReactionsDialogWidget(
-                                menuItemsWidth: 1,
-                                menuItems: menuItemsSender,
-                                reactions: reactions,
-                                id: messageData[
-                                    'messageId'], // unique id for message
-                                messageWidget: SenderMessageCardCopy(
-                                  colorMe: widget.colorMe,
-                                  colorSender: widget.colorSender,
-                                  messageId:
-                                      messageData['messageId']?.toString() ??
-                                          "",
-                                  key: ValueKey(messageData['messageId']),
-                                  message:
-                                      messageData['text']?.toString() ?? "",
-                                  date: timeSent,
-                                  type: messageData['type'] == 'audio'
-                                      ? MessageEnum.audio
-                                      : messageData['type'] == 'image'
-                                          ? MessageEnum.image
-                                          : messageData['type'] == 'video'
-                                              ? MessageEnum.video
-                                              : messageData['type'] == 'gif'
-                                                  ? MessageEnum.gif
-                                                  : MessageEnum.text,
-                                  username:
-                                      messageData['repliedTo']?.toString() ??
-                                          "",
-                                  repliedMessageType: messageData[
-                                              'repliedMessageType'] ==
-                                          'audio'
-                                      ? MessageEnum.audio
-                                      : messageData['repliedMessageType'] ==
-                                              'image'
-                                          ? MessageEnum.image
-                                          : messageData['repliedMessageType'] ==
-                                                  'video'
-                                              ? MessageEnum.video
+                                          username: messageData['repliedTo']
+                                                  ?.toString() ??
+                                              "",
+                                          repliedMessageType: messageData[
+                                                      'repliedMessageType'] ==
+                                                  'audio'
+                                              ? MessageEnum.audio
                                               : messageData[
                                                           'repliedMessageType'] ==
-                                                      'gif'
-                                                  ? MessageEnum.gif
-                                                  : MessageEnum.text,
-                                  onRightSwipe: () => onMessageSwipe(
-                                    messageData,
-                                    false,
+                                                      'image'
+                                                  ? MessageEnum.image
+                                                  : messageData[
+                                                              'repliedMessageType'] ==
+                                                          'video'
+                                                      ? MessageEnum.video
+                                                      : messageData[
+                                                                  'repliedMessageType'] ==
+                                                              'gif'
+                                                          ? MessageEnum.gif
+                                                          : MessageEnum.text,
+                                          onRightSwipe: () => onMessageSwipe(
+                                            messageData,
+                                            false,
+                                          ),
+                                          repliedText:
+                                              messageData['repliedMessage']
+                                                      ?.toString() ??
+                                                  "",
+                                        ), // message widget
+                                        onReactionTap: (reaction) async {
+                                          final List<ConnectivityResult>
+                                              connectivityResult =
+                                              await (Connectivity()
+                                                  .checkConnectivity());
+                                          bool isMessageReply =
+                                              messageData['repliedMessage'] ==
+                                                      ""
+                                                  ? false
+                                                  : true;
+                                          if (reaction == '➕') {
+                                            // show emoji picker container
+                                          } else {
+                                            if (connectivityResult.contains(
+                                                ConnectivityResult.none)) {
+                                              showCustomSnackBar(
+                                                  "Pas de connexion internet");
+                                              return;
+                                            }
+                                            if (mounted) {
+                                              ref
+                                                  .read(chatStateNotifier(
+                                                          widget.uidUser)
+                                                      .notifier)
+                                                  .reactMessage(
+                                                      reaction,
+                                                      messageData['messageId'],
+                                                      widget.uidUser,
+                                                      isMessageReply);
+                                            }
+                                          }
+                                        },
+                                        onContextMenuTap: (menuItem) async {
+                                          final List<ConnectivityResult>
+                                              connectivityResult =
+                                              await (Connectivity()
+                                                  .checkConnectivity());
+                                          int selectedIndex =
+                                              menuItemsSender.indexOf(menuItem);
+                                          if (selectedIndex != -1) {
+                                            if (selectedIndex == 0) {
+                                              List<Map<String, dynamic>>
+                                                  dataMessage = [];
+                                              bool isMe =
+                                                  (messageData['senderId'] ==
+                                                          uidUser)
+                                                      ? true
+                                                      : false;
+                                              dataMessage.add({
+                                                "idMessage":
+                                                    messageData['messageId']
+                                                            ?.toString() ??
+                                                        "",
+                                                "checkIsMe": isMe,
+                                                "typeMessage": messageData[
+                                                            'type'] ==
+                                                        'audio'
+                                                    ? MessageEnum.audio
+                                                    : messageData['type'] ==
+                                                            'image'
+                                                        ? MessageEnum.image
+                                                        : messageData['type'] ==
+                                                                'video'
+                                                            ? MessageEnum.video
+                                                            : messageData[
+                                                                        'type'] ==
+                                                                    'gif'
+                                                                ? MessageEnum
+                                                                    .gif
+                                                                : MessageEnum
+                                                                    .text,
+                                                "message": messageData['text'],
+                                                "nameSender": widget.name
+                                              });
+                                              if (mounted) {
+                                                ref
+                                                    .read(chatStateNotifier(
+                                                            widget.uidUser)
+                                                        .notifier)
+                                                    .getReplyMessage(
+                                                        dataMessage);
+                                              }
+                                            } else if (selectedIndex == 1) {
+                                              await Clipboard.setData(
+                                                  ClipboardData(
+                                                      text: messageData['text']
+                                                              ?.toString() ??
+                                                          ""));
+                                            } else if (selectedIndex == 2) {
+                                              bool isMe =
+                                                  (messageData['senderId'] ==
+                                                          uidUser)
+                                                      ? true
+                                                      : false;
+                                              _showMoreOption4(
+                                                  isMe, widget.name, dateSent);
+                                            }
+                                            // Gérer l'élément du menu selon l'index
+                                          } else {
+                                            print("Menu item not found");
+                                          }
+                                          // handle context menu item
+                                        },
+                                        widgetAlignment: Alignment.centerLeft,
+                                      );
+                                    },
                                   ),
-                                  repliedText: messageData['repliedMessage']
-                                          ?.toString() ??
-                                      "",
-                                ), // message widget
-                                onReactionTap: (reaction) async {
-                                  final List<ConnectivityResult>
-                                      connectivityResult = await (Connectivity()
-                                          .checkConnectivity());
-                                  bool isMessageReply =
-                                      messageData['repliedMessage'] == ""
-                                          ? false
-                                          : true;
-                                  if (reaction == '➕') {
-                                    // show emoji picker container
-                                  } else {
-                                    if (connectivityResult
-                                        .contains(ConnectivityResult.none)) {
-                                      showCustomSnackBar(
-                                          "Pas de connexion internet");
-                                      return;
+                                );
+                              }
+                            },
+                            child: messageData['text'] == "messageretirerforme"
+                                ? Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: Align(
+                                      alignment: Alignment.topLeft,
+                                      child: Container(
+                                          height: 30,
+                                          width: 120,
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(20),
+                                                  topRight: Radius.circular(20),
+                                                  bottomLeft:
+                                                      Radius.circular(20),
+                                                  bottomRight:
+                                                      Radius.circular(20)),
+                                              color: Colors.white),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(2),
+                                            child: Center(
+                                                child: Text(
+                                              'Ce message a été retiré.'.tr,
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  color: Colors.black26,
+                                                  fontStyle: FontStyle.italic),
+                                            )),
+                                          )),
+                                    ),
+                                  )
+                                : messageData['text'] == "messageretirerforall"
+                                    ? Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 10),
+                                        child: Align(
+                                          alignment: Alignment.topLeft,
+                                          child: Container(
+                                              height: 30,
+                                              width: 120,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                          topLeft: Radius
+                                                              .circular(20),
+                                                          topRight:
+                                                              Radius.circular(
+                                                                  20),
+                                                          bottomLeft:
+                                                              Radius.circular(
+                                                                  20),
+                                                          bottomRight:
+                                                              Radius.circular(
+                                                                  20)),
+                                                  color: Colors.white),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(2),
+                                                child: Center(
+                                                    child: Text(
+                                                  'Ce message a été retiré.'.tr,
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                      color: Colors.black26,
+                                                      fontStyle:
+                                                          FontStyle.italic),
+                                                )),
+                                              )),
+                                        ),
+                                      )
+                                    : Padding(
+                                        padding: EdgeInsets.only(left: 12),
+                                        child: SenderMessageCard(
+                                          colorMe: widget.colorMe,
+                                          colorSender: widget.colorSender,
+                                          reactMessageReply: (messageData[
+                                                          'reactMessageReply']
+                                                      as List<dynamic>?)
+                                                  ?.map((e) =>
+                                                      Map<String, String>.from(
+                                                          e))
+                                                  .toList() ??
+                                              [],
+                                          reactMessageSingle: (messageData[
+                                                          'reactMessageSingle']
+                                                      as List<dynamic>?)
+                                                  ?.map((e) =>
+                                                      Map<String, String>.from(
+                                                          e))
+                                                  .toList() ??
+                                              [],
+                                          messageId: messageData['messageId']
+                                                  ?.toString() ??
+                                              "",
+                                          key: ValueKey(
+                                              messageData['messageId']),
+                                          message:
+                                              messageData['text']?.toString() ??
+                                                  "",
+                                          date: timeSent,
+                                          type: messageData['type'] == 'audio'
+                                              ? MessageEnum.audio
+                                              : messageData['type'] == 'image'
+                                                  ? MessageEnum.image
+                                                  : messageData['type'] ==
+                                                          'video'
+                                                      ? MessageEnum.video
+                                                      : messageData['type'] ==
+                                                              'gif'
+                                                          ? MessageEnum.gif
+                                                          : MessageEnum.text,
+                                          username: messageData['repliedTo']
+                                                  ?.toString() ??
+                                              "",
+                                          repliedMessageType: messageData[
+                                                      'repliedMessageType'] ==
+                                                  'audio'
+                                              ? MessageEnum.audio
+                                              : messageData[
+                                                          'repliedMessageType'] ==
+                                                      'image'
+                                                  ? MessageEnum.image
+                                                  : messageData[
+                                                              'repliedMessageType'] ==
+                                                          'video'
+                                                      ? MessageEnum.video
+                                                      : messageData[
+                                                                  'repliedMessageType'] ==
+                                                              'gif'
+                                                          ? MessageEnum.gif
+                                                          : MessageEnum.text,
+                                          onRightSwipe: () => onMessageSwipe(
+                                            messageData,
+                                            false,
+                                          ),
+                                          repliedText:
+                                              messageData['repliedMessage']
+                                                      ?.toString() ??
+                                                  "",
+                                        ),
+                                      ),
+                          ),
+                          (index == 0)
+                              ? StreamBuilder(
+                                  stream: ref
+                                      .read(chatStateNotifier(widget.uidUser)
+                                          .notifier)
+                                      .getStatusTyping(widget.uidUser),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return SizedBox();
                                     }
-                                    if (mounted) {
-                                      ref
-                                          .read(
-                                              chatStateNotifier(widget.uidUser)
-                                                  .notifier)
-                                          .reactMessage(
-                                              reaction,
-                                              messageData['messageId'],
-                                              widget.uidUser,
-                                              isMessageReply);
-                                    }
+                                    return snapshot.data == null
+                                        ? SizedBox()
+                                        : Align(
+                                            alignment: Alignment.bottomLeft,
+                                            child: Padding(
+                                              padding:
+                                                  EdgeInsets.only(left: 12),
+                                              child: TypingIndicator(
+                                                showIndicator: snapshot.data!,
+                                                photo: widget.photo,
+                                              ),
+                                            ),
+                                          );
+                                  })
+                              : SizedBox()
+                        ],
+                      );
+                    }
+                  },
+                  onEmpty: Center(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                              width: 130,
+                              height: 130,
+                              child: Image.asset('assets/speech-bubble.png',
+                                  color: Colors.white)),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            textAlign: TextAlign.center,
+                            "Soyez_respectueux".tr,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20),
+                          ),
+                          SizedBox(
+                            height: 2,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            child: Text(
+                              "Vos_messages_cryptés".tr,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 17),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ));
+            }
+
+            final messages = snapshot.data!.docs;
+            // Mettre à jour tous les messages non lus
+            Future.delayed(Duration.zero, () async {
+              for (var doc in messages) {
+                await doc.reference.update({'isSeen': true});
+              }
+
+              // Ensuite, mettre à jour les statuts de lecture
+              await FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .collection('chats')
+                  .doc(widget.uidUser)
+                  .update({'statusRead': true});
+
+              await FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(widget.uidUser)
+                  .collection('chats')
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .update({'checkStatusReadOnOther': true});
+            });
+            return FirestorePagination(
+                controller: _scrollController,
+                limit: 15, // Defaults to 10.
+                viewType: ViewType.list,
+                isLive: true,
+                reverse: true,
+                bottomLoader: SizedBox(),
+                initialLoader: SizedBox(),
+                query: firestore
+                    .collection('users')
+                    .doc(uidUser)
+                    .collection('chats')
+                    .doc(widget.uidUser)
+                    .collection('messages')
+                    .orderBy('timeSent', descending: true),
+                itemBuilder: (context, documentSnapshot, index) {
+                  final data = documentSnapshot.data() as Map<String, dynamic>?;
+                  if (data == null) return Container();
+                  final messageData = data;
+                  DateTime datetimes = DateTime.fromMillisecondsSinceEpoch(
+                      messageData['timeSent']);
+                  var timeSent = DateFormat.Hm().format(datetimes);
+                  String a = "à".tr;
+                  var dateSentq = DateFormat.yMMMd().format(datetimes);
+                  String dateSent = "$dateSentq $a $timeSent";
+                  // Ajouter la date du message actuel à la liste
+                  if (!messageDates.contains(datetimes)) {
+                    messageDates.add(datetimes);
+                  }
+                  // Utilisation de SchedulerBinding pour s'assurer que la liste est bien affichée
+                  if (initOpenChat == true) {
+                    SchedulerBinding.instance.addPostFrameCallback((_) {
+                      if (!_userIsScrolling) {
+                        _scrollToBottom(); // Forcer le défilement
+                      }
+                    });
+                  } else {
+                    SchedulerBinding.instance.addPostFrameCallback((_) {
+                      if (!_userIsScrolling) {
+                        _scrollToBottomNotInit(); // Forcer le défilement
+                      }
+                    });
+                  }
+                  if (messageData['senderId'] == uidUser) {
+                    return Column(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            if (messageData['reactMessageReply'].isNotEmpty ||
+                                messageData['reactMessageSingle'].isNotEmpty) {
+                              showReactionMessage(
+                                  widget.photo,
+                                  widget.uidUser,
+                                  widget.name,
+                                  messageData['reactMessageReply']
+                                      as List<dynamic>,
+                                  messageData['reactMessageSingle']
+                                      as List<dynamic>);
+                            }
+                          },
+                          onLongPress: () {
+                            if (!(messageData['text'] ==
+                                    "messageretirerforme" ||
+                                messageData['text'] ==
+                                    "messageretirerforall")) {
+                              // navigate with a custom [HeroDialogRoute] to [ReactionsDialogWidget]
+                              Navigator.of(context).push(
+                                HeroDialogRoute(
+                                  builder: (context) {
+                                    return ReactionsDialogWidget(
+                                        menuItemsWidth: 1,
+                                        menuItems: menuItems,
+                                        reactions: reactions,
+                                        id: messageData[
+                                            'messageId'], // unique id for message
+                                        messageWidget: MyMessageCardCopy(
+                                          colorMe: widget.colorMe,
+                                          colorSender: widget.colorSender,
+                                          messageId: messageData['messageId']
+                                                  ?.toString() ??
+                                              "",
+                                          key: ValueKey(
+                                              messageData['messageId']),
+                                          message:
+                                              messageData['text']?.toString() ??
+                                                  "",
+                                          date: timeSent,
+                                          type: messageData['type'] == 'audio'
+                                              ? MessageEnum.audio
+                                              : messageData['type'] == 'image'
+                                                  ? MessageEnum.image
+                                                  : messageData['type'] ==
+                                                          'video'
+                                                      ? MessageEnum.video
+                                                      : messageData['type'] ==
+                                                              'gif'
+                                                          ? MessageEnum.gif
+                                                          : MessageEnum.text,
+                                          repliedText:
+                                              messageData['repliedMessage']
+                                                      ?.toString() ??
+                                                  "",
+                                          username: messageData['repliedTo']
+                                                  ?.toString() ??
+                                              "",
+                                          repliedMessageType: messageData[
+                                                      'repliedMessageType'] ==
+                                                  'audio'
+                                              ? MessageEnum.audio
+                                              : messageData[
+                                                          'repliedMessageType'] ==
+                                                      'image'
+                                                  ? MessageEnum.image
+                                                  : messageData[
+                                                              'repliedMessageType'] ==
+                                                          'video'
+                                                      ? MessageEnum.video
+                                                      : messageData[
+                                                                  'repliedMessageType'] ==
+                                                              'gif'
+                                                          ? MessageEnum.gif
+                                                          : MessageEnum.text,
+                                          onLeftSwipe: () => onMessageSwipe(
+                                            messageData,
+                                            true,
+                                          ),
+                                          isSeen: messageData['isSeen'],
+                                        ), // message widget
+                                        onReactionTap: (reaction) async {
+                                          final List<ConnectivityResult>
+                                              connectivityResult =
+                                              await (Connectivity()
+                                                  .checkConnectivity());
+                                          bool isMessageReply =
+                                              messageData['repliedMessage'] ==
+                                                      ""
+                                                  ? false
+                                                  : true;
+                                          if (reaction == '➕') {
+                                            // show emoji picker container
+                                          } else {
+                                            if (connectivityResult.contains(
+                                                ConnectivityResult.none)) {
+                                              showCustomSnackBar(
+                                                  "Pas de connexion internet");
+                                              return;
+                                            }
+                                            if (mounted) {
+                                              ref
+                                                  .read(chatStateNotifier(
+                                                          widget.uidUser)
+                                                      .notifier)
+                                                  .reactMessage(
+                                                      reaction,
+                                                      messageData['messageId'],
+                                                      widget.uidUser,
+                                                      isMessageReply);
+                                            }
+                                          }
+                                        },
+                                        onContextMenuTap: (menuItem) async {
+                                          final List<ConnectivityResult>
+                                              connectivityResult =
+                                              await (Connectivity()
+                                                  .checkConnectivity());
+                                          int selectedIndex =
+                                              menuItems.indexOf(menuItem);
+                                          if (selectedIndex != -1) {
+                                            if (selectedIndex == 0) {
+                                              List<Map<String, dynamic>>
+                                                  dataMessage = [];
+                                              bool isMe =
+                                                  (messageData['senderId'] ==
+                                                          uidUser)
+                                                      ? true
+                                                      : false;
+                                              dataMessage.add({
+                                                "idMessage":
+                                                    messageData['messageId'],
+                                                "checkIsMe": isMe,
+                                                "typeMessage": messageData[
+                                                            'type'] ==
+                                                        'audio'
+                                                    ? MessageEnum.audio
+                                                    : messageData['type'] ==
+                                                            'image'
+                                                        ? MessageEnum.image
+                                                        : messageData['type'] ==
+                                                                'video'
+                                                            ? MessageEnum.video
+                                                            : messageData[
+                                                                        'type'] ==
+                                                                    'gif'
+                                                                ? MessageEnum
+                                                                    .gif
+                                                                : MessageEnum
+                                                                    .text,
+                                                "message": messageData['text'],
+                                                "nameSender": widget.name
+                                              });
+                                              if (mounted) {
+                                                ref
+                                                    .read(chatStateNotifier(
+                                                            widget.uidUser)
+                                                        .notifier)
+                                                    .getReplyMessage(
+                                                        dataMessage);
+                                              }
+                                            } else if (selectedIndex == 1) {
+                                              await Clipboard.setData(
+                                                  ClipboardData(
+                                                      text: messageData['text']
+                                                              ?.toString() ??
+                                                          ""));
+                                            } else if (selectedIndex == 2) {
+                                              if (connectivityResult.contains(
+                                                  ConnectivityResult.none)) {
+                                                showCustomSnackBar(
+                                                    "Pas de connexion internet");
+                                                return;
+                                              }
+                                              if (mounted) {
+                                                int timesent =
+                                                    messageData['timeSent'];
+                                                ref
+                                                    .read(chatStateNotifier(
+                                                            widget.uidUser)
+                                                        .notifier)
+                                                    .deleteMessage(
+                                                        messageData[
+                                                            'messageId'],
+                                                        widget.uidUser,
+                                                        timesent,
+                                                        true);
+                                              }
+                                            } else if (selectedIndex == 3) {
+                                              if (connectivityResult.contains(
+                                                  ConnectivityResult.none)) {
+                                                showCustomSnackBar(
+                                                    "Pas de connexion internet");
+                                                return;
+                                              }
+                                              if (mounted) {
+                                                int timesent =
+                                                    messageData['timeSent'];
+                                                ref
+                                                    .read(chatStateNotifier(
+                                                            widget.uidUser)
+                                                        .notifier)
+                                                    .deleteMessage(
+                                                        messageData[
+                                                            'messageId'],
+                                                        widget.uidUser,
+                                                        timesent,
+                                                        false);
+                                              }
+                                            } else if (selectedIndex == 4) {
+                                              bool isMe =
+                                                  (messageData['senderId'] ==
+                                                          uidUser)
+                                                      ? true
+                                                      : false;
+                                              _showMoreOption4(
+                                                  isMe, widget.name, dateSent);
+                                            }
+                                            // Gérer l'élément du menu selon l'index
+                                          } else {
+                                            print("Menu item not found");
+                                          }
+                                          // handle context menu item
+                                        },
+                                        widgetAlignment: Alignment.centerLeft);
+                                  },
+                                ),
+                              );
+                            }
+                          },
+                          child: messageData['text'] == "messageretirerforme"
+                              ? Padding(
+                                  padding:
+                                      const EdgeInsets.only(right: 7, top: 3),
+                                  child: Align(
+                                    alignment: Alignment.topRight,
+                                    child: Container(
+                                        height: 40,
+                                        width: 120,
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(15),
+                                                topRight: Radius.circular(15),
+                                                bottomLeft: Radius.circular(15),
+                                                bottomRight:
+                                                    Radius.circular(15)),
+                                            color: newColorBlueElevate),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(2),
+                                          child: Center(
+                                              child: Text(
+                                            'Ce message a été retiré.'.tr,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                color: Colors.white54,
+                                                fontStyle: FontStyle.italic),
+                                          )),
+                                        )),
+                                  ),
+                                )
+                              : messageData['text'] == "messageretirerforall"
+                                  ? Padding(
+                                      padding: const EdgeInsets.only(
+                                          right: 7, top: 3),
+                                      child: Align(
+                                        alignment: Alignment.topRight,
+                                        child: Container(
+                                            height: 40,
+                                            width: 120,
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.only(
+                                                    topLeft:
+                                                        Radius.circular(15),
+                                                    topRight:
+                                                        Radius.circular(15),
+                                                    bottomLeft:
+                                                        Radius.circular(15),
+                                                    bottomRight:
+                                                        Radius.circular(15)),
+                                                color: newColorBlueElevate),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(2),
+                                              child: Center(
+                                                  child: Text(
+                                                'Ce message a été retiré.'.tr,
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    color: Colors.white54,
+                                                    fontStyle:
+                                                        FontStyle.italic),
+                                              )),
+                                            )),
+                                      ),
+                                    )
+                                  : MyMessageCard(
+                                      colorMe: widget.colorMe,
+                                      colorSender: widget.colorSender,
+                                      reactMessageReply: (messageData[
+                                                      'reactMessageReply']
+                                                  as List<dynamic>?)
+                                              ?.map((e) =>
+                                                  Map<String, String>.from(e))
+                                              .toList() ??
+                                          [],
+                                      reactMessageSingle: (messageData[
+                                                      'reactMessageSingle']
+                                                  as List<dynamic>?)
+                                              ?.map((e) =>
+                                                  Map<String, String>.from(e))
+                                              .toList() ??
+                                          [],
+                                      messageId: messageData['messageId']
+                                              ?.toString() ??
+                                          "",
+                                      key: ValueKey(messageData['messageId']),
+                                      message:
+                                          messageData['text']?.toString() ?? "",
+                                      date: timeSent,
+                                      type: messageData['type'] == 'audio'
+                                          ? MessageEnum.audio
+                                          : messageData['type'] == 'image'
+                                              ? MessageEnum.image
+                                              : messageData['type'] == 'video'
+                                                  ? MessageEnum.video
+                                                  : messageData['type'] == 'gif'
+                                                      ? MessageEnum.gif
+                                                      : MessageEnum.text,
+                                      repliedText: messageData['repliedMessage']
+                                              ?.toString() ??
+                                          "",
+                                      username: messageData['repliedTo']
+                                              ?.toString() ??
+                                          "",
+                                      repliedMessageType: messageData[
+                                                  'repliedMessageType'] ==
+                                              'audio'
+                                          ? MessageEnum.audio
+                                          : messageData['repliedMessageType'] ==
+                                                  'image'
+                                              ? MessageEnum.image
+                                              : messageData[
+                                                          'repliedMessageType'] ==
+                                                      'video'
+                                                  ? MessageEnum.video
+                                                  : messageData[
+                                                              'repliedMessageType'] ==
+                                                          'gif'
+                                                      ? MessageEnum.gif
+                                                      : MessageEnum.text,
+                                      onLeftSwipe: () => onMessageSwipe(
+                                        messageData,
+                                        true,
+                                      ),
+                                      isSeen: messageData['isSeen'],
+                                    ),
+                        ),
+                        (index == 0)
+                            ? StreamBuilder(
+                                stream: ref
+                                    .read(chatStateNotifier(widget.uidUser)
+                                        .notifier)
+                                    .getStatusTyping(widget.uidUser),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return SizedBox();
                                   }
-                                },
-                                onContextMenuTap: (menuItem) async {
-                                  final List<ConnectivityResult>
-                                      connectivityResult = await (Connectivity()
-                                          .checkConnectivity());
-                                  int selectedIndex =
-                                      menuItemsSender.indexOf(menuItem);
-                                  if (selectedIndex != -1) {
-                                    if (selectedIndex == 0) {
-                                      List<Map<String, dynamic>> dataMessage =
-                                          [];
-                                      bool isMe =
-                                          (messageData['senderId'] == uidUser)
-                                              ? true
-                                              : false;
-                                      dataMessage.add({
-                                        "idMessage": messageData['messageId']
+                                  return snapshot.data == null
+                                      ? SizedBox()
+                                      : Align(
+                                          alignment: Alignment.bottomLeft,
+                                          child: Padding(
+                                            padding: EdgeInsets.only(left: 12),
+                                            child: TypingIndicator(
+                                              showIndicator: snapshot.data!,
+                                              photo: widget.photo,
+                                            ),
+                                          ),
+                                        );
+                                })
+                            : SizedBox()
+                      ],
+                    );
+                  } else {
+                    return Column(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            if (messageData['reactMessageReply'].isNotEmpty ||
+                                messageData['reactMessageSingle'].isNotEmpty) {
+                              showReactionMessage(
+                                  widget.photo,
+                                  widget.uidUser,
+                                  widget.name,
+                                  messageData['reactMessageReply']
+                                      as List<dynamic>,
+                                  messageData['reactMessageSingle']
+                                      as List<dynamic>);
+                            }
+                          },
+                          onLongPress: () {
+                            // _showMoreOption(messageData,index,totalMessage,false);
+                            if (!(messageData['text'] ==
+                                    "messageretirerforme" ||
+                                messageData['text'] ==
+                                    "messageretirerforall")) {
+                              // navigate with a custom [HeroDialogRoute] to [ReactionsDialogWidget]
+                              Navigator.of(context).push(
+                                HeroDialogRoute(
+                                  builder: (context) {
+                                    return ReactionsDialogWidget(
+                                      menuItemsWidth: 1,
+                                      menuItems: menuItemsSender,
+                                      reactions: reactions,
+                                      id: messageData[
+                                          'messageId'], // unique id for message
+                                      messageWidget: SenderMessageCardCopy(
+                                        colorMe: widget.colorMe,
+                                        colorSender: widget.colorSender,
+                                        messageId: messageData['messageId']
                                                 ?.toString() ??
                                             "",
-                                        "checkIsMe": isMe,
-                                        "typeMessage": messageData['type'] ==
-                                                'audio'
+                                        key: ValueKey(messageData['messageId']),
+                                        message:
+                                            messageData['text']?.toString() ??
+                                                "",
+                                        date: timeSent,
+                                        type: messageData['type'] == 'audio'
                                             ? MessageEnum.audio
                                             : messageData['type'] == 'image'
                                                 ? MessageEnum.image
@@ -818,229 +1664,342 @@ class _ListMessageDetailState extends ConsumerState<ListMessageDetail> {
                                                             'gif'
                                                         ? MessageEnum.gif
                                                         : MessageEnum.text,
-                                        "message": messageData['text'],
-                                        "nameSender": widget.name
-                                      });
-                                      if (mounted) {
-                                        ref
-                                            .read(chatStateNotifier(
-                                                    widget.uidUser)
-                                                .notifier)
-                                            .getReplyMessage(dataMessage);
-                                      }
-                                    } else if (selectedIndex == 1) {
-                                      await Clipboard.setData(ClipboardData(
-                                          text:
-                                              messageData['text']?.toString() ??
-                                                  ""));
-                                    } else if (selectedIndex == 2) {
-                                      bool isMe =
-                                          (messageData['senderId'] == uidUser)
-                                              ? true
-                                              : false;
-                                      _showMoreOption4(
-                                          isMe, widget.name, dateSent);
-                                    }
-                                    // Gérer l'élément du menu selon l'index
-                                  } else {
-                                    print("Menu item not found");
-                                  }
-                                  // handle context menu item
-                                },
-                                widgetAlignment: Alignment.centerLeft,
+                                        username: messageData['repliedTo']
+                                                ?.toString() ??
+                                            "",
+                                        repliedMessageType: messageData[
+                                                    'repliedMessageType'] ==
+                                                'audio'
+                                            ? MessageEnum.audio
+                                            : messageData[
+                                                        'repliedMessageType'] ==
+                                                    'image'
+                                                ? MessageEnum.image
+                                                : messageData[
+                                                            'repliedMessageType'] ==
+                                                        'video'
+                                                    ? MessageEnum.video
+                                                    : messageData[
+                                                                'repliedMessageType'] ==
+                                                            'gif'
+                                                        ? MessageEnum.gif
+                                                        : MessageEnum.text,
+                                        onRightSwipe: () => onMessageSwipe(
+                                          messageData,
+                                          false,
+                                        ),
+                                        repliedText:
+                                            messageData['repliedMessage']
+                                                    ?.toString() ??
+                                                "",
+                                      ), // message widget
+                                      onReactionTap: (reaction) async {
+                                        final List<ConnectivityResult>
+                                            connectivityResult =
+                                            await (Connectivity()
+                                                .checkConnectivity());
+                                        bool isMessageReply =
+                                            messageData['repliedMessage'] == ""
+                                                ? false
+                                                : true;
+                                        if (reaction == '➕') {
+                                          // show emoji picker container
+                                        } else {
+                                          if (connectivityResult.contains(
+                                              ConnectivityResult.none)) {
+                                            showCustomSnackBar(
+                                                "Pas de connexion internet");
+                                            return;
+                                          }
+                                          if (mounted) {
+                                            ref
+                                                .read(chatStateNotifier(
+                                                        widget.uidUser)
+                                                    .notifier)
+                                                .reactMessage(
+                                                    reaction,
+                                                    messageData['messageId'],
+                                                    widget.uidUser,
+                                                    isMessageReply);
+                                          }
+                                        }
+                                      },
+                                      onContextMenuTap: (menuItem) async {
+                                        final List<ConnectivityResult>
+                                            connectivityResult =
+                                            await (Connectivity()
+                                                .checkConnectivity());
+                                        int selectedIndex =
+                                            menuItemsSender.indexOf(menuItem);
+                                        if (selectedIndex != -1) {
+                                          if (selectedIndex == 0) {
+                                            List<Map<String, dynamic>>
+                                                dataMessage = [];
+                                            bool isMe =
+                                                (messageData['senderId'] ==
+                                                        uidUser)
+                                                    ? true
+                                                    : false;
+                                            dataMessage.add({
+                                              "idMessage":
+                                                  messageData['messageId']
+                                                          ?.toString() ??
+                                                      "",
+                                              "checkIsMe": isMe,
+                                              "typeMessage": messageData[
+                                                          'type'] ==
+                                                      'audio'
+                                                  ? MessageEnum.audio
+                                                  : messageData['type'] ==
+                                                          'image'
+                                                      ? MessageEnum.image
+                                                      : messageData['type'] ==
+                                                              'video'
+                                                          ? MessageEnum.video
+                                                          : messageData[
+                                                                      'type'] ==
+                                                                  'gif'
+                                                              ? MessageEnum.gif
+                                                              : MessageEnum
+                                                                  .text,
+                                              "message": messageData['text'],
+                                              "nameSender": widget.name
+                                            });
+                                            if (mounted) {
+                                              ref
+                                                  .read(chatStateNotifier(
+                                                          widget.uidUser)
+                                                      .notifier)
+                                                  .getReplyMessage(dataMessage);
+                                            }
+                                          } else if (selectedIndex == 1) {
+                                            await Clipboard.setData(
+                                                ClipboardData(
+                                                    text: messageData['text']
+                                                            ?.toString() ??
+                                                        ""));
+                                          } else if (selectedIndex == 2) {
+                                            bool isMe =
+                                                (messageData['senderId'] ==
+                                                        uidUser)
+                                                    ? true
+                                                    : false;
+                                            _showMoreOption4(
+                                                isMe, widget.name, dateSent);
+                                          }
+                                          // Gérer l'élément du menu selon l'index
+                                        } else {
+                                          print("Menu item not found");
+                                        }
+                                        // handle context menu item
+                                      },
+                                      widgetAlignment: Alignment.centerLeft,
+                                    );
+                                  },
+                                ),
                               );
-                            },
-                          ),
-                        );
-                      }
-                    },
-                    child: messageData['text'] == "messageretirerforme"
-                        ? Padding(
-                            padding: const EdgeInsets.only(left: 10),
-                            child: Align(
-                              alignment: Alignment.topLeft,
-                              child: Container(
-                                  height: 30,
-                                  width: 120,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(20),
-                                          topRight: Radius.circular(20),
-                                          bottomLeft: Radius.circular(20),
-                                          bottomRight: Radius.circular(20)),
-                                      color: Colors.white),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(2),
-                                    child: Center(
-                                        child: Text(
-                                      'Ce message a été retiré.'.tr,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          color: Colors.black26,
-                                          fontStyle: FontStyle.italic),
-                                    )),
-                                  )),
-                            ),
-                          )
-                        : messageData['text'] == "messageretirerforall"
-                            ? Padding(
-                                padding: const EdgeInsets.only(left: 10),
-                                child: Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Container(
-                                      height: 30,
-                                      width: 120,
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(20),
-                                              topRight: Radius.circular(20),
-                                              bottomLeft: Radius.circular(20),
-                                              bottomRight: Radius.circular(20)),
-                                          color: Colors.white),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(2),
-                                        child: Center(
-                                            child: Text(
-                                          'Ce message a été retiré.'.tr,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              color: Colors.black26,
-                                              fontStyle: FontStyle.italic),
-                                        )),
-                                      )),
-                                ),
-                              )
-                            : Padding(
-                                padding: EdgeInsets.only(left: 12),
-                                child: SenderMessageCard(
-                                  colorMe: widget.colorMe,
-                                  colorSender: widget.colorSender,
-                                  reactMessageReply:
-                                      (messageData['reactMessageReply']
-                                                  as List<dynamic>?)
-                                              ?.map((e) =>
-                                                  Map<String, String>.from(e))
-                                              .toList() ??
-                                          [],
-                                  reactMessageSingle:
-                                      (messageData['reactMessageSingle']
-                                                  as List<dynamic>?)
-                                              ?.map((e) =>
-                                                  Map<String, String>.from(e))
-                                              .toList() ??
-                                          [],
-                                  messageId:
-                                      messageData['messageId']?.toString() ??
-                                          "",
-                                  key: ValueKey(messageData['messageId']),
-                                  message:
-                                      messageData['text']?.toString() ?? "",
-                                  date: timeSent,
-                                  type: messageData['type'] == 'audio'
-                                      ? MessageEnum.audio
-                                      : messageData['type'] == 'image'
-                                          ? MessageEnum.image
-                                          : messageData['type'] == 'video'
-                                              ? MessageEnum.video
-                                              : messageData['type'] == 'gif'
-                                                  ? MessageEnum.gif
-                                                  : MessageEnum.text,
-                                  username:
-                                      messageData['repliedTo']?.toString() ??
-                                          "",
-                                  repliedMessageType: messageData[
-                                              'repliedMessageType'] ==
-                                          'audio'
-                                      ? MessageEnum.audio
-                                      : messageData['repliedMessageType'] ==
-                                              'image'
-                                          ? MessageEnum.image
-                                          : messageData['repliedMessageType'] ==
-                                                  'video'
-                                              ? MessageEnum.video
-                                              : messageData[
-                                                          'repliedMessageType'] ==
-                                                      'gif'
-                                                  ? MessageEnum.gif
-                                                  : MessageEnum.text,
-                                  onRightSwipe: () => onMessageSwipe(
-                                    messageData,
-                                    false,
-                                  ),
-                                  repliedText: messageData['repliedMessage']
-                                          ?.toString() ??
-                                      "",
-                                ),
-                              ),
-                  ),
-                  (index == 0)
-                      ? StreamBuilder(
-                          stream: ref
-                              .read(chatStateNotifier(widget.uidUser).notifier)
-                              .getStatusTyping(widget.uidUser),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return SizedBox();
                             }
-                            return snapshot.data == null
-                                ? SizedBox()
-                                : Align(
-                                    alignment: Alignment.bottomLeft,
-                                    child: Padding(
+                          },
+                          child: messageData['text'] == "messageretirerforme"
+                              ? Padding(
+                                  padding: const EdgeInsets.only(left: 10),
+                                  child: Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Container(
+                                        height: 30,
+                                        width: 120,
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(20),
+                                                topRight: Radius.circular(20),
+                                                bottomLeft: Radius.circular(20),
+                                                bottomRight:
+                                                    Radius.circular(20)),
+                                            color: Colors.white),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(2),
+                                          child: Center(
+                                              child: Text(
+                                            'Ce message a été retiré.'.tr,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                color: Colors.black26,
+                                                fontStyle: FontStyle.italic),
+                                          )),
+                                        )),
+                                  ),
+                                )
+                              : messageData['text'] == "messageretirerforall"
+                                  ? Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Align(
+                                        alignment: Alignment.topLeft,
+                                        child: Container(
+                                            height: 30,
+                                            width: 120,
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.only(
+                                                    topLeft:
+                                                        Radius.circular(20),
+                                                    topRight:
+                                                        Radius.circular(20),
+                                                    bottomLeft:
+                                                        Radius.circular(20),
+                                                    bottomRight:
+                                                        Radius.circular(20)),
+                                                color: Colors.white),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(2),
+                                              child: Center(
+                                                  child: Text(
+                                                'Ce message a été retiré.'.tr,
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    color: Colors.black26,
+                                                    fontStyle:
+                                                        FontStyle.italic),
+                                              )),
+                                            )),
+                                      ),
+                                    )
+                                  : Padding(
                                       padding: EdgeInsets.only(left: 12),
-                                      child: TypingIndicator(
-                                        showIndicator: snapshot.data!,
-                                        photo: widget.photo,
+                                      child: SenderMessageCard(
+                                        colorMe: widget.colorMe,
+                                        colorSender: widget.colorSender,
+                                        reactMessageReply: (messageData[
+                                                        'reactMessageReply']
+                                                    as List<dynamic>?)
+                                                ?.map((e) =>
+                                                    Map<String, String>.from(e))
+                                                .toList() ??
+                                            [],
+                                        reactMessageSingle: (messageData[
+                                                        'reactMessageSingle']
+                                                    as List<dynamic>?)
+                                                ?.map((e) =>
+                                                    Map<String, String>.from(e))
+                                                .toList() ??
+                                            [],
+                                        messageId: messageData['messageId']
+                                                ?.toString() ??
+                                            "",
+                                        key: ValueKey(messageData['messageId']),
+                                        message:
+                                            messageData['text']?.toString() ??
+                                                "",
+                                        date: timeSent,
+                                        type: messageData['type'] == 'audio'
+                                            ? MessageEnum.audio
+                                            : messageData['type'] == 'image'
+                                                ? MessageEnum.image
+                                                : messageData['type'] == 'video'
+                                                    ? MessageEnum.video
+                                                    : messageData['type'] ==
+                                                            'gif'
+                                                        ? MessageEnum.gif
+                                                        : MessageEnum.text,
+                                        username: messageData['repliedTo']
+                                                ?.toString() ??
+                                            "",
+                                        repliedMessageType: messageData[
+                                                    'repliedMessageType'] ==
+                                                'audio'
+                                            ? MessageEnum.audio
+                                            : messageData[
+                                                        'repliedMessageType'] ==
+                                                    'image'
+                                                ? MessageEnum.image
+                                                : messageData[
+                                                            'repliedMessageType'] ==
+                                                        'video'
+                                                    ? MessageEnum.video
+                                                    : messageData[
+                                                                'repliedMessageType'] ==
+                                                            'gif'
+                                                        ? MessageEnum.gif
+                                                        : MessageEnum.text,
+                                        onRightSwipe: () => onMessageSwipe(
+                                          messageData,
+                                          false,
+                                        ),
+                                        repliedText:
+                                            messageData['repliedMessage']
+                                                    ?.toString() ??
+                                                "",
                                       ),
                                     ),
-                                  );
-                          })
-                      : SizedBox()
-                ],
-              );
-            }
-          },
-          onEmpty: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                      width: 130,
-                      height: 130,
-                      child: Image.asset('assets/speech-bubble.png',
-                          color: Colors.white)),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    textAlign: TextAlign.center,
-                    "Soyez_respectueux".tr,
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20),
-                  ),
-                  SizedBox(
-                    height: 2,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: Text(
-                      "Vos_messages_cryptés".tr,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 17),
+                        ),
+                        (index == 0)
+                            ? StreamBuilder(
+                                stream: ref
+                                    .read(chatStateNotifier(widget.uidUser)
+                                        .notifier)
+                                    .getStatusTyping(widget.uidUser),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return SizedBox();
+                                  }
+                                  return snapshot.data == null
+                                      ? SizedBox()
+                                      : Align(
+                                          alignment: Alignment.bottomLeft,
+                                          child: Padding(
+                                            padding: EdgeInsets.only(left: 12),
+                                            child: TypingIndicator(
+                                              showIndicator: snapshot.data!,
+                                              photo: widget.photo,
+                                            ),
+                                          ),
+                                        );
+                                })
+                            : SizedBox()
+                      ],
+                    );
+                  }
+                },
+                onEmpty: Center(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                            width: 130,
+                            height: 130,
+                            child: Image.asset('assets/speech-bubble.png',
+                                color: Colors.white)),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          textAlign: TextAlign.center,
+                          "Soyez_respectueux".tr,
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20),
+                        ),
+                        SizedBox(
+                          height: 2,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: Text(
+                            "Vos_messages_cryptés".tr,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w400,
+                                fontSize: 17),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          )),
-    );
+                ));
+          },
+        ));
   }
 
   void _scrollToBottom() {

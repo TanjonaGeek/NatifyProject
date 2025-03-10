@@ -124,17 +124,28 @@ class _cardListMessageState extends ConsumerState<cardListMessage>
                     child: Text(
                       widget.userMessage['name']?.toString() ?? "",
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15.0,
-                      ),
+                      style: Theme.of(context)
+                          .appBarTheme
+                          .titleTextStyle
+                          ?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize:
+                                15.0, // On force uniquement la graisse en bold
+                          ),
                     ),
                   ),
                 ),
-                Text(
-                  timeSent,
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 10),
-                )
+                widget.userMessage['statusRead'] != false
+                    ? Text(
+                        timeSent,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 10),
+                      )
+                    : Text(
+                        "🔵  $timeSent",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 10),
+                      )
               ],
             ),
             const SizedBox(
@@ -194,10 +205,12 @@ class _cardListMessageState extends ConsumerState<cardListMessage>
                                 "messageretirerforme"
                             ? 'messageretire'
                             : widget.userMessage['lastMessage'].toString(),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13.0,
-                    ),
+                    style:
+                        Theme.of(context).appBarTheme.titleTextStyle?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              fontSize:
+                                  13.0, // On force uniquement la graisse en bold
+                            ),
                     overflow: TextOverflow.ellipsis,
                   ),
           ],
@@ -207,9 +220,9 @@ class _cardListMessageState extends ConsumerState<cardListMessage>
     return InkWell(
       onTap: () async {
         String uid = widget.userMessage['contactId']?.toString() ?? "";
-        if (mounted) {
-          ref.read(chatStateNotifier(uid).notifier).unreadMessage(uid);
-        }
+        // if (mounted) {
+        //   ref.read(chatStateNotifier(uid).notifier).unreadMessage(uid);
+        // }
         Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
             builder: (context) => MessageDetail(

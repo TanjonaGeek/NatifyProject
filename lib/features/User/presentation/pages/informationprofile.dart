@@ -109,9 +109,8 @@ class ProfileInformation extends ConsumerWidget {
                         Positioned(
                             bottom: 0,
                             right: 0,
-                            child: Text(
-                                notifier.MydataPersiste!.flag?.toString() ??
-                                    ""))
+                            child:
+                                Text(MyOwnData.first.flag?.toString() ?? ""))
                       ],
                     ),
                     SizedBox(width: 20),

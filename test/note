@@ -77,3 +77,28 @@ Run echo "Rechargement des identités de signature"
     FLUTTER_ROOT: /Users/runner/hostedtoolcache/flutter/stable-3.27.3-arm64
     PUB_CACHE: /Users/runner/.pub-cache
   Rechargement des identités de signature
+
+
+  il affiche encore le "There are no local code signing identities found." dans le Fetch Certificates via Match,
+  voici le log de "Vérification des certificats téléchargés" :
+  Run echo "🔍 Vérification des certificats téléchargés"
+  echo "🔍 Vérification des certificats téléchargés"
+  ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
+  ls -la ~/Library/Keychains/
+  shell: /bin/bash -e ***0***
+  env:
+    FLUTTER_ROOT: /Users/runner/hostedtoolcache/flutter/stable-3.27.3-arm64
+    PUB_CACHE: /Users/runner/.pub-cache
+🔍 Vérification des certificats téléchargés
+      total 32
+      drwxr-xr-x  3 runner  staff     96 Mar  5 13:48 .
+      drwxr-xr-x  3 runner  staff     96 Mar  5 13:48 ..
+      -rw-r--r--  1 runner  staff  12394 Mar  5 13:48 72a2f5b9-0ebe-475d-8b4c-161e1270afbb.mobileprovision
+      total 176
+      drwx--x--x   7 runner  staff    224 Mar  5 13:48 .
+      drwx------@ 81 runner  staff   2592 Mar  5 13:48 ..
+      -r--r--r--   1 runner  staff      0 Mar  5 13:47 .fl1C67CD18
+      -r--r--r--   1 runner  staff      0 Jan 20 03:51 .fl34AC2A0A
+      drwx------   6 runner  staff    192 Mar  5 13:39 580DF914-427B-59B9-8058-0678C25B0FB6
+      -rw-r--r--   1 runner  staff  44744 Mar  5 13:48 build.keychain-db
+      -rw-r--r--   1 runner  staff  42780 Mar  5 13:44 login.keychain-db

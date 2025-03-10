@@ -216,6 +216,8 @@ class InfoNotifierUser extends StateNotifier<InfoStateUser> {
         MydataPersiste: value['dataUser'],
       );
     });
+    print(
+        'le nouveau donneer est ${state.MydataPersiste!.friendBlocked!.length}');
   }
 
   Future<String> isFilled() async {

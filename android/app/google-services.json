@@ -119,6 +119,14 @@
           }
         },
         {
+          "client_id": "197899231348-qk8ba6pqe2pkthvniho210mfj51hel18.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.natify.natifyapp",
+            "certificate_hash": "071c4421b1738e79eb0089c059cf952906b7e292"
+          }
+        },
+        {
           "client_id": "197899231348-tt0e1gaq31a68n3qmhhfm2kl3kb7uuh7.apps.googleusercontent.com",
           "client_type": 3
         }

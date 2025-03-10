@@ -90,7 +90,7 @@ class DisplayTextImageGIF extends StatelessWidget {
                       },
                       child: SizedBox(
                           width: 180,
-                          height: 100,
+                          height: 300,
                           child: StoryThumbnail(videoUrl: message)),
                     ),
                   )
@@ -202,7 +202,7 @@ class DisplayTextImageGIF extends StatelessWidget {
                                 },
                                 child: SizedBox(
                                   width: 180,
-                                  height: 100,
+                                  height: 300,
                                   child: CachedNetworkImage(
                                     fit: BoxFit.cover,
                                     imageUrl: message,

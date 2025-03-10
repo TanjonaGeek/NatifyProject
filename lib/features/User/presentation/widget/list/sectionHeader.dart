@@ -27,7 +27,10 @@ class _SectionHeaderState extends ConsumerState<SectionHeader> {
     _debounce = Timer(const Duration(milliseconds: 1300), () {
       ref
           .read(allUserListStateNotifier.notifier)
-          .getAllUserBySearchName(_searchController.text.trim());
+          .getAllUserBySearchName(_searchController.text.trim())
+          .then((onValue) {
+        ref.read(infoUserStateNotifier.notifier).refreshProfile();
+      });
     });
   }
 

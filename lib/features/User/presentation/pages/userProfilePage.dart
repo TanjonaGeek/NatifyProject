@@ -547,11 +547,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                                           8)), // Bords arrondis
                                                 ),
                                                 child: ElevatedButton.icon(
-                                                  icon: FaIcon(
-                                                      FontAwesomeIcons
-                                                          .circleInfo,
-                                                      size: 15,
-                                                      color: Colors.white),
+                                                  icon: SizedBox.shrink(),
                                                   onPressed: () {
                                                     SlideNavigation.slideToPage(
                                                         context,
@@ -561,6 +557,8 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                                         ));
                                                   },
                                                   label: Text("Information".tr,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                       style: TextStyle(
                                                           color: Colors.white,
                                                           fontWeight:
@@ -2004,7 +2002,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                             ),
                             child: Center(
                                 child: FaIcon(
-                              FontAwesomeIcons.personWalkingLuggage,
+                              FontAwesomeIcons.userPlus,
                               size: 17,
                               color: Colors.black,
                             ))),
@@ -2050,7 +2048,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                             ),
                             child: Center(
                                 child: FaIcon(
-                              FontAwesomeIcons.personWalkingLuggage,
+                              FontAwesomeIcons.userPlus,
                               size: 17,
                               color: Colors.black,
                             ))),

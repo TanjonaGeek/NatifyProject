@@ -170,11 +170,15 @@ class ChatNotifier extends StateNotifier<ChatState> {
   }
 
   Future<void> bloquerConversation(String userUid) async {
-    _bloqueConversation.call(userUid);
+    _bloqueConversation.call(userUid).then((onValue) {
+      showCustomSnackBar("Vous_bloqué_utilisateur");
+    });
   }
 
   Future<void> debloquerConversation(String userUid) async {
-    _debloqueConversation.call(userUid);
+    _debloqueConversation.call(userUid).then((onValue) {
+      showCustomSnackBar("Vous_débloqué_utilisateur.");
+    });
   }
 
   Stream<bool> getStatusBlock(String uidUser) {

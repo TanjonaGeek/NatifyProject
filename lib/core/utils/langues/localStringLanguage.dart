@@ -420,7 +420,15 @@ class localStringLanguage extends Translations {
           "Date": "Datum",
           "Expediteur": "Absender",
           "Modifier_photo_profile": "Profilbild bearbeiten",
-          "Voir_photo_profile": "Profilbild anzeigen"
+          "Voir_photo_profile": "Profilbild anzeigen",
+          "debloquer": "Entsperren",
+          "liste_personnes_bloquées":
+              "Die Liste der Personen, die Sie blockiert haben. Sie können sie jederzeit entsperren, um die Kommunikation wiederherzustellen.",
+          "Amies_Bloqués": "Blockierte Freunde",
+          "Vous_bloqué_utilisateur.": "Sie haben diesen Benutzer blockiert.",
+          "Vous_débloqué_utilisateur.": "Sie haben diesen Benutzer entsperrt.",
+          "Aucun_ami_bloqué": "Keine blockierten Freunde",
+          "Vous_bloqué_aucun_ami": "Sie haben noch keine Freunde blockiert."
         },
         // francais
         'fr_FR': {
@@ -839,7 +847,16 @@ class localStringLanguage extends Translations {
           "Date": "Date",
           "Expediteur": "Expéditeur",
           "Modifier_photo_profile": "Modifier photo profile",
-          "Voir_photo_profile": "Voir photo profile"
+          "Voir_photo_profile": "Voir photo profile",
+          "debloquer": "Débloquer",
+          "liste_personnes_bloquées":
+              "La liste des personnes que vous avez bloquées. Vous pouvez les débloquer à tout moment pour rétablir la communication.",
+          "Amies_Bloqués": "Amis Bloqués",
+          "Vous_bloqué_utilisateur.": "Vous avez bloqué cet utilisateur.",
+          "Vous_débloqué_utilisateur.": "Vous avez débloqué cet utilisateur.",
+          "Aucun_ami_bloqué": "Aucun ami bloqué",
+          "Vous_bloqué_aucun_ami":
+              "Vous n'avez bloqué aucun ami pour le moment."
         },
         // portugais
         'pt_PT': {
@@ -1252,7 +1269,15 @@ class localStringLanguage extends Translations {
           "Date": "Data",
           "Expediteur": "Remetente",
           "Modifier_photo_profile": "Editar foto de perfil",
-          "Voir_photo_profile": "Ver foto de perfil"
+          "Voir_photo_profile": "Ver foto de perfil",
+          "debloquer": "Desbloquear",
+          "liste_personnes_bloquées":
+              "A lista de pessoas que você bloqueou. Você pode desbloqueá-las a qualquer momento para restabelecer a comunicação.",
+          "Amies_Bloqués": "Amigos Bloqueados",
+          "Vous_bloqué_utilisateur.": "Você bloqueou este usuário.",
+          "Vous_débloqué_utilisateur.": "Você desbloqueou este usuário.",
+          "Aucun_ami_bloqué": "Nenhum amigo bloqueado",
+          "Vous_bloqué_aucun_ami": "Você ainda não bloqueou nenhum amigo."
         },
         // arabe
         'ar_AR': {
@@ -1648,7 +1673,15 @@ class localStringLanguage extends Translations {
           "Date": "التاريخ",
           "Expediteur": "المرسل",
           "Modifier_photo_profile": "تعديل صورة الملف الشخصي",
-          "Voir_photo_profile": "عرض صورة الملف الشخصي"
+          "Voir_photo_profile": "عرض صورة الملف الشخصي",
+          "debloquer": "إلغاء الحظر",
+          "liste_personnes_bloquées":
+              "قائمة الأشخاص الذين قمت بحظرهم. يمكنك إلغاء حظرهم في أي وقت لاستعادة التواصل.",
+          "Amies_Bloqués": "الأصدقاء المحظورون",
+          "Vous_bloqué_utilisateur.": "لقد قمت بحظر هذا المستخدم.",
+          "Vous_débloqué_utilisateur.": "لقد قمت بإلغاء حظر هذا المستخدم.",
+          "Aucun_ami_bloqué": "لا يوجد أصدقاء محظورون",
+          "Vous_bloqué_aucun_ami": "لم تقم بحظر أي صديق حتى الآن."
         },
         // pologne
         'pl_PL': {
@@ -2060,7 +2093,15 @@ class localStringLanguage extends Translations {
           "Date": "Data",
           "Expediteur": "Nadawca",
           "Modifier_photo_profile": "Edytuj zdjęcie profilowe",
-          "Voir_photo_profile": "Zobacz zdjęcie profilowe"
+          "Voir_photo_profile": "Zobacz zdjęcie profilowe",
+          "debloquer": "Odblokować",
+          "liste_personnes_bloquées":
+              "Lista osób, które zablokowałeś. Możesz je odblokować w każdej chwili, aby przywrócić komunikację.",
+          "Amies_Bloqués": "Zablokowani znajomi",
+          "Vous_bloqué_utilisateur.": "Zablokowałeś tego użytkownika.",
+          "Vous_débloqué_utilisateur.": "Odblokowałeś tego użytkownika.",
+          "Aucun_ami_bloqué": "Brak zablokowanych znajomych",
+          "Vous_bloqué_aucun_ami": "Nie zablokowałeś jeszcze żadnego znajomego."
         },
         // turkie
         'tr_TR': {
@@ -2472,7 +2513,15 @@ class localStringLanguage extends Translations {
           "Date": "Tarih",
           "Expediteur": "Gönderen",
           "Modifier_photo_profile": "Profil fotoğrafını düzenle",
-          "Voir_photo_profile": "Profil fotoğrafını görüntüle"
+          "Voir_photo_profile": "Profil fotoğrafını görüntüle",
+          "debloquer": "Engeli Kaldır",
+          "liste_personnes_bloquées":
+              "Engellediğiniz kişilerin listesi. İletişimi yeniden sağlamak için onları istediğiniz zaman engelden çıkarabilirsiniz.",
+          "Amies_Bloqués": "Engellenen Arkadaşlar",
+          "Vous_bloqué_utilisateur.": "Bu kullanıcıyı engellediniz.",
+          "Vous_débloqué_utilisateur.": "Bu kullanıcının engelini kaldırdınız.",
+          "Aucun_ami_bloqué": "Engellenen arkadaş yok",
+          "Vous_bloqué_aucun_ami": "Henüz hiçbir arkadaşınızı engellemediniz."
         },
         // italian
         'it_IT': {
@@ -2892,7 +2941,15 @@ class localStringLanguage extends Translations {
           "Date": "Data",
           "Expediteur": "Mittente",
           "Modifier_photo_profile": "Modifica foto del profilo",
-          "Voir_photo_profile": "Visualizza foto del profilo"
+          "Voir_photo_profile": "Visualizza foto del profilo",
+          "debloquer": "Sbloccare",
+          "liste_personnes_bloquées":
+              "L'elenco delle persone che hai bloccato. Puoi sbloccarle in qualsiasi momento per ripristinare la comunicazione.",
+          "Amies_Bloqués": "Amici Bloccati",
+          "Vous_bloqué_utilisateur.": "Hai bloccato questo utente.",
+          "Vous_débloqué_utilisateur.": "Hai sbloccato questo utente.",
+          "Aucun_ami_bloqué": "Nessun amico bloccato",
+          "Vous_bloqué_aucun_ami": "Non hai ancora bloccato nessun amico."
         },
         // espagnol
         'es_ES': {
@@ -3304,7 +3361,15 @@ class localStringLanguage extends Translations {
           "Date": "Fecha",
           "Expediteur": "Remitente",
           "Modifier_photo_profile": "Editar foto de perfil",
-          "Voir_photo_profile": "Ver foto de perfil"
+          "Voir_photo_profile": "Ver foto de perfil",
+          "debloquer": "Desbloquear",
+          "liste_personnes_bloquées":
+              "La lista de personas que has bloqueado. Puedes desbloquearlas en cualquier momento para restablecer la comunicación.",
+          "Amies_Bloqués": "Amigos Bloqueados",
+          "Vous_bloqué_utilisateur.": "Has bloqueado a este usuario.",
+          "Vous_débloqué_utilisateur.": "Has desbloqueado a este usuario.",
+          "Aucun_ami_bloqué": "Ningún amigo bloqueado",
+          "Vous_bloqué_aucun_ami": "Aún no has bloqueado a ningún amigo."
         },
         // anglais
         'en_US': {
@@ -3709,7 +3774,15 @@ class localStringLanguage extends Translations {
           "Date": "Date",
           "Expediteur": "Sender",
           "Modifier_photo_profile": "Edit profile photo",
-          "Voir_photo_profile": "View profile photo"
+          "Voir_photo_profile": "View profile photo",
+          "debloquer": "Unblock",
+          "liste_personnes_bloquées":
+              "The list of people you have blocked. You can unblock them at any time to restore communication.",
+          "Amies_Bloqués": "Blocked Friends",
+          "Vous_bloqué_utilisateur.": "You have blocked this user.",
+          "Vous_débloqué_utilisateur.": "You have unblocked this user.",
+          "Aucun_ami_bloqué": "No blocked friends",
+          "Vous_bloqué_aucun_ami": "You haven't blocked any friends yet."
         },
       };
 }

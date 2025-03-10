@@ -59,6 +59,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       print('le status est detached');
       ref.read(infoUserStateNotifier.notifier).updateStatusUser(false, uidUser);
       // LoginToZego(ref);
+    } else if (state == AppLifecycleState.hidden) {
+      print('le status est hidden');
+      ref.read(infoUserStateNotifier.notifier).updateStatusUser(false, uidUser);
+      // ref.read(infoUserStateNotifier.notifier).updateStatusUser(false, uidUser);
+      // LoginToZego(ref);
+    } else if (state == AppLifecycleState.inactive) {
+      print('le status est inactive');
+      ref.read(infoUserStateNotifier.notifier).updateStatusUser(false, uidUser);
+      // ref.read(infoUserStateNotifier.notifier).updateStatusUser(false, uidUser);
+      // LoginToZego(ref);
+    } else {
+      ref.read(infoUserStateNotifier.notifier).updateStatusUser(false, uidUser);
+      print('le status est inactive');
     }
   }
 

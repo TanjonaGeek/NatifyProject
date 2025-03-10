@@ -7,10 +7,10 @@ import 'package:natify/features/Chat/presentation/provider/chat_provider.dart';
 import 'package:natify/features/Storie/presentation/provider/storie_provider.dart';
 import 'package:natify/features/User/presentation/pages/auth/AuthUserPage.dart';
 import 'package:natify/features/User/presentation/pages/langues.dart';
-import 'package:natify/features/User/presentation/pages/menuSuppressionCompte.dart';
 import 'package:natify/features/User/presentation/pages/parametre.dart';
 import 'package:natify/features/User/presentation/pages/politiqueConfidentialite.dart';
 import 'package:natify/features/User/presentation/pages/politiqueUtilisation.dart';
+import 'package:natify/features/User/presentation/pages/sous-menu-supprimer.dart';
 import 'package:natify/features/User/presentation/pages/termsCondition.dart';
 import 'package:natify/features/User/presentation/provider/user_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -195,7 +195,7 @@ class Menu extends ConsumerWidget {
                   text: 'Securite',
                   iconColor: kPrimaryColor,
                   onTap: () {
-                    SlideNavigation.slideToPage(context, ParametreSecurite());
+                    SlideNavigation.slideToPage(context, SousMenuSupprimer());
                   }),
               // _buildMenuItem(
               //   icon: Icons.notifications,

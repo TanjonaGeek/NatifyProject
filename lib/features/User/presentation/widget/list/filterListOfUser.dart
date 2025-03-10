@@ -361,6 +361,7 @@ class _FilterPageState extends ConsumerState<FilterPage> {
       padding: const EdgeInsets.all(16.0),
       child: ElevatedButton(
         onPressed: () async {
+          ref.read(infoUserStateNotifier.notifier).refreshProfile();
           if (mounted) {
             ref.read(allUserListStateNotifier.notifier).SetUpdateFieldToFilter(
                 nationaliteGroupSansFlag: nationaliteGroupSansFlag,

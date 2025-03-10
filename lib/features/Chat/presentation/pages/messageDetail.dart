@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:animated_dashed_circle/animated_dashed_circle.dart';
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:natify/core/utils/my_date_util.dart';
@@ -27,7 +29,7 @@ class MessageDetail extends ConsumerWidget {
       super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    String AvezVousDebloquer = "Avez-vous débloqué".tr;
+    String AvezVousDebloquer = "debloquer".tr;
     String VousEtesBloquer = "Vous avez été bloqué par".tr;
     final notifier = ref.watch(themesStateNotifier);
     Future<List<Map<String, String>>> getUserTheme(
@@ -115,7 +117,17 @@ class MessageDetail extends ConsumerWidget {
             child: ThemeSwitchingArea(
               child: Scaffold(
                 extendBodyBehindAppBar: true,
+                backgroundColor: Colors.transparent,
                 appBar: AppBar(
+                  flexibleSpace: ClipRect(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        color: Colors.black
+                            .withOpacity(0.1), // Semi-transparent avec flou
+                      ),
+                    ),
+                  ),
                   backgroundColor: Colors.transparent,
                   leading: IconButton(
                     icon: Container(
