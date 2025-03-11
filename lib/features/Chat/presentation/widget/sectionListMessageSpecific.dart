@@ -1123,10 +1123,13 @@ class _ListMessageDetailState extends ConsumerState<ListMessageDetail> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           SizedBox(
-                              width: 130,
-                              height: 130,
-                              child: Image.asset('assets/speech-bubble.png',
-                                  color: Colors.white)),
+                              width: 110,
+                              height: 110,
+                              child: Image.asset(
+                                'assets/bulle-de-chat.png',
+                                color:
+                                    Color(int.parse("0xFF${widget.colorMe}")),
+                              )),
                           SizedBox(
                             height: 10,
                           ),

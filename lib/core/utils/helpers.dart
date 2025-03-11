@@ -86,6 +86,11 @@ abstract class Helpers {
     {'label': 'femme', 'icon': Icons.female},
   ];
 
+  static List<Map<String, dynamic>> list_Following_Followers = [
+    {'label': 'Followers', 'icon': Icons.list},
+    {'label': 'Following', 'icon': Icons.list},
+  ];
+
   static List<Map<String, String>> ListeNationaliteHelper = [
     {
       'country': 'Afghanistan',

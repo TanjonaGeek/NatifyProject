@@ -26,6 +26,7 @@ import 'package:natify/features/User/presentation/provider/user_provider.dart';
 import 'package:natify/features/User/presentation/widget/OverlappingAvatars.dart';
 import 'package:natify/features/User/presentation/widget/list/listFollower.dart';
 import 'package:natify/features/User/presentation/widget/list/listFollowing.dart';
+import 'package:natify/features/User/presentation/widget/list/listFollowingAndFollowers.dart';
 import 'package:natify/features/User/presentation/widget/list/shimmer/shimmerProfilePage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -1362,11 +1363,13 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                         size: 20,
                         color: Colors.white,
                       )
-                    : FaIcon(
-                        FontAwesomeIcons.solidEnvelope,
-                        size: 20,
-                        color: Colors.white,
-                      ), // Utilisé pour éviter les conflits de héros
+                    : SizedBox(
+                        width: 30,
+                        height: 30,
+                        child: Image.asset(
+                          'assets/message-de-chat.png',
+                          color: Colors.white,
+                        )), // Utilisé pour éviter les conflits de héros
               ),
             ],
           ),
@@ -1706,8 +1709,9 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                             Navigator.pop(context);
                             SlideNavigation.slideToPage(
                                 context,
-                                AllUserFollower(
+                                ListFollowingAndFollowers(
                                   uid: widget.uid,
+                                  nom: name,
                                 ));
                           },
                           leading: Container(
@@ -1981,8 +1985,9 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                           Navigator.pop(context);
                           SlideNavigation.slideToPage(
                               context,
-                              AllUserFollower(
+                              ListFollowingAndFollowers(
                                 uid: widget.uid,
+                                nom: userName.value,
                               ));
                         },
                         leading: Container(

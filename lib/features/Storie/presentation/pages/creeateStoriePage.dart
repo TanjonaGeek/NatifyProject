@@ -209,9 +209,13 @@ class _GalleryPageState extends State<GalleryPage> {
                   // ),
                   Flexible(
                     child: _buildOptionCard(
-                      icon: FaIcon(FontAwesomeIcons.pencil,
-                          size: 30, color: Colors.white),
-                      label: 'Texte'.tr,
+                      icon: SizedBox(
+                          width: 70,
+                          height: 70,
+                          child: Image.asset(
+                            'assets/police-de-caractere.png',
+                            color: Colors.white,
+                          )),
                       onTap: openTextEditorStorie,
                     ),
                   ),
@@ -220,14 +224,15 @@ class _GalleryPageState extends State<GalleryPage> {
                   ),
                   Flexible(
                     child: _buildOptionCard(
-                      icon: FaIcon(FontAwesomeIcons.eye,
-                          size: 30, color: Colors.white),
-                      label: 'Voir les story'.tr,
+                      icon: SizedBox(
+                          width: 70,
+                          height: 70,
+                          child: Image.asset(
+                            'assets/camera.png',
+                            color: Colors.white,
+                          )),
                       onTap: () {
-                        fetchYourStoryStream().then((value) {
-                          SlideNavigation.slideToPage(context,
-                              StoryViewForMe(indexJump: 0, stories: value));
-                        });
+                        _pickImageFromCamera();
                       },
                     ),
                   ),
@@ -322,23 +327,11 @@ class _GalleryPageState extends State<GalleryPage> {
             ),
           ],
         ),
-        floatingActionButton: Padding(
-          padding: const EdgeInsets.only(bottom: 20),
-          child: FloatingActionButton(
-            onPressed: _pickImageFromCamera,
-            backgroundColor: kPrimaryColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: FaIcon(FontAwesomeIcons.camera, color: Colors.white),
-          ),
-        ),
       ),
     );
   }
 
-  Widget _buildOptionCard(
-      {required Widget icon, required String label, required Function onTap}) {
+  Widget _buildOptionCard({required Widget icon, required Function onTap}) {
     return GestureDetector(
       onTap: () => onTap(),
       child: Container(
@@ -356,14 +349,6 @@ class _GalleryPageState extends State<GalleryPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             icon,
-            SizedBox(height: 8.0),
-            Text(
-                textAlign: TextAlign.center,
-                label,
-                style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white)),
           ],
         ),
       ),
