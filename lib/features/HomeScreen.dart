@@ -162,21 +162,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               ),
             ),
             actions: [
-              ValueListenableBuilder<int>(
-                valueListenable: _selectedIndexNotifier,
-                builder: (context, selectedIndex, _) {
-                  return selectedIndex == 2
-                      ? InkWell(
-                          onTap: () {
-                            SlideNavigation.slideToPage(context, GalleryPage());
-                          },
-                          child: FaIcon(
-                            FontAwesomeIcons.squarePlus,
-                            size: 24,
-                          ))
-                      : SizedBox();
-                },
-              ),
+              // ValueListenableBuilder<int>(
+              //   valueListenable: _selectedIndexNotifier,
+              //   builder: (context, selectedIndex, _) {
+              //     return selectedIndex == 2
+              //         ? InkWell(
+              //             onTap: () {
+              //               SlideNavigation.slideToPage(context, GalleryPage());
+              //             },
+              //             child: FaIcon(
+              //               FontAwesomeIcons.squarePlus,
+              //               size: 24,
+              //             ))
+              //         : SizedBox();
+              //   },
+              // ),
               IconButton(
                 iconSize: 50,
                 icon: Stack(

@@ -53,29 +53,6 @@ class _SectionHeaderState extends ConsumerState<SectionHeader> {
         decoration: InputDecoration(
           filled: widget.showFilterOption == false ? true : false,
           fillColor: Colors.grey[200],
-          suffixIcon: widget.showFilterOption == false
-              ? SizedBox.shrink()
-              : Padding(
-                  padding: const EdgeInsets.only(right: 1),
-                  child: InkWell(
-                    onTap: () {
-                      SlideNavigation.slideToPage(context, FilterPage());
-                    },
-                    child: Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(30),
-                                bottomLeft: Radius.circular(30),
-                                topRight: Radius.circular(30),
-                                bottomRight: Radius.circular(30))),
-                        child: Center(
-                            child: FaIcon(FontAwesomeIcons.filterCircleXmark,
-                                size: 25, color: Colors.black))),
-                  ),
-                ),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.grey.shade300),
             borderRadius: BorderRadius.all(Radius.circular(30.0)),

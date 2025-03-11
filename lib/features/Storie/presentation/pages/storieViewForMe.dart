@@ -463,15 +463,11 @@ class _CarousselWidgetState extends ConsumerState<CarousselWidget> {
                                           MainAxisAlignment.center,
                                       children: [
                                         SizedBox(
-                                          width: 140,
-                                          height: 140,
+                                          width: 120,
+                                          height: 120,
                                           child: Image.asset(
-                                              'assets/spectators.png',
-                                              color: Theme.of(context)
-                                                          .brightness ==
-                                                      Brightness.dark
-                                                  ? Colors.white
-                                                  : Colors.black),
+                                            'assets/grouper.png',
+                                          ),
                                         ),
                                         SizedBox(height: 10),
                                         Text(

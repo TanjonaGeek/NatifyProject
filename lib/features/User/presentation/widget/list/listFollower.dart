@@ -85,13 +85,11 @@ class AllUserFollower extends ConsumerWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 SizedBox(
-                                  width: 140,
-                                  height: 140,
-                                  child: Image.asset('assets/followers.png',
-                                      color: Theme.of(context).brightness ==
-                                              Brightness.dark
-                                          ? Colors.white
-                                          : Colors.black),
+                                  width: 130,
+                                  height: 130,
+                                  child: Image.asset(
+                                    'assets/grouper.png',
+                                  ),
                                 ),
                                 SizedBox(height: 10),
                                 Text(
@@ -155,13 +153,11 @@ class AllUserFollower extends ConsumerWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 SizedBox(
-                                  width: 140,
-                                  height: 140,
-                                  child: Image.asset('assets/notFoundXl.png',
-                                      color: Theme.of(context).brightness ==
-                                              Brightness.dark
-                                          ? Colors.white
-                                          : Colors.black),
+                                  width: 130,
+                                  height: 130,
+                                  child: Image.asset(
+                                    'assets/grouper.png',
+                                  ),
                                 ),
                                 SizedBox(height: 10),
                                 Text(
