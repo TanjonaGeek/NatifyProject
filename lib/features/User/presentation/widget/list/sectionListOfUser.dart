@@ -32,7 +32,6 @@ class SectonListOfUser extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final myOwnData = ref.watch(infoUserStateNotifier);
-    print('fdfdfdddfdf ${myOwnData.MydataPersiste!.friendBlocked!.length}');
     final String uidUser = auth.currentUser?.uid ?? "";
     var requeteId = const Uuid().v1();
     if (notifier.nameSearch.isEmpty &&
@@ -48,12 +47,11 @@ class SectonListOfUser extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
-                  width: 130,
-                  height: 130,
-                  child: Image.asset('assets/earth2.png',
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : Colors.black)),
+                  width: 150,
+                  height: 150,
+                  child: Image.asset(
+                    'assets/personnes.png',
+                  )),
               // SizedBox(height: 10,),
               // Text("Aucun résultat".tr,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),),
               SizedBox(
@@ -86,7 +84,7 @@ class SectonListOfUser extends ConsumerWidget {
                       "Découvrir".tr,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.bold,
                           fontSize: 15,
                           color: kPrimaryColor),
                     ),
@@ -184,12 +182,11 @@ class SectonListOfUser extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                    width: 130,
-                    height: 130,
-                    child: Image.asset('assets/earth2.png',
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : Colors.black)),
+                    width: 150,
+                    height: 150,
+                    child: Image.asset(
+                      'assets/personnes.png',
+                    )),
                 SizedBox(
                   height: 10,
                 ),
@@ -222,7 +219,7 @@ class SectonListOfUser extends ConsumerWidget {
                         "Découvrir".tr,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.bold,
                             fontSize: 15,
                             color: kPrimaryColor),
                       ),

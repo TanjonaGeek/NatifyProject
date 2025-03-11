@@ -359,11 +359,9 @@ class AllNotification extends StatelessWidget {
                           SizedBox(
                             width: 100,
                             height: 100,
-                            child: Image.asset('assets/notification.png',
-                                color: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black),
+                            child: Image.asset(
+                              'assets/cloche-de-notification.png',
+                            ),
                           ),
                           SizedBox(height: 10),
                           Text(

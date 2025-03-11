@@ -1040,28 +1040,24 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     SizedBox(
-                                        width: 120,
-                                        height: 120,
+                                        width: 130,
+                                        height: 130,
                                         child: Image.asset(
-                                          'assets/photos.png',
-                                          color: Theme.of(context).brightness ==
-                                                  Brightness.dark
-                                              ? Colors.white
-                                              : Colors.black,
+                                          'assets/galerie-dimages (1).png',
                                         )),
-                                    SizedBox(
-                                      height: 1,
-                                    ),
-                                    Text(
-                                      textAlign: TextAlign.center,
-                                      "Aucun Photo".tr,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20),
-                                    ),
                                     SizedBox(
                                       height: 2,
                                     ),
+                                    // Text(
+                                    //   textAlign: TextAlign.center,
+                                    //   "Aucun Photo".tr,
+                                    //   style: TextStyle(
+                                    //       fontWeight: FontWeight.bold,
+                                    //       fontSize: 20),
+                                    // ),
+                                    // SizedBox(
+                                    //   height: 2,
+                                    // ),
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 15),
@@ -1092,7 +1088,8 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                               "Créer nouveau".tr,
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
-                                                  fontWeight: FontWeight.w500,
+                                                  color: kPrimaryColor,
+                                                  fontWeight: FontWeight.bold,
                                                   fontSize: 15),
                                             ),
                                             SizedBox(
@@ -1259,14 +1256,10 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     SizedBox(
-                                        width: 120,
-                                        height: 120,
+                                        width: 110,
+                                        height: 110,
                                         child: Image.asset(
-                                          'assets/image.png',
-                                          color: Theme.of(context).brightness ==
-                                                  Brightness.dark
-                                              ? Colors.white
-                                              : Colors.black,
+                                          'assets/galerie-dimages.png',
                                         )),
                                     SizedBox(
                                       height: 10,
@@ -1276,23 +1269,23 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                       "Aucun Photo".tr,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 20),
+                                          fontSize: 18),
                                     ),
-                                    SizedBox(
-                                      height: 2,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 15),
-                                      child: Text(
-                                        "Il n'y a pas encore de photo à découvrir en ce moment"
-                                            .tr,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 16),
-                                      ),
-                                    ),
+                                    // SizedBox(
+                                    //   height: 2,
+                                    // ),
+                                    // Padding(
+                                    //   padding: const EdgeInsets.symmetric(
+                                    //       horizontal: 15),
+                                    //   child: Text(
+                                    //     "Il n'y a pas encore de photo à découvrir en ce moment"
+                                    //         .tr,
+                                    //     textAlign: TextAlign.center,
+                                    //     style: TextStyle(
+                                    //         fontWeight: FontWeight.w400,
+                                    //         fontSize: 16),
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                               ),

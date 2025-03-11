@@ -7,6 +7,7 @@ const kContentColorDarkTheme = Color(0xFFF5FCF9);
 const kWarninngColor = Color(0xFFF3BB1C);
 const kErrorColor = Color(0xFFF03738);
 const kDefaultPadding = 20.0;
+// #2A6E8B
 
 const Color gradientStart = Color(0xFFfbab66);
 const Color gradientEnd = Color(0xFFf7418c);

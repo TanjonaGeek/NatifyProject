@@ -97,7 +97,12 @@ class _IsfillsexepageState extends ConsumerState<Isfillsexepage> {
                 Flexible(
                   child: GenderCard(
                     gender: 'homme',
-                    icon: Icons.male,
+                    icon: Image.asset(
+                      'assets/male (2).png',
+                      // color: Theme.of(context).brightness == Brightness.dark
+                      //     ? Colors.white
+                      //     : Colors.black
+                    ),
                     isSelected: selectedGender == 'homme',
                     onTap: () {
                       setState(() {
@@ -111,7 +116,8 @@ class _IsfillsexepageState extends ConsumerState<Isfillsexepage> {
                 Flexible(
                   child: GenderCard(
                     gender: 'femme',
-                    icon: Icons.female,
+                    icon: Image.asset('assets/sexe-feminin.png',
+                        color: Colors.pink),
                     isSelected: selectedGender == 'femme',
                     onTap: () {
                       setState(() {
@@ -132,7 +138,7 @@ class _IsfillsexepageState extends ConsumerState<Isfillsexepage> {
 
 class GenderCard extends StatelessWidget {
   final String gender;
-  final IconData icon;
+  final Widget icon;
   final bool isSelected;
   final VoidCallback onTap;
   final Color color;
@@ -174,7 +180,8 @@ class GenderCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 50, color: color),
+              SizedBox(width: 80, height: 80, child: icon),
+              // Icon(icon, size: 50, color: color),
               SizedBox(height: 10),
               Text(
                 gender.tr,

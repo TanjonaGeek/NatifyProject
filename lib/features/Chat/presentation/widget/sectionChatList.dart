@@ -101,10 +101,9 @@ class _ChatListState extends State<ChatList> {
                   SizedBox(
                       width: 130,
                       height: 130,
-                      child: Image.asset('assets/speech-bubble.png',
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white
-                              : Colors.black)),
+                      child: Image.asset(
+                        'assets/discuter.png',
+                      )),
                   SizedBox(
                     height: 10,
                   ),
