@@ -233,21 +233,21 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                         widget.uid == uidUser
                             ? Row(
                                 children: [
-                                  IconButton(
-                                    icon: FaIcon(FontAwesomeIcons.penToSquare,
-                                        size: 20, color: Colors.white),
-                                    onPressed: () {
-                                      Navigator.of(context, rootNavigator: true)
-                                          .push(
-                                        MaterialPageRoute(
-                                            builder: (context) => Editerprofile(
-                                                  uid: widget.uid,
-                                                  myOwnData:
-                                                      notifier.MydataPersiste!,
-                                                )),
-                                      );
-                                    },
-                                  ),
+                                  // IconButton(
+                                  //   icon: FaIcon(FontAwesomeIcons.penToSquare,
+                                  //       size: 20, color: Colors.white),
+                                  //   onPressed: () {
+                                  //     Navigator.of(context, rootNavigator: true)
+                                  //         .push(
+                                  //       MaterialPageRoute(
+                                  //           builder: (context) => Editerprofile(
+                                  //                 uid: widget.uid,
+                                  //                 myOwnData:
+                                  //                     notifier.MydataPersiste!,
+                                  //               )),
+                                  //     );
+                                  //   },
+                                  // ),
                                   IconButton(
                                     icon: FaIcon(FontAwesomeIcons.bars,
                                         size: 20, color: Colors.white),
@@ -278,10 +278,8 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                             : SizedBox();
                                       }),
                                   IconButton(
-                                    icon: FaIcon(
-                                        FontAwesomeIcons.ellipsisVertical,
-                                        size: 20,
-                                        color: Colors.white),
+                                    icon: FaIcon(FontAwesomeIcons.bars,
+                                        size: 20, color: Colors.white),
                                     onPressed: () => _showMoreOption(
                                       widget.uid,
                                       users.first.name?.toString() ?? "",
@@ -719,16 +717,26 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                 height: 5,
                               ),
                               GestureDetector(
-                                onTap: () => _showMoreOption4(
-                                  widget.uid,
-                                  users.first.abonnee!.length.toString(),
-                                  users.first.abonnement!.length.toString(),
-                                ),
+                                onTap: () {
+                                  SlideNavigation.slideToPage(
+                                      context,
+                                      ListFollowingAndFollowers(
+                                        nombrefollower: users
+                                            .first.abonnee!.length
+                                            .toString(),
+                                        nombrefollowing: users
+                                            .first.abonnement!.length
+                                            .toString(),
+                                        uid: widget.uid,
+                                        nom: userName.value,
+                                        optionSelected: "Followers",
+                                      ));
+                                },
                                 child: ValueListenableBuilder<List<String>>(
                                   valueListenable: imageUrlsNotifier,
                                   builder: (context, imageUrls, child) {
                                     return Text(
-                                      "${users.first.abonnee!.length} Followers & ${users.first.abonnement!.length} Following",
+                                      "${users.first.abonnee!.length} Followers . ${users.first.abonnement!.length} Following",
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold),
                                     );
@@ -739,11 +747,21 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                 height: 5,
                               ),
                               GestureDetector(
-                                onTap: () => _showMoreOption4(
-                                  widget.uid,
-                                  users.first.abonnee!.length.toString(),
-                                  users.first.abonnement!.length.toString(),
-                                ),
+                                onTap: () {
+                                  SlideNavigation.slideToPage(
+                                      context,
+                                      ListFollowingAndFollowers(
+                                        nombrefollower: users
+                                            .first.abonnee!.length
+                                            .toString(),
+                                        nombrefollowing: users
+                                            .first.abonnement!.length
+                                            .toString(),
+                                        uid: widget.uid,
+                                        nom: userName.value,
+                                        optionSelected: "Followers",
+                                      ));
+                                },
                                 child: ValueListenableBuilder<List<String>>(
                                   valueListenable: imageUrlsNotifier,
                                   builder: (context, imageUrls, child) {
@@ -1323,68 +1341,42 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
             FloatingActionButtonLocation.endDocked, // Centre en bas
         floatingActionButton: Padding(
           padding: const EdgeInsets.only(bottom: 40.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end, // Centre horizontalement
-            children: <Widget>[
-              if (widget.uid == uidUser)
-                FloatingActionButton(
-                    backgroundColor: kPrimaryColor,
-                    onPressed: () {
-                      Navigator.of(context, rootNavigator: true).push(
-                        MaterialPageRoute(
-                          builder: (context) => Createhighlight(),
-                        ),
-                      );
-                    },
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50), // Coins arrondis
-                    ),
-                    heroTag: null,
-                    child: FaIcon(
-                      FontAwesomeIcons.solidSquarePlus,
-                      size: 18,
-                      color: Colors.white,
-                    ) // Utilisé pour éviter les conflits de héros
-                    ),
-              SizedBox(width: 10), // Espacement entre les boutons
-              FloatingActionButton(
-                backgroundColor: kPrimaryColor,
-                onPressed: () => widget.uid == uidUser
-                    ? _showMoreOption(
-                        widget.uid,
-                        userName.value,
-                        userDataGet.value,
-                        notifier.MydataPersiste!.abonnee!.length.toString(),
-                        notifier.MydataPersiste!.abonnement!.length.toString(),
-                      )
-                    : Navigator.of(context, rootNavigator: true).push(
-                        MaterialPageRoute(
-                          builder: (context) => MessageDetail(
-                            urlPhoto: userProfilePic.value,
-                            uid: userUid.value,
-                            name: userName.value,
-                          ),
-                        ),
+          child: FloatingActionButton(
+            backgroundColor: kPrimaryColor,
+            onPressed: () => widget.uid == uidUser
+                ? _showMoreOption(
+                    widget.uid,
+                    userName.value,
+                    userDataGet.value,
+                    notifier.MydataPersiste!.abonnee!.length.toString(),
+                    notifier.MydataPersiste!.abonnement!.length.toString(),
+                  )
+                : Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(
+                      builder: (context) => MessageDetail(
+                        urlPhoto: userProfilePic.value,
+                        uid: userUid.value,
+                        name: userName.value,
                       ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50), // Coins arrondis
-                ),
-                heroTag: null,
-                child: widget.uid == uidUser
-                    ? FaIcon(
-                        FontAwesomeIcons.ellipsis,
-                        size: 20,
-                        color: Colors.white,
-                      )
-                    : SizedBox(
-                        width: 30,
-                        height: 30,
-                        child: Image.asset(
-                          'assets/message-de-chat.png',
-                          color: Colors.white,
-                        )), // Utilisé pour éviter les conflits de héros
-              ),
-            ],
+                    ),
+                  ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(50), // Coins arrondis
+            ),
+            heroTag: null,
+            child: widget.uid == uidUser
+                ? FaIcon(
+                    FontAwesomeIcons.ellipsis,
+                    size: 20,
+                    color: Colors.white,
+                  )
+                : SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: Image.asset(
+                      'assets/message-de-chat.png',
+                      color: Colors.white,
+                    )), // Utilisé pour éviter les conflits de héros
           ),
         ),
       ),
@@ -1727,6 +1719,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                   nom: userName.value,
                                   nombrefollower: nombrefollower,
                                   nombrefollowing: nombrefollowing,
+                                  optionSelected: "Followers",
                                 ));
                           },
                           leading: Container(
@@ -1773,8 +1766,12 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                             Navigator.pop(context);
                             SlideNavigation.slideToPage(
                                 context,
-                                AllUserFollowing(
+                                ListFollowingAndFollowers(
                                   uid: widget.uid,
+                                  nom: userName.value,
+                                  nombrefollower: nombrefollower,
+                                  nombrefollowing: nombrefollowing,
+                                  optionSelected: "Following",
                                 ));
                           },
                           leading: Container(
@@ -2009,6 +2006,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                 nombrefollowing: nombrefollowing,
                                 uid: widget.uid,
                                 nom: userName.value,
+                                optionSelected: "Followers",
                               ));
                         },
                         leading: Container(
@@ -2053,8 +2051,12 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                           Navigator.pop(context);
                           SlideNavigation.slideToPage(
                               context,
-                              AllUserFollowing(
+                              ListFollowingAndFollowers(
+                                nombrefollower: nombrefollower,
+                                nombrefollowing: nombrefollowing,
                                 uid: widget.uid,
+                                nom: userName.value,
+                                optionSelected: "Following",
                               ));
                         },
                         leading: Container(

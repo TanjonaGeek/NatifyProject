@@ -5,6 +5,7 @@ import 'package:natify/core/utils/colors.dart';
 import 'package:natify/core/utils/helpers.dart';
 import 'package:natify/core/utils/slideNavigation.dart';
 import 'package:natify/features/Chat/presentation/pages/messageDetail.dart';
+import 'package:natify/features/Chat/presentation/provider/chat_provider.dart';
 import 'package:natify/features/User/presentation/pages/map/filterOption.dart';
 import 'package:natify/features/User/presentation/pages/userProfilePage.dart';
 import 'package:natify/features/User/presentation/provider/user_provider.dart';
@@ -24,11 +25,13 @@ class ListFollowingAndFollowers extends ConsumerStatefulWidget {
   final String nom;
   final String nombrefollowing;
   final String nombrefollower;
+  final String optionSelected;
   const ListFollowingAndFollowers({
     required this.uid,
     required this.nom,
     required this.nombrefollowing,
     required this.nombrefollower,
+    required this.optionSelected,
     super.key,
   });
 
@@ -41,12 +44,28 @@ class _ListFollowingAndFollowersState
     extends ConsumerState<ListFollowingAndFollowers> {
   String selected = "Followers";
   final TextEditingController _searchController = TextEditingController();
-
+  final String uidUser = auth.currentUser?.uid ?? "";
   Timer? _debounce;
 
   void _filterUsers(String value) {
     _debounce = Timer(const Duration(milliseconds: 1300), () {
       setState(() {});
+    });
+  }
+
+  bool isUserSubscribed(String uid, List<dynamic> subscribedUids) {
+    // Convertir la List<dynamic> en Set<String> pour améliorer les performances
+    Set<String> subscribedUidsSet =
+        Set<String>.from(subscribedUids.whereType<String>());
+    return subscribedUidsSet.contains(uid);
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setState(() {
+      selected = widget.optionSelected;
     });
   }
 
@@ -237,6 +256,8 @@ class _ListFollowingAndFollowersState
                                   final data = documentSnapshot.data()
                                       as Map<String, dynamic>?;
                                   if (data == null) return Container();
+                                  bool estAbonne = isUserSubscribed(
+                                      data['uid'], data['abonnee']);
                                   return AnimationConfiguration.staggeredList(
                                       position: index,
                                       duration:
@@ -247,6 +268,9 @@ class _ListFollowingAndFollowersState
                                             child: Container(
                                               key: ValueKey(data['uid']),
                                               child: _buildOption(
+                                                  optionSelectedItem:
+                                                      "Followers",
+                                                  estAbonne: estAbonne,
                                                   uid: data['uid'],
                                                   context: context,
                                                   onTap: () {
@@ -373,7 +397,8 @@ class _ListFollowingAndFollowersState
                                   final data = documentSnapshot.data()
                                       as Map<String, dynamic>?;
                                   if (data == null) return Container();
-
+                                  bool estAbonne = isUserSubscribed(
+                                      uidUser, data['abonnee']);
                                   return AnimationConfiguration.staggeredList(
                                       position: index,
                                       duration:
@@ -383,7 +408,10 @@ class _ListFollowingAndFollowersState
                                           child: FadeInAnimation(
                                             child: Container(
                                               key: ValueKey(data['uid']),
-                                              child: _buildOption(
+                                              child: _buildOption2(
+                                                  optionSelectedItem:
+                                                      "Following",
+                                                  estAbonne: estAbonne,
                                                   uid: data['uid'],
                                                   context: context,
                                                   onTap: () {
@@ -443,7 +471,9 @@ class _ListFollowingAndFollowersState
       required String nom,
       required String flag,
       required VoidCallback onTap,
-      required BuildContext context}) {
+      required BuildContext context,
+      required String optionSelectedItem,
+      required bool estAbonne}) {
     return ListTile(
       onTap: onTap,
       trailing: IconButton(
@@ -465,6 +495,128 @@ class _ListFollowingAndFollowersState
               ),
             );
           }),
+      leading: Stack(
+        children: [
+          CachedNetworkImage(
+            imageUrl: urlPhoto,
+            imageBuilder: (context, imageProvider) => Container(
+              height: 50.0,
+              width: 50.0,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                image: DecorationImage(
+                  image: imageProvider,
+                  fit: BoxFit.cover,
+                ),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.grey),
+              ),
+            ),
+            placeholder: (context, url) => Container(
+              height: 50.0,
+              width: 50.0,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.grey),
+              ),
+            ),
+            errorWidget: (context, url, error) => Container(
+              height: 50.0,
+              width: 50.0,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                image: const DecorationImage(
+                  image: AssetImage('assets/noimage.png'),
+                  fit: BoxFit.cover,
+                ),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.grey),
+              ),
+            ),
+          ),
+          Positioned(bottom: 0, right: 0, child: Text(flag))
+        ],
+      ),
+      title: Text(
+        nom,
+        style: TextStyle(fontSize: 16),
+      ),
+      contentPadding:
+          const EdgeInsets.symmetric(vertical: 1.0, horizontal: 15.0),
+    );
+  }
+
+  Widget _buildOption2(
+      {required String urlPhoto,
+      required String uid,
+      required String nom,
+      required String flag,
+      required VoidCallback onTap,
+      required BuildContext context,
+      required String optionSelectedItem,
+      required bool estAbonne}) {
+    return ListTile(
+      onTap: onTap,
+      trailing: (optionSelectedItem == "Following" && estAbonne)
+          ? OutlinedButton(
+              onPressed: () async {
+                // Action au clic
+                await ref
+                    .read(infoUserStateNotifier.notifier)
+                    .desabonner(uid, 'dd');
+                Future.delayed(Duration(milliseconds: 600), () {
+                  setState(() {});
+                });
+              },
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black), // Bordure
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15)), // Coins arrondis
+                padding: EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 8), // Espacement
+              ),
+              child: Text(
+                "Suivi(e)".tr,
+                style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black,
+                    fontWeight: FontWeight.bold),
+              ),
+            )
+          : OutlinedButton(
+              onPressed: () async {
+                // Action au clic
+                await ref
+                    .read(infoUserStateNotifier.notifier)
+                    .abonner(uid, 'dd');
+                Future.delayed(Duration(milliseconds: 600), () {
+                  setState(() {});
+                });
+              },
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black), // Bordure
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15)), // Coins arrondis
+                padding: EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 8), // Espacement
+              ),
+              child: Text(
+                "Suivre".tr,
+                style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
       leading: Stack(
         children: [
           CachedNetworkImage(
