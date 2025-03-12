@@ -4,7 +4,6 @@ import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:natify/core/utils/colors.dart';
 import 'package:natify/core/utils/slideNavigation.dart';
 import 'package:natify/features/Storie/domaine/entities/storie_entities.dart';
-import 'package:natify/features/Storie/presentation/pages/storieViewForMe.dart';
 import 'package:natify/features/Storie/presentation/widget/StorieEditor.dart';
 import 'package:natify/features/Storie/presentation/widget/textEditorPage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

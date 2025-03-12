@@ -22,9 +22,13 @@ import 'package:get/get.dart';
 class ListFollowingAndFollowers extends ConsumerStatefulWidget {
   final String uid;
   final String nom;
+  final String nombrefollowing;
+  final String nombrefollower;
   const ListFollowingAndFollowers({
     required this.uid,
     required this.nom,
+    required this.nombrefollowing,
+    required this.nombrefollower,
     super.key,
   });
 
@@ -59,8 +63,8 @@ class _ListFollowingAndFollowersState
     return ThemeSwitchingArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text("${widget.nom}",
-              style: TextStyle(fontWeight: FontWeight.bold)),
+          title:
+              Text(widget.nom, style: TextStyle(fontWeight: FontWeight.bold)),
           elevation: 0,
           centerTitle: true,
           leading: IconButton(
@@ -146,6 +150,18 @@ class _ListFollowingAndFollowersState
             ),
             SizedBox(
               height: 1,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Text(
+                selected == "Followers"
+                    ? "(${widget.nombrefollower}) Followers"
+                    : "(${widget.nombrefollowing}) Following".tr,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(
+              height: 4,
             ),
             selected == "Followers"
                 ? FutureBuilder(

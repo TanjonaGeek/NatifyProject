@@ -2,10 +2,8 @@ import 'dart:async';
 import 'package:natify/core/utils/slideNavigation.dart';
 import 'package:natify/features/User/presentation/pages/List/AllUserPage.dart';
 import 'package:natify/features/User/presentation/provider/user_provider.dart';
-import 'package:natify/features/User/presentation/widget/list/filterListOfUser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
 class SectionHeader extends ConsumerStatefulWidget {

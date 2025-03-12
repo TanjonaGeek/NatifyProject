@@ -24,7 +24,6 @@ import 'package:natify/features/User/presentation/pages/modifierProfiles.dart';
 import 'package:natify/features/User/presentation/pages/signaler_profile.dart';
 import 'package:natify/features/User/presentation/provider/user_provider.dart';
 import 'package:natify/features/User/presentation/widget/OverlappingAvatars.dart';
-import 'package:natify/features/User/presentation/widget/list/listFollower.dart';
 import 'package:natify/features/User/presentation/widget/list/listFollowing.dart';
 import 'package:natify/features/User/presentation/widget/list/listFollowingAndFollowers.dart';
 import 'package:natify/features/User/presentation/widget/list/shimmer/shimmerProfilePage.dart';
@@ -284,9 +283,12 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                         size: 20,
                                         color: Colors.white),
                                     onPressed: () => _showMoreOption(
-                                        widget.uid,
-                                        users.first.name?.toString() ?? "",
-                                        users),
+                                      widget.uid,
+                                      users.first.name?.toString() ?? "",
+                                      users,
+                                      users.first.abonnee!.length.toString(),
+                                      users.first.abonnement!.length.toString(),
+                                    ),
                                   )
                                 ],
                               )
@@ -719,6 +721,8 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                               GestureDetector(
                                 onTap: () => _showMoreOption4(
                                   widget.uid,
+                                  users.first.abonnee!.length.toString(),
+                                  users.first.abonnement!.length.toString(),
                                 ),
                                 child: ValueListenableBuilder<List<String>>(
                                   valueListenable: imageUrlsNotifier,
@@ -735,7 +739,11 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                 height: 5,
                               ),
                               GestureDetector(
-                                onTap: () => _showMoreOption4(widget.uid),
+                                onTap: () => _showMoreOption4(
+                                  widget.uid,
+                                  users.first.abonnee!.length.toString(),
+                                  users.first.abonnement!.length.toString(),
+                                ),
                                 child: ValueListenableBuilder<List<String>>(
                                   valueListenable: imageUrlsNotifier,
                                   builder: (context, imageUrls, child) {
@@ -1343,7 +1351,12 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                 backgroundColor: kPrimaryColor,
                 onPressed: () => widget.uid == uidUser
                     ? _showMoreOption(
-                        widget.uid, userName.value, userDataGet.value)
+                        widget.uid,
+                        userName.value,
+                        userDataGet.value,
+                        notifier.MydataPersiste!.abonnee!.length.toString(),
+                        notifier.MydataPersiste!.abonnement!.length.toString(),
+                      )
                     : Navigator.of(context, rootNavigator: true).push(
                         MaterialPageRoute(
                           builder: (context) => MessageDetail(
@@ -1555,8 +1568,8 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
     );
   }
 
-  _showMoreOption(
-      String userUid, String name, List<UserEntity> MyOwnData) async {
+  _showMoreOption(String userUid, String name, List<UserEntity> MyOwnData,
+      String nombrefollower, String nombrefollowing) async {
     return await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -1711,7 +1724,9 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                 context,
                                 ListFollowingAndFollowers(
                                   uid: widget.uid,
-                                  nom: name,
+                                  nom: userName.value,
+                                  nombrefollower: nombrefollower,
+                                  nombrefollowing: nombrefollowing,
                                 ));
                           },
                           leading: Container(
@@ -1936,7 +1951,11 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
     );
   }
 
-  _showMoreOption4(String userUid) async {
+  _showMoreOption4(
+    String userUid,
+    String nombrefollower,
+    String nombrefollowing,
+  ) async {
     return await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -1986,6 +2005,8 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                           SlideNavigation.slideToPage(
                               context,
                               ListFollowingAndFollowers(
+                                nombrefollower: nombrefollower,
+                                nombrefollowing: nombrefollowing,
                                 uid: widget.uid,
                                 nom: userName.value,
                               ));

@@ -36,7 +36,7 @@ class _ListUserOnlineState extends ConsumerState<ListUserOnline> {
         .doc(uidUser)
         .snapshots()
         .map((snapshot) {
-      final data = snapshot.data() as Map<String, dynamic>?;
+      final data = snapshot.data();
       return List<String>.from(data?['friendBlocked'] ?? [uidUser]);
     });
 

@@ -1,6 +1,5 @@
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:natify/core/utils/slideNavigation.dart';
-import 'package:natify/features/Chat/presentation/pages/messageDetail.dart';
 import 'package:natify/features/Chat/presentation/provider/chat_provider.dart';
 import 'package:natify/features/User/presentation/pages/userProfilePage.dart';
 import 'package:natify/features/User/presentation/provider/user_provider.dart';
