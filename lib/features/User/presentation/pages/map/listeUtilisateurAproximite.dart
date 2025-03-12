@@ -62,7 +62,7 @@ class _ListeutilisateuraproximiteState
           ),
           actions: [
             IconButton(
-              icon: FaIcon(FontAwesomeIcons.filterCircleXmark, size: 20),
+              icon: FaIcon(FontAwesomeIcons.sliders, size: 20),
               onPressed: () {
                 SlideNavigation.slideToPage(context, FilterPage());
               },
@@ -78,13 +78,13 @@ class _ListeutilisateuraproximiteState
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           SizedBox(
-                              width: 130,
-                              height: 130,
-                              child: Image.asset('assets/earth.png',
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? Colors.white
-                                      : Colors.black)),
+                            width: 120,
+                            height: 120,
+                            child: Image.asset(
+                                'assets/localisation-de-lutilisateur.png',
+                                width: 120,
+                                height: 120),
+                          ),
                           SizedBox(
                             height: 10,
                           ),

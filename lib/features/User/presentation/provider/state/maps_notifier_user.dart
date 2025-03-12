@@ -127,85 +127,199 @@ class MapsUserhNotifier extends StateNotifier<MapsUserState> {
   }
 
   Future<void> transferDataPrefToNotifer() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final BitmapDescriptor icon = state.customIcon!;
-    double? Latitude = prefs.getDouble('latitude') ?? 0.0;
-    double? Longitude = prefs.getDouble('longitude') ?? 0.0;
-    double? zoom = prefs.getDouble('zoom') ?? 11.2;
-    String? rangeString = prefs.getString('rangeOfageDebutAndFin');
-    RangeValues loadedRangeOfageDebutAndFin = rangeString != null
-        ? RangeValues(
-            double.parse(rangeString.split(',')[0]),
-            double.parse(rangeString.split(',')[1]),
-          )
-        : RangeValues(14, 90);
-    List<String> nationaliteGroupSansFlag =
-        prefs.getStringList('nationaliteGroupSansFlag') ?? [];
-    String pays = prefs.getString('pays') ?? '';
-    String sexe = prefs.getString('sexe') ?? '';
-    String adresse = prefs.getString('adresse') ?? '';
-    bool isFilter = prefs.getBool('isFilter') ?? false;
-    String? nationaliteGroupJson = prefs.getString('nationaliteGroup');
-    List<Map<String, String>> loadedNationaliteGroup =
-        nationaliteGroupJson != null
-            ? List<Map<String, String>>.from(
-                jsonDecode(nationaliteGroupJson)
-                    .map((e) => Map<String, String>.from(e)),
-              )
-            : [];
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      final BitmapDescriptor icon = state.customIcon!;
 
-    double? radius = prefs.getDouble('radius') ?? 10000.0;
-    double? mapCenterLatitude = prefs.getDouble('mapCenter_latitude') ?? 0.0;
-    double? mapCenterLongitude = prefs.getDouble('mapCenter_longitude') ?? 0.0;
-    final GeoFirePoint mapCenter = GeoFirePoint(
-      mapCenterLatitude,
-      mapCenterLongitude,
-    );
-    if (Latitude == 0.0 && Longitude == 0.0) {
-      getCurrentLocation();
-    } else {
-      final initialCameraPosition = CameraPosition(
-        target: LatLng(Latitude, Longitude),
-        zoom: zoom, // Par exemple
+      double? latitude = prefs.getDouble('latitude') ?? 0.0;
+      double? longitude = prefs.getDouble('longitude') ?? 0.0;
+      double? zoom = prefs.getDouble('zoom') ?? 11.2;
+      double? radius = prefs.getDouble('radius') ?? 10000.0;
+      double? mapCenterLatitude = prefs.getDouble('mapCenter_latitude') ?? 0.0;
+      double? mapCenterLongitude =
+          prefs.getDouble('mapCenter_longitude') ?? 0.0;
+
+      // Vérifier si rangeOfageDebutAndFin est bien formaté avant de le parser
+      String? rangeString = prefs.getString('rangeOfageDebutAndFin');
+      RangeValues loadedRangeOfageDebutAndFin;
+      if (rangeString != null && rangeString.contains(',')) {
+        List<String> parts = rangeString.split(',');
+        if (parts.length == 2) {
+          try {
+            loadedRangeOfageDebutAndFin = RangeValues(
+              double.tryParse(parts[0]) ?? 14.0,
+              double.tryParse(parts[1]) ?? 90.0,
+            );
+          } catch (e) {
+            print("Erreur parsing rangeOfageDebutAndFin: $e");
+            loadedRangeOfageDebutAndFin = RangeValues(14, 90);
+          }
+        } else {
+          loadedRangeOfageDebutAndFin = RangeValues(14, 90);
+        }
+      } else {
+        loadedRangeOfageDebutAndFin = RangeValues(14, 90);
+      }
+
+      List<String> nationaliteGroupSansFlag =
+          prefs.getStringList('nationaliteGroupSansFlag') ?? [];
+      String pays = prefs.getString('pays') ?? '';
+      String sexe = prefs.getString('sexe') ?? '';
+      String adresse = prefs.getString('adresse') ?? '';
+      bool isFilter = prefs.getBool('isFilter') ?? false;
+
+      // Vérifier si nationaliteGroup est bien formaté avant de le décoder
+      String? nationaliteGroupJson = prefs.getString('nationaliteGroup');
+      List<Map<String, String>> loadedNationaliteGroup = [];
+      if (nationaliteGroupJson != null) {
+        try {
+          loadedNationaliteGroup = List<Map<String, String>>.from(
+            jsonDecode(nationaliteGroupJson)
+                .map((e) => Map<String, String>.from(e)),
+          );
+        } catch (e) {
+          print("Erreur parsing nationaliteGroup: $e");
+          loadedNationaliteGroup = [];
+        }
+      }
+
+      final GeoFirePoint mapCenter = GeoFirePoint(
+        mapCenterLatitude,
+        mapCenterLongitude,
       );
-      final currentPositionMarker = Marker(
-        markerId: MarkerId('current_position'),
-        position: LatLng(Latitude, Longitude),
-        infoWindow: InfoWindow(title: 'Votre position actuelle'),
-        icon: icon,
-      );
-      // Obtenir la position actuelle
-      Position position = Position(
-        latitude: Latitude,
-        longitude: Longitude,
-        accuracy: 0.0, // Précision, vous pouvez ajuster cette valeur
-        altitude: 0.0, // Altitude par défaut
-        heading: 0.0, // Direction par défaut
-        speed: 0.0, // Vitesse par défaut
-        speedAccuracy: 0.0, // Précision de la vitesse
-        timestamp: DateTime.now(),
-        altitudeAccuracy: 0.0, // Ajoutez l'altitudeAccuracy par défaut
-        headingAccuracy: 0.0,
-      );
-      state = state.copyWith(
-        position: position,
-        mapCenter: mapCenter,
-        cameraPosition: initialCameraPosition,
-        markers: {currentPositionMarker},
-        adressMaps: adresse,
-        rangeOfageDebutAndFin: loadedRangeOfageDebutAndFin,
-        sexe: sexe,
-        pays: pays,
-        zoom: zoom,
-        radius: radius,
-        nationaliteGroup: loadedNationaliteGroup,
-        nationaliteGroupSansFlag: nationaliteGroupSansFlag,
-        isFilter: isFilter,
-        isLoading: false,
-        state: MapsUserConcreteState.loaded,
-      );
+
+      if (latitude == 0.0 && longitude == 0.0) {
+        getCurrentLocation();
+      } else {
+        final initialCameraPosition = CameraPosition(
+          target: LatLng(latitude, longitude),
+          zoom: zoom,
+        );
+
+        final currentPositionMarker = Marker(
+          markerId: MarkerId('current_position'),
+          position: LatLng(latitude, longitude),
+          infoWindow: InfoWindow(title: 'Votre position actuelle'),
+          icon: icon,
+        );
+
+        // Création correcte de l'objet Position avec `altitudeAccuracy` et `headingAccuracy`
+        Position position = Position(
+          latitude: latitude,
+          longitude: longitude,
+          accuracy: 0.0,
+          altitude: 0.0,
+          heading: 0.0,
+          speed: 0.0,
+          speedAccuracy: 0.0,
+          timestamp: DateTime.now(),
+          altitudeAccuracy: 0.0, // Correction ici
+          headingAccuracy: 0.0, // Correction ici
+        );
+
+        state = state.copyWith(
+          position: position,
+          mapCenter: mapCenter,
+          cameraPosition: initialCameraPosition,
+          markers: {currentPositionMarker},
+          adressMaps: adresse,
+          rangeOfageDebutAndFin: loadedRangeOfageDebutAndFin,
+          sexe: sexe,
+          pays: pays,
+          zoom: zoom,
+          radius: radius,
+          nationaliteGroup: loadedNationaliteGroup,
+          nationaliteGroupSansFlag: nationaliteGroupSansFlag,
+          isFilter: isFilter,
+          isLoading: false,
+          state: MapsUserConcreteState.loaded,
+        );
+      }
+    } catch (e) {
+      print("Erreur dans transferDataPrefToNotifer: $e");
     }
   }
+
+  // Future<void> transferDataPrefToNotifer() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   final BitmapDescriptor icon = state.customIcon!;
+  //   double? Latitude = prefs.getDouble('latitude') ?? 0.0;
+  //   double? Longitude = prefs.getDouble('longitude') ?? 0.0;
+  //   double? zoom = prefs.getDouble('zoom') ?? 11.2;
+  //   String? rangeString = prefs.getString('rangeOfageDebutAndFin');
+  //   RangeValues loadedRangeOfageDebutAndFin = rangeString != null
+  //       ? RangeValues(
+  //           double.parse(rangeString.split(',')[0]),
+  //           double.parse(rangeString.split(',')[1]),
+  //         )
+  //       : RangeValues(14, 90);
+  //   List<String> nationaliteGroupSansFlag =
+  //       prefs.getStringList('nationaliteGroupSansFlag') ?? [];
+  //   String pays = prefs.getString('pays') ?? '';
+  //   String sexe = prefs.getString('sexe') ?? '';
+  //   String adresse = prefs.getString('adresse') ?? '';
+  //   bool isFilter = prefs.getBool('isFilter') ?? false;
+  //   String? nationaliteGroupJson = prefs.getString('nationaliteGroup');
+  //   List<Map<String, String>> loadedNationaliteGroup =
+  //       nationaliteGroupJson != null
+  //           ? List<Map<String, String>>.from(
+  //               jsonDecode(nationaliteGroupJson)
+  //                   .map((e) => Map<String, String>.from(e)),
+  //             )
+  //           : [];
+
+  //   double? radius = prefs.getDouble('radius') ?? 10000.0;
+  //   double? mapCenterLatitude = prefs.getDouble('mapCenter_latitude') ?? 0.0;
+  //   double? mapCenterLongitude = prefs.getDouble('mapCenter_longitude') ?? 0.0;
+  //   final GeoFirePoint mapCenter = GeoFirePoint(
+  //     mapCenterLatitude,
+  //     mapCenterLongitude,
+  //   );
+  //   if (Latitude == 0.0 && Longitude == 0.0) {
+  //     getCurrentLocation();
+  //   } else {
+  //     final initialCameraPosition = CameraPosition(
+  //       target: LatLng(Latitude, Longitude),
+  //       zoom: zoom, // Par exemple
+  //     );
+  //     final currentPositionMarker = Marker(
+  //       markerId: MarkerId('current_position'),
+  //       position: LatLng(Latitude, Longitude),
+  //       infoWindow: InfoWindow(title: 'Votre position actuelle'),
+  //       icon: icon,
+  //     );
+  //     // Obtenir la position actuelle
+  //     Position position = Position(
+  //       latitude: Latitude,
+  //       longitude: Longitude,
+  //       accuracy: 0.0, // Précision, vous pouvez ajuster cette valeur
+  //       altitude: 0.0, // Altitude par défaut
+  //       heading: 0.0, // Direction par défaut
+  //       speed: 0.0, // Vitesse par défaut
+  //       speedAccuracy: 0.0, // Précision de la vitesse
+  //       timestamp: DateTime.now(),
+  //       altitudeAccuracy: 0.0, // Ajoutez l'altitudeAccuracy par défaut
+  //       headingAccuracy: 0.0,
+  //     );
+  //     state = state.copyWith(
+  //       position: position,
+  //       mapCenter: mapCenter,
+  //       cameraPosition: initialCameraPosition,
+  //       markers: {currentPositionMarker},
+  //       adressMaps: adresse,
+  //       rangeOfageDebutAndFin: loadedRangeOfageDebutAndFin,
+  //       sexe: sexe,
+  //       pays: pays,
+  //       zoom: zoom,
+  //       radius: radius,
+  //       nationaliteGroup: loadedNationaliteGroup,
+  //       nationaliteGroupSansFlag: nationaliteGroupSansFlag,
+  //       isFilter: isFilter,
+  //       isLoading: false,
+  //       state: MapsUserConcreteState.loaded,
+  //     );
+  //   }
+  // }
 
   void updatePosition(
       Position newPosition, GoogleMapController controller) async {
@@ -370,7 +484,14 @@ class MapsUserhNotifier extends StateNotifier<MapsUserState> {
       return;
     }
     state = state.copyWith(isLoading: true);
-
+    // Récupérer tes propres données depuis Firestore
+    final String myUidss = FirebaseAuth.instance.currentUser!.uid;
+    final myDoc = await firestore.collection('users').doc(myUidss).get();
+    List<String> friendBlockedList = [];
+    if (myDoc.exists) {
+      final myData = myDoc.data() as Map<String, dynamic>;
+      friendBlockedList = List<String>.from(myData['friendBlocked'] ?? []);
+    }
     try {
       final collectionReference = firestore.collection('users');
       final double radiusInKm = state.radius / 1000;
@@ -419,6 +540,13 @@ class MapsUserhNotifier extends StateNotifier<MapsUserState> {
             matchesCountry &&
             matchesGender;
       }).toList();
+
+      // Supprimer de la liste les utilisateurs dont le uid est dans friendblockerd
+      filteredUsers.removeWhere((user) {
+        final data = user.data() as Map<String, dynamic>;
+        final String? uid = data['uid'];
+        return uid != null && friendBlockedList.contains(uid);
+      });
 
       // Traitement des utilisateurs filtrés
       final Set<String> countedUsers = {};

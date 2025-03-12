@@ -5,7 +5,6 @@ import 'package:natify/core/utils/colors.dart';
 import 'package:natify/core/utils/helpers.dart';
 import 'package:natify/core/utils/slideNavigation.dart';
 import 'package:natify/features/Chat/presentation/pages/messageDetail.dart';
-import 'package:natify/features/Chat/presentation/provider/chat_provider.dart';
 import 'package:natify/features/User/presentation/pages/map/filterOption.dart';
 import 'package:natify/features/User/presentation/pages/userProfilePage.dart';
 import 'package:natify/features/User/presentation/provider/user_provider.dart';
@@ -582,10 +581,7 @@ class _ListFollowingAndFollowersState
               child: Text(
                 "Suivi(e)".tr,
                 style: TextStyle(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : Colors.black,
-                    fontWeight: FontWeight.bold),
+                    color: kPrimaryColor, fontWeight: FontWeight.bold),
               ),
             )
           : OutlinedButton(
@@ -611,10 +607,7 @@ class _ListFollowingAndFollowersState
               child: Text(
                 "Suivre".tr,
                 style: TextStyle(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : Colors.black,
-                    fontWeight: FontWeight.bold),
+                    color: kPrimaryColor, fontWeight: FontWeight.bold),
               ),
             ),
       leading: Stack(

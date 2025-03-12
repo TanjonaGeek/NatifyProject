@@ -187,13 +187,8 @@ class _TrouverParPlaceState extends ConsumerState<TrouverParPlace> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Image.asset('assets/earth.png',
-                              color: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.white
-                                  : Colors.black,
-                              width: 130,
-                              height: 130),
+                          Image.asset('assets/localisation-de-lutilisateur.png',
+                              width: 120, height: 120),
                           SizedBox(height: 10),
                           Text("Aucun résultat".tr,
                               style: TextStyle(

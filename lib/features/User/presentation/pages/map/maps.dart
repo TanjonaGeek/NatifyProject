@@ -91,7 +91,11 @@ class _MapsState extends ConsumerState<Maps>
         double? Longitude = prefs.getDouble('longitude') ?? 0.0;
         if (Latitude == 0.0 && Longitude == 0.0) {
           await Future.delayed(Duration(seconds: 2));
-          _showAlertDialog(context);
+
+          /// Attendre que l'UI soit prête avant d'afficher l'alerte
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _showAlertDialog(context);
+          });
         }
       });
     } catch (e) {
