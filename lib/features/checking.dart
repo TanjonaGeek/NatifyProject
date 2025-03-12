@@ -12,6 +12,8 @@ import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class Cheking extends ConsumerStatefulWidget {
   const Cheking({super.key});
@@ -23,6 +25,7 @@ class Cheking extends ConsumerStatefulWidget {
 class _ChekingState extends ConsumerState<Cheking> {
   String tokenReload = "";
   String _appVersion = "";
+  String _appVersion2 = "";
 
   // Récupérer la version locale
   Future<void> _getLocalVersion() async {
@@ -30,6 +33,7 @@ class _ChekingState extends ConsumerState<Cheking> {
     if (mounted) {
       setState(() {
         _appVersion = '${packageInfo.version}+${packageInfo.buildNumber}';
+        _appVersion2 = '${packageInfo.version}';
       });
     }
   }
@@ -51,6 +55,17 @@ class _ChekingState extends ConsumerState<Cheking> {
       }
       return allVersions;
     });
+  }
+
+  // Ouvre le Play Store pour mettre à jour l'application
+  Future<void> _launchPlayStore() async {
+    final url =
+        "https://play.google.com/store/apps/details?id=com.natify.natifyapp";
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      print("Impossible d'ouvrir le Play Store");
+    }
   }
 
   Widget erroPage() {
@@ -123,6 +138,7 @@ class _ChekingState extends ConsumerState<Cheking> {
 
   @override
   Widget build(BuildContext context) {
+    String messageversion = "Version_obsolete".tr;
     return Scaffold(
         body: StreamBuilder<List<String>>(
       stream: _getVersionStream(),
@@ -174,16 +190,14 @@ class _ChekingState extends ConsumerState<Cheking> {
                     SizedBox(
                         width: 100,
                         height: 100,
-                        child: Image.asset('assets/update.png',
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black)),
+                        child: Image.asset(
+                          'assets/boucler.png',
+                        )),
                     SizedBox(
                       height: 10,
                     ),
                     Text(
-                      "Version_obsolete".tr,
+                      "${messageversion} (v${_appVersion2})".tr,
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
@@ -201,16 +215,14 @@ class _ChekingState extends ConsumerState<Cheking> {
                     ),
                     SizedBox(height: 3),
                     GestureDetector(
-                      onTap: () {
-                        print('mise a jour terminer');
-                      },
+                      onTap: _launchPlayStore,
                       child: Column(
                         children: [
                           Text(
                             "Mettre à jour".tr,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.bold,
                                 fontSize: 15,
                                 color: kPrimaryColor),
                           ),

@@ -171,7 +171,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
 
   Future<void> bloquerConversation(String userUid) async {
     _bloqueConversation.call(userUid).then((onValue) {
-      showCustomSnackBar("Vous_bloqué_utilisateur");
+      showCustomSnackBar("Vous_bloqué_utilisateur.");
     });
   }
 

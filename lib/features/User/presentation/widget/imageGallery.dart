@@ -2,8 +2,6 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:natify/core/utils/colors.dart';
-import 'package:natify/core/utils/enums/message_enum.dart';
-import 'package:natify/features/Chat/presentation/provider/chat_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';

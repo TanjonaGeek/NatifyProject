@@ -2,7 +2,7 @@ import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:natify/core/utils/colors.dart';
 import 'package:natify/core/utils/slideNavigation.dart';
-import 'package:natify/features/User/presentation/pages/map/filterListOfUser.dart';
+import 'package:natify/features/User/presentation/widget/list/filterListOfUser.dart';
 import 'package:natify/features/User/presentation/widget/list/sectionHeader.dart';
 import 'package:natify/features/User/presentation/provider/user_provider.dart';
 import 'package:natify/features/User/presentation/widget/list/sectionListOfUser.dart';
@@ -20,7 +20,7 @@ class AllUserList extends ConsumerWidget {
       child: Scaffold(
         // backgroundColor: Colors.white,
         appBar: AppBar(
-          title: Text('Liste des utilisateurs'.tr,
+          title: Text('Liste des utilisateursssss'.tr,
               style: TextStyle(fontWeight: FontWeight.bold)),
           elevation: 0,
           centerTitle: true,

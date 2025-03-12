@@ -1,14 +1,15 @@
-import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'dart:convert';
 
 class PolitiqueConfidentialite extends StatefulWidget {
   const PolitiqueConfidentialite({super.key});
 
   @override
-  State<PolitiqueConfidentialite> createState() => _PolitiqueConfidentialiteState();
+  State<PolitiqueConfidentialite> createState() =>
+      _PolitiqueConfidentialiteState();
 }
 
 class _PolitiqueConfidentialiteState extends State<PolitiqueConfidentialite> {
@@ -18,7 +19,6 @@ class _PolitiqueConfidentialiteState extends State<PolitiqueConfidentialite> {
   @override
   void initState() {
     super.initState();
-    // Initialiser le contrôleur WebView
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
@@ -39,54 +39,64 @@ class _PolitiqueConfidentialiteState extends State<PolitiqueConfidentialite> {
             });
           },
         ),
-      )
-      ..loadRequest(Uri.parse('https://app.getterms.io/view/DIMpv/privacy/en-au'));
+      );
+
+    // Charger le fichier HTML local
+    _loadLocalHtml();
+  }
+
+  void _loadLocalHtml() async {
+    String fileText = await rootBundle
+        .loadString("assets/condition_utilisateur/privacy_policy.html");
+
+    // Ajout du meta viewport pour un meilleur affichage mobile
+    String htmlContent = '''
+    <html>
+    <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+      <style>
+        body { font-size: 18px; padding: 15px; line-height: 1.6; }
+      </style>
+    </head>
+    <body>
+      $fileText
+    </body>
+    </html>
+    ''';
+
+    _controller.loadRequest(Uri.dataFromString(
+      htmlContent,
+      mimeType: 'text/html',
+      encoding: Encoding.getByName('utf-8'),
+    ));
   }
 
   void _reloadWebView() {
-    _controller.reload();
+    _loadLocalHtml(); // Recharge le HTML local
   }
 
   @override
   Widget build(BuildContext context) {
-    return ThemeSwitchingArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            "Politique de confidentialité".tr,
-            style: TextStyle(fontWeight: FontWeight.bold),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Politique de confidentialité".tr,
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _reloadWebView, // Recharger le HTML local
           ),
-          elevation: 0,
-          centerTitle: true,
-          leading: IconButton(
-            icon: const FaIcon(
-              FontAwesomeIcons.chevronLeft,
-              size: 20,
+        ],
+      ),
+      body: Stack(
+        children: [
+          WebViewWidget(controller: _controller),
+          if (_isLoading)
+            const Center(
+              child: CircularProgressIndicator(),
             ),
-            onPressed: () => Navigator.pop(context),
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.refresh,),
-              onPressed: _reloadWebView,
-            ),
-          ],
-        ),
-        body: _isLoading 
-        ? 
-        Center(
-          child: Container(
-            width: 20,
-            height: 20,
-            margin: const EdgeInsets.symmetric(vertical: 20),
-            child: CircularProgressIndicator(color:Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black)
-          ),
-        )
-        : Stack(
-          children: [
-            WebViewWidget(controller: _controller),
-          ],
-        ),
+        ],
       ),
     );
   }

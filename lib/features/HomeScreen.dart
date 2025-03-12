@@ -7,6 +7,7 @@ import 'package:natify/core/utils/colors.dart';
 import 'package:natify/core/utils/slideNavigation.dart';
 import 'package:natify/features/Chat/presentation/pages/AllMessagePage.dart';
 import 'package:natify/features/Storie/presentation/pages/AllStoriePage.dart';
+import 'package:natify/features/Storie/presentation/pages/creeateStoriePage.dart';
 import 'package:natify/features/User/presentation/pages/UserProfilePage.dart';
 import 'package:natify/features/User/presentation/pages/editerprofile.dart';
 import 'package:natify/features/User/presentation/pages/map/maps.dart';
@@ -161,21 +162,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               ),
             ),
             actions: [
-              // ValueListenableBuilder<int>(
-              //   valueListenable: _selectedIndexNotifier,
-              //   builder: (context, selectedIndex, _) {
-              //     return selectedIndex == 2
-              //         ? InkWell(
-              //             onTap: () {
-              //               SlideNavigation.slideToPage(context, GalleryPage());
-              //             },
-              //             child: FaIcon(
-              //               FontAwesomeIcons.squarePlus,
-              //               size: 24,
-              //             ))
-              //         : SizedBox();
-              //   },
-              // ),
+              ValueListenableBuilder<int>(
+                valueListenable: _selectedIndexNotifier,
+                builder: (context, selectedIndex, _) {
+                  return selectedIndex == 2
+                      ? InkWell(
+                          onTap: () {
+                            SlideNavigation.slideToPage(context, GalleryPage());
+                          },
+                          child: FaIcon(
+                            FontAwesomeIcons.solidSquarePlus,
+                            size: 24,
+                          ))
+                      : SizedBox();
+                },
+              ),
               IconButton(
                 iconSize: 50,
                 icon: Stack(

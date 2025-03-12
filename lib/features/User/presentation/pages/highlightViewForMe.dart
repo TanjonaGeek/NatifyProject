@@ -259,7 +259,7 @@ class _CarousselWidgetState extends ConsumerState<CarousselWidget> {
         var timeParsing = DateTime.fromMillisecondsSinceEpoch(timeCreatedAt);
         String timePosting =
             MyDateUtil.timeAgoSinceDate3(timeParsing.toString());
-        print('le timeposting est ${timePosting}');
+        print('le timeposting est $timePosting');
         // Afficher FlutterStoryView pour chaque histoire
         return Stack(
           children: [
