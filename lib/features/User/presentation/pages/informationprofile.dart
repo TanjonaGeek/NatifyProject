@@ -109,8 +109,7 @@ class ProfileInformation extends ConsumerWidget {
                         Positioned(
                             bottom: 0,
                             right: 0,
-                            child:
-                                Text(MyOwnData.first.flag?.toString() ?? ""))
+                            child: Text(MyOwnData.first.flag?.toString() ?? ""))
                       ],
                     ),
                     SizedBox(width: 20),
@@ -164,8 +163,11 @@ class ProfileInformation extends ConsumerWidget {
                             borderRadius:
                                 BorderRadius.all(Radius.circular(10))),
                         child: Center(
-                            child: FaIcon(FontAwesomeIcons.solidCircleUser,
-                                size: 20, color: Colors.black54))),
+                            child: Image.asset(
+                          'assets/utilisateur (1).png',
+                          width: 19,
+                          height: 19,
+                        ))),
                     title: "Nom_Prenom".tr,
                     subtitle: uid == uidUser
                         ? "${notifier.MydataPersiste?.nom ?? ""} ${notifier.MydataPersiste?.prenom ?? ""}"
@@ -180,8 +182,11 @@ class ProfileInformation extends ConsumerWidget {
                             borderRadius:
                                 BorderRadius.all(Radius.circular(10))),
                         child: Center(
-                            child: FaIcon(FontAwesomeIcons.venusMars,
-                                size: 20, color: Colors.black54))),
+                            child: Image.asset(
+                          'assets/genre-fluide.png',
+                          width: 22,
+                          height: 22,
+                        ))),
                     title: "Genre".tr,
                     subtitle: uid == uidUser
                         ? notifier.MydataPersiste?.sexe ?? ""
@@ -196,8 +201,11 @@ class ProfileInformation extends ConsumerWidget {
                             borderRadius:
                                 BorderRadius.all(Radius.circular(10))),
                         child: Center(
-                            child: FaIcon(FontAwesomeIcons.earthAmericas,
-                                size: 20, color: Colors.black54))),
+                            child: Image.asset(
+                          'assets/localisation-de-ladresse.png',
+                          width: 22,
+                          height: 22,
+                        ))),
                     title: "residant".tr,
                     subtitle:
                         "${uid == uidUser && notifier.MydataPersiste!.pays!.isNotEmpty ? notifier.MydataPersiste?.pays ?? "" : uid != uidUser && MyOwnData.first.pays!.isNotEmpty ? MyOwnData.first.pays ?? "" : SizedBox.shrink()}",
@@ -211,8 +219,11 @@ class ProfileInformation extends ConsumerWidget {
                             borderRadius:
                                 BorderRadius.all(Radius.circular(10))),
                         child: Center(
-                            child: FaIcon(FontAwesomeIcons.earthAsia,
-                                size: 20, color: Colors.black54))),
+                            child: Image.asset(
+                          'assets/drapeau.png',
+                          width: 22,
+                          height: 22,
+                        ))),
                     title: "dorigine".tr,
                     subtitle:
                         "${uid == uidUser && notifier.MydataPersiste!.nationalite!.isNotEmpty ? notifier.MydataPersiste?.nationalite ?? "" : uid != uidUser && MyOwnData.first.nationalite!.isNotEmpty ? MyOwnData.first.nationalite ?? "" : SizedBox.shrink()}",
@@ -234,8 +245,11 @@ class ProfileInformation extends ConsumerWidget {
                             borderRadius:
                                 BorderRadius.all(Radius.circular(10))),
                         child: Center(
-                            child: FaIcon(FontAwesomeIcons.school,
-                                size: 20, color: Colors.black54))),
+                            child: Image.asset(
+                          'assets/college (2).png',
+                          width: 22,
+                          height: 22,
+                        ))),
                     title: "education_college".tr,
                     subtitle:
                         "${uid == uidUser && notifier.MydataPersiste!.college!.isNotEmpty ? notifier.MydataPersiste?.college![0]['nom'] ?? "" : uid != uidUser && MyOwnData.first.college!.isNotEmpty ? MyOwnData.first.college![0]['nom'] : "aucun".tr}",
@@ -249,8 +263,11 @@ class ProfileInformation extends ConsumerWidget {
                             borderRadius:
                                 BorderRadius.all(Radius.circular(10))),
                         child: Center(
-                            child: FaIcon(FontAwesomeIcons.buildingColumns,
-                                size: 20, color: Colors.black54))),
+                            child: Image.asset(
+                          'assets/lobtention-du-diplome.png',
+                          width: 25,
+                          height: 25,
+                        ))),
                     title: "education_universite".tr,
                     subtitle:
                         "${uid == uidUser && notifier.MydataPersiste!.universite!.isNotEmpty ? notifier.MydataPersiste?.universite![0]['nom'] ?? "" : uid != uidUser && MyOwnData.first.universite!.isNotEmpty ? MyOwnData.first.universite![0]['nom'] : "aucun".tr}",
@@ -274,8 +291,11 @@ class ProfileInformation extends ConsumerWidget {
                             borderRadius:
                                 BorderRadius.all(Radius.circular(10))),
                         child: Center(
-                            child: FaIcon(FontAwesomeIcons.heartCircleCheck,
-                                size: 23, color: Colors.red))),
+                            child: Image.asset(
+                          'assets/amour.png',
+                          width: 25,
+                          height: 25,
+                        ))),
                     title: "situation".tr,
                     subtitle:
                         "${uid == uidUser && notifier.MydataPersiste!.situationamoureux!.isNotEmpty ? notifier.MydataPersiste?.situationamoureux![0]['situation'] ?? "" : uid != uidUser && MyOwnData.first.situationamoureux!.isNotEmpty ? MyOwnData.first.situationamoureux![0]['situation'] : "aucun".tr}"

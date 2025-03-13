@@ -37,21 +37,21 @@ class AllVisiteurByNationality extends StatelessWidget {
         ),
         body: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-              child: Text(
-                "Voici la liste des utilisateurs qui ont récemment visité votre profil."
-                    .tr,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 15.0,
-                ),
-              ),
-            ),
-            Divider(
-              color: Colors.grey.shade500,
-              thickness: 0.2,
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+            //   child: Text(
+            //     "Voici la liste des utilisateurs qui ont récemment visité votre profil."
+            //         .tr,
+            //     textAlign: TextAlign.center,
+            //     style: TextStyle(
+            //       fontSize: 15.0,
+            //     ),
+            //   ),
+            // ),
+            // Divider(
+            //   color: Colors.grey.shade500,
+            //   thickness: 0.2,
+            // ),
             SizedBox(
               height: 1,
             ),

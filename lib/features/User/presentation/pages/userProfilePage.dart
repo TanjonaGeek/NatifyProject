@@ -1632,10 +1632,10 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                             color: Colors.grey.shade300,
                                           ),
                                           child: Center(
-                                              child: FaIcon(
-                                            FontAwesomeIcons.solidTrashCan,
-                                            size: 17,
-                                            color: Colors.black,
+                                              child: Image.asset(
+                                            'assets/bloquer-un-utilisateur (2).png',
+                                            width: 20,
+                                            height: 20,
                                           ))),
                                       title: Column(
                                         crossAxisAlignment:
@@ -1677,11 +1677,12 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                             color: Colors.grey.shade300,
                                           ),
                                           child: Center(
-                                              child: FaIcon(
-                                            FontAwesomeIcons.solidTrashCan,
-                                            size: 17,
-                                            color: Colors.black,
-                                          ))),
+                                            child: Image.asset(
+                                              'assets/bloquer-un-utilisateur (2).png',
+                                              width: 20,
+                                              height: 20,
+                                            ),
+                                          )),
                                       title: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -1729,11 +1730,12 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                 color: Colors.grey.shade300,
                               ),
                               child: Center(
-                                  child: FaIcon(
-                                FontAwesomeIcons.person,
-                                size: 17,
-                                color: Colors.black,
-                              ))),
+                                child: Image.asset(
+                                  'assets/suivre.png',
+                                  width: 20,
+                                  height: 20,
+                                ),
+                              )),
                           title: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -1781,11 +1783,12 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                 color: Colors.grey.shade300,
                               ),
                               child: Center(
-                                  child: FaIcon(
-                                FontAwesomeIcons.person,
-                                size: 17,
-                                color: Colors.black,
-                              ))),
+                                child: Image.asset(
+                                  'assets/suivre.png',
+                                  width: 20,
+                                  height: 20,
+                                ),
+                              )),
                           title: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -1829,11 +1832,12 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                 color: Colors.grey.shade300,
                               ),
                               child: Center(
-                                  child: FaIcon(
-                                FontAwesomeIcons.photoFilm,
-                                size: 17,
-                                color: Colors.black,
-                              ))),
+                                child: Image.asset(
+                                  'assets/photo.png',
+                                  width: 20,
+                                  height: 20,
+                                ),
+                              )),
                           title: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -1873,11 +1877,12 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                               color: Colors.grey.shade300,
                             ),
                             child: Center(
-                                child: FaIcon(
-                              FontAwesomeIcons.person,
-                              size: 17,
-                              color: Colors.black,
-                            ))),
+                              child: Image.asset(
+                                'assets/info.png',
+                                width: 20,
+                                height: 20,
+                              ),
+                            )),
                         title: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -1920,11 +1925,12 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                 color: Colors.grey.shade300,
                               ),
                               child: Center(
-                                  child: FaIcon(
-                                FontAwesomeIcons.person,
-                                size: 17,
-                                color: Colors.black,
-                              ))),
+                                child: Image.asset(
+                                  'assets/interdit.png',
+                                  width: 20,
+                                  height: 20,
+                                ),
+                              )),
                           title: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -2016,11 +2022,12 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                               color: Colors.grey.shade300,
                             ),
                             child: Center(
-                                child: FaIcon(
-                              FontAwesomeIcons.userPlus,
-                              size: 17,
-                              color: Colors.black,
-                            ))),
+                              child: Image.asset(
+                                'assets/suivre.png',
+                                width: 20,
+                                height: 20,
+                              ),
+                            )),
                         title: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -2066,11 +2073,12 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                               color: Colors.grey.shade300,
                             ),
                             child: Center(
-                                child: FaIcon(
-                              FontAwesomeIcons.userPlus,
-                              size: 17,
-                              color: Colors.black,
-                            ))),
+                              child: Image.asset(
+                                'assets/suivre.png',
+                                width: 20,
+                                height: 20,
+                              ),
+                            )),
                         title: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -2132,10 +2140,10 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                       color: Colors.grey.shade300,
                     ),
                     child: Center(
-                      child: FaIcon(
-                        FontAwesomeIcons.eye,
-                        size: 17,
-                        color: Colors.black87,
+                      child: Image.asset(
+                        'assets/oeil (1).png',
+                        width: 20,
+                        height: 20,
                       ),
                     ),
                   ),
@@ -2175,10 +2183,10 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                       color: Colors.grey.shade300,
                     ),
                     child: Center(
-                      child: FaIcon(
-                        FontAwesomeIcons.pencil,
-                        size: 17,
-                        color: Colors.black87,
+                      child: Image.asset(
+                        'assets/editer-le-texte.png',
+                        width: 20,
+                        height: 20,
                       ),
                     ),
                   ),
@@ -2218,10 +2226,10 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                       color: Colors.grey.shade300,
                     ),
                     child: Center(
-                      child: FaIcon(
-                        FontAwesomeIcons.image,
-                        size: 17,
-                        color: Colors.black87,
+                      child: Image.asset(
+                        'assets/oeil (1).png',
+                        width: 20,
+                        height: 20,
                       ),
                     ),
                   ),
@@ -2259,10 +2267,10 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                       color: Colors.grey.shade300,
                     ),
                     child: Center(
-                      child: FaIcon(
-                        FontAwesomeIcons.trash,
-                        size: 17,
-                        color: Colors.red,
+                      child: Image.asset(
+                        'assets/supprimer.png',
+                        width: 20,
+                        height: 20,
                       ),
                     ),
                   ),

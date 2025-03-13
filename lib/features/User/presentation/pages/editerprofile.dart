@@ -343,10 +343,14 @@ class _EditerprofileState extends ConsumerState<Editerprofile> {
                                             )),
                                       ),
                                       Positioned(
-                                          bottom: 8,
-                                          right: 3,
-                                          child: FaIcon(FontAwesomeIcons.camera,
-                                              size: 24, color: kPrimaryColor))
+                                        bottom: 8,
+                                        right: 3,
+                                        child: Image.asset(
+                                          'assets/ajouter-une-photo.png',
+                                          width: 27,
+                                          height: 27,
+                                        ),
+                                      )
                                     ],
                                   )
                                 : Stack(
@@ -406,10 +410,14 @@ class _EditerprofileState extends ConsumerState<Editerprofile> {
                                         ),
                                       ),
                                       Positioned(
-                                          bottom: 8,
-                                          right: 3,
-                                          child: FaIcon(FontAwesomeIcons.camera,
-                                              size: 24, color: kPrimaryColor))
+                                        bottom: 8,
+                                        right: 3,
+                                        child: Image.asset(
+                                          'assets/ajouter-une-photo.png',
+                                          width: 27,
+                                          height: 27,
+                                        ),
+                                      )
                                     ],
                                   ),
                           ),

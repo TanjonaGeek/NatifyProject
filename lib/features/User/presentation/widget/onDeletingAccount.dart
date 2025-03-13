@@ -19,28 +19,30 @@ class _OndeletingAccountState extends ConsumerState<OndeletingAccount> {
   final AccountDeletionService _deleteAccountService = AccountDeletionService();
   Future<void> _deleteAccount() async {
     try {
-      await _deleteAccountService.deleteAccount(context);
-    } catch (e) {
-    }
+      await _deleteAccountService.deleteAccount(ref, context);
+    } catch (e) {}
   }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _deleteAccount();
   }
+
   @override
   Widget build(BuildContext context) {
     final notifier = ref.watch(infoUserStateNotifier);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Securite'.tr, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        leading: SizedBox()
-      ),
+          title: Text('Securite'.tr,
+              style:
+                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+          backgroundColor: Colors.white,
+          elevation: 0,
+          centerTitle: true,
+          leading: SizedBox()),
       body: Column(
         children: [
           Expanded(
@@ -55,7 +57,11 @@ class _OndeletingAccountState extends ConsumerState<OndeletingAccount> {
                       children: [
                         ClipOval(
                           child: CachedNetworkImage(
-                            imageUrl: notifier.MydataPersiste!.profilePic == null ? '' : notifier.MydataPersiste!.profilePic.toString(),
+                            imageUrl:
+                                notifier.MydataPersiste!.profilePic == null
+                                    ? ''
+                                    : notifier.MydataPersiste!.profilePic
+                                        .toString(),
                             placeholder: (context, url) {
                               return Shimmer.fromColors(
                                 baseColor: Colors.grey[300]!,
@@ -70,7 +76,8 @@ class _OndeletingAccountState extends ConsumerState<OndeletingAccount> {
                                 ),
                               );
                             },
-                            errorWidget: (context, url, error) => Icon(Icons.error),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error),
                             width: 100,
                             height: 100,
                             fit: BoxFit.cover,
@@ -78,14 +85,18 @@ class _OndeletingAccountState extends ConsumerState<OndeletingAccount> {
                         ),
                         SizedBox(height: 10),
                         Text(
-                          notifier.MydataPersiste!.name == null ? '' : '${notifier.MydataPersiste!.name}',
+                          notifier.MydataPersiste!.name == null
+                              ? ''
+                              : '${notifier.MydataPersiste!.name}',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          FirebaseAuth.instance.currentUser == null ? "" : "${FirebaseAuth.instance.currentUser!.email}",
+                          FirebaseAuth.instance.currentUser == null
+                              ? ""
+                              : "${FirebaseAuth.instance.currentUser!.email}",
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey.shade600,
@@ -155,20 +166,19 @@ class _OndeletingAccountState extends ConsumerState<OndeletingAccount> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20.0),
             child: ElevatedButton(
-              onPressed: () {
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-                textStyle: TextStyle(fontSize: 18),
-              ),
-              child: SizedBox(
-                width: 15,
-                height: 15,
-                // margin: const EdgeInsets.symmetric(vertical: 20),
-                child: CircularProgressIndicator(color: Colors.white,)
-              )
-            ),
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                  textStyle: TextStyle(fontSize: 18),
+                ),
+                child: SizedBox(
+                    width: 15,
+                    height: 15,
+                    // margin: const EdgeInsets.symmetric(vertical: 20),
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ))),
           ),
         ],
       ),

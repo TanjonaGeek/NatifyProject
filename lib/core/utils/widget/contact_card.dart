@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:natify/core/utils/colors.dart';
 import 'package:natify/features/User/presentation/provider/user_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:custom_marker/marker_icon.dart';
@@ -117,11 +118,18 @@ class _ContactCardState extends ConsumerState<ContactCard> {
                               color: Colors.grey.shade300,
                             ),
                             child: Center(
-                                child: isFollowed
-                                    ? FaIcon(FontAwesomeIcons.userSlash,
-                                        size: 17, color: Colors.black)
-                                    : FaIcon(FontAwesomeIcons.userPlus,
-                                        size: 17, color: Colors.black))),
+                              child: isFollowed
+                                  ? Image.asset(
+                                      'assets/suivre.png',
+                                      width: 20,
+                                      height: 20,
+                                    )
+                                  : Image.asset(
+                                      'assets/suivre.png',
+                                      width: 20,
+                                      height: 20,
+                                    ),
+                            )),
                         title: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -176,13 +184,13 @@ class _ContactCardState extends ConsumerState<ContactCard> {
                                     child: FaIcon(
                                     FontAwesomeIcons.locationDot,
                                     size: 17,
-                                    color: Colors.black,
+                                    color: kPrimaryColor,
                                   ))
                                 : Center(
                                     child: FaIcon(
                                     FontAwesomeIcons.locationPinLock,
                                     size: 17,
-                                    color: Colors.black,
+                                    color: kPrimaryColor,
                                   ))),
                         title: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

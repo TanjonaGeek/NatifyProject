@@ -194,8 +194,12 @@ class _ListMessageDetailState extends ConsumerState<ListMessageDetail> {
                               color: Colors.grey.shade300,
                             ),
                             child: Center(
-                                child: FaIcon(FontAwesomeIcons.user,
-                                    size: 17, color: Colors.black))),
+                              child: Image.asset(
+                                'assets/utilisateur (1).png',
+                                width: 17,
+                                height: 17,
+                              ),
+                            )),
                         title: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -229,11 +233,12 @@ class _ListMessageDetailState extends ConsumerState<ListMessageDetail> {
                               color: Colors.grey.shade300,
                             ),
                             child: Center(
-                                child: FaIcon(
-                              FontAwesomeIcons.calendar,
-                              size: 17,
-                              color: Colors.black,
-                            ))),
+                              child: Image.asset(
+                                'assets/calendrier (1).png',
+                                width: 30,
+                                height: 30,
+                              ),
+                            )),
                         title: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

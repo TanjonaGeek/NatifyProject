@@ -393,13 +393,8 @@ class MessageDetail extends ConsumerWidget {
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .bold,
-                                                                    color: Theme.of(context).brightness ==
-                                                                            Brightness
-                                                                                .dark
-                                                                        ? Colors
-                                                                            .white
-                                                                        : Colors
-                                                                            .black),
+                                                                    color: Colors
+                                                                        .black),
                                                               ))),
                                                     ],
                                                   )

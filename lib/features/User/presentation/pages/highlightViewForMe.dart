@@ -600,11 +600,12 @@ class _CarousselWidgetState extends ConsumerState<CarousselWidget> {
                               color: Colors.grey.shade300,
                             ),
                             child: Center(
-                                child: FaIcon(
-                              FontAwesomeIcons.trash,
-                              size: 17,
-                              color: Colors.red,
-                            ))),
+                              child: Image.asset(
+                                'assets/supprimer.png',
+                                width: 17,
+                                height: 17,
+                              ),
+                            )),
                         title: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -643,11 +644,12 @@ class _CarousselWidgetState extends ConsumerState<CarousselWidget> {
                               color: Colors.grey.shade300,
                             ),
                             child: Center(
-                                child: FaIcon(
-                              FontAwesomeIcons.list,
-                              size: 17,
-                              color: Colors.black,
-                            ))),
+                              child: Image.asset(
+                                'assets/grouper.png',
+                                width: 20,
+                                height: 20,
+                              ),
+                            )),
                         title: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
