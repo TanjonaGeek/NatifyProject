@@ -234,7 +234,7 @@ class _ParametreSecuriteState extends ConsumerState<ParametreSecurite> {
         showCustomSnackBar("Pas de connexion Internet.");
         return;
       }
-      await _deleteAccountService.deleteAccount(context);
+      await _deleteAccountService.deleteAccount(ref, context);
     } catch (e) {
       showCustomSnackBar(
           "Une erreur s'est produite. Veuillez vérifier votre connexion et réessayer.");

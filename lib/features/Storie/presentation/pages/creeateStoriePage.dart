@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:natify/core/utils/colors.dart';
 import 'package:natify/core/utils/slideNavigation.dart';
+import 'package:natify/core/utils/snack_bar_helpers.dart';
 import 'package:natify/features/Storie/domaine/entities/storie_entities.dart';
 import 'package:natify/features/Storie/presentation/widget/StorieEditor.dart';
 import 'package:natify/features/Storie/presentation/widget/textEditorPage.dart';
@@ -107,6 +108,17 @@ class _GalleryPageState extends State<GalleryPage> {
     final file = await asset.file;
     if (file != null) {
       String type = asset.type == AssetType.video ? 'video' : 'image';
+      // Vérifier la taille seulement pour les vidéos
+      if (type == 'video') {
+        const int maxSizeInMB = 90;
+        const int maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+
+        if (file.lengthSync() > maxSizeInBytes) {
+          showCustomSnackBar(
+              "La vidéo dépasse 90 Mo. Choisissez-en une plus légère"); // Affiche une alerte si la vidéo est trop lourde
+          return;
+        }
+      }
       SlideNavigation.slideToPage(
           context,
           StorieeditorPage(

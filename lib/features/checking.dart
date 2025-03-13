@@ -76,10 +76,9 @@ class _ChekingState extends ConsumerState<Cheking> {
           SizedBox(
               width: 100,
               height: 100,
-              child: Image.asset('assets/warning.png',
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
-                      : Colors.black)),
+              child: Image.asset(
+                'assets/erreur.png',
+              )),
           SizedBox(
             height: 10,
           ),
@@ -108,7 +107,7 @@ class _ChekingState extends ConsumerState<Cheking> {
                   "Réessayer".tr,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.bold,
                       fontSize: 15,
                       color: kPrimaryColor),
                 ),
