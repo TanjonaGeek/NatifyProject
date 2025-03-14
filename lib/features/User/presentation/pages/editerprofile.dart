@@ -668,28 +668,28 @@ class _EditerprofileState extends ConsumerState<Editerprofile> {
                           ),
                         ),
 
-                        SizedBox(height: 20),
+                        // SizedBox(height: 20),
 
-                        // Spirit CryptoKitty
-                        TextFormField(
-                          readOnly: true,
-                          onTap: () => openNationalityPage(),
-                          controller: nationaliteController,
-                          validator: (value) {
-                            if ((value == null || value.isEmpty)) {
-                              return "rempli_champs".tr;
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            suffix: Text(flagController.text),
-                            labelText: "Nationalité".tr,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            contentPadding: EdgeInsets.all(15),
-                          ),
-                        ),
+                        // // Spirit CryptoKitty
+                        // TextFormField(
+                        //   readOnly: true,
+                        //   onTap: () => openNationalityPage(),
+                        //   controller: nationaliteController,
+                        //   validator: (value) {
+                        //     if ((value == null || value.isEmpty)) {
+                        //       return "rempli_champs".tr;
+                        //     }
+                        //     return null;
+                        //   },
+                        //   decoration: InputDecoration(
+                        //     suffix: Text(flagController.text),
+                        //     labelText: "Nationalité".tr,
+                        //     border: OutlineInputBorder(
+                        //       borderRadius: BorderRadius.circular(10),
+                        //     ),
+                        //     contentPadding: EdgeInsets.all(15),
+                        //   ),
+                        // ),
                         SizedBox(height: 20),
                         Row(
                           children: [

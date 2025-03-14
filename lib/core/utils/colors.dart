@@ -19,7 +19,8 @@ const Color gradientEnd = Color(0xFFf7418c);
 const Color newColorGrey = Color(0xFFF0F4FD);
 const Color newColorGreyElevate = Color(0xFFE2E8F4);
 const Color newColorBlueShadow = Color(0xFF0d649a);
-const Color newColorBlueElevate = Color(0xFF03a8e8);
+// const Color newColorBlueElevate = Color(0xFF03a8e8);
+const Color newColorBlueElevate = Color(0xFF1198d1);
 const Color newColorGreenDarkElevate = Color(0xFF14334b);
 
 const primaryGradient = LinearGradient(

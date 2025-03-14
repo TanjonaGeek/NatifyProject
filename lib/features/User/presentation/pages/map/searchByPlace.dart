@@ -27,6 +27,9 @@ class _TrouverParPlaceState extends ConsumerState<TrouverParPlace> {
   Timer? _debounce;
   final String baseUrl = "https://nominatim.openstreetmap.org";
   final http.Client client = http.Client();
+  static const Map<String, String> headers = {
+    'User-Agent': 'Natify/1.2 (natifyteam@gmail.com)' // Remplace avec tes infos
+  };
 
   // Future pour récupérer les lieux
   Future<List<dynamic>> fetchPlaceSuggestions(String placeInput) async {
@@ -41,14 +44,17 @@ class _TrouverParPlaceState extends ConsumerState<TrouverParPlace> {
     try {
       final url = Uri.parse(
           '$baseUrl/search?q=$placeInput&format=json&polygon_geojson=1&addressdetails=1');
-      final response = await client.get(url);
+      // Attendre 500ms pour éviter le blocage par surcharge
+      await Future.delayed(Duration(milliseconds: 500));
+      final response = await client.get(url, headers: headers);
 
       if (response.statusCode == 200) {
         final decodedResponse =
             jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
         return decodedResponse;
       } else {
-        showCustomSnackBar("Erreur de requête : ${response.statusCode}");
+        // showCustomSnackBar(
+        //     "Une erreur s'est produite. Veuillez vérifier votre connexion et réessayer.");
         return [];
       }
     } catch (e) {

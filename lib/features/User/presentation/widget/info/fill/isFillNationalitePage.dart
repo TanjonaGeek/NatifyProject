@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:natify/core/utils/colors.dart';
 import 'package:natify/core/utils/helpers.dart';
 import 'package:natify/core/utils/slideNavigation.dart';
@@ -109,7 +110,11 @@ class _IsfillnationalitepageState extends ConsumerState<Isfillnationalitepage> {
                   child: FaIcon(FontAwesomeIcons.chevronLeft, size: 20))),
           onPressed: () {
             // Action for the back button
-            Navigator.pop(context);
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            } else {
+              SystemNavigator.pop(); // Quitte l'application
+            }
           },
         ),
         actions: [
@@ -134,7 +139,8 @@ class _IsfillnationalitepageState extends ConsumerState<Isfillnationalitepage> {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               child: Text(
                 textAlign: TextAlign.center,
-                'Renseignez votre nationalité et votre pays de résidence pour une expérience plus personnalisée.',
+                'Renseignez votre nationalité et votre pays de résidence pour une expérience plus personnalisée.'
+                    .tr,
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.grey,

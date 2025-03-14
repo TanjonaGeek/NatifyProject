@@ -428,7 +428,10 @@ class localStringLanguage extends Translations {
           "Vous_bloqué_utilisateur.": "Sie haben diesen Benutzer blockiert.",
           "Vous_débloqué_utilisateur.": "Sie haben diesen Benutzer entsperrt.",
           "Aucun_ami_bloqué": "Keine blockierten Freunde",
-          "Vous_bloqué_aucun_ami": "Sie haben noch keine Freunde blockiert."
+          "Vous_bloqué_aucun_ami": "Sie haben noch keine Freunde blockiert.",
+          "Participants": "Teilnehmer",
+          "La_vidéo_dépasse":
+              "Das Video überschreitet 90 MB. Bitte wählen Sie ein kleineres"
         },
         // francais
         'fr_FR': {
@@ -856,7 +859,10 @@ class localStringLanguage extends Translations {
           "Vous_débloqué_utilisateur.": "Vous avez débloqué cet utilisateur.",
           "Aucun_ami_bloqué": "Aucun ami bloqué",
           "Vous_bloqué_aucun_ami":
-              "Vous n'avez bloqué aucun ami pour le moment."
+              "Vous n'avez bloqué aucun ami pour le moment.",
+          "Participants": "Participants",
+          "La_vidéo_dépasse":
+              "La vidéo dépasse 90 Mo. Choisissez-en une plus légère"
         },
         // portugais
         'pt_PT': {
@@ -1277,7 +1283,9 @@ class localStringLanguage extends Translations {
           "Vous_bloqué_utilisateur.": "Você bloqueou este usuário.",
           "Vous_débloqué_utilisateur.": "Você desbloqueou este usuário.",
           "Aucun_ami_bloqué": "Nenhum amigo bloqueado",
-          "Vous_bloqué_aucun_ami": "Você ainda não bloqueou nenhum amigo."
+          "Vous_bloqué_aucun_ami": "Você ainda não bloqueou nenhum amigo.",
+          "Participants": "Participantes",
+          "La_vidéo_dépasse": "O vídeo excede 90 MB. Escolha um menor"
         },
         // arabe
         'ar_AR': {
@@ -1681,7 +1689,10 @@ class localStringLanguage extends Translations {
           "Vous_bloqué_utilisateur.": "لقد قمت بحظر هذا المستخدم.",
           "Vous_débloqué_utilisateur.": "لقد قمت بإلغاء حظر هذا المستخدم.",
           "Aucun_ami_bloqué": "لا يوجد أصدقاء محظورون",
-          "Vous_bloqué_aucun_ami": "لم تقم بحظر أي صديق حتى الآن."
+          "Vous_bloqué_aucun_ami": "لم تقم بحظر أي صديق حتى الآن.",
+          "Participants": "المشاركون",
+          "La_vidéo_dépasse":
+              "يتجاوز الفيديو 90 ميغابايت. الرجاء اختيار واحد أصغر"
         },
         // pologne
         'pl_PL': {
@@ -2101,7 +2112,10 @@ class localStringLanguage extends Translations {
           "Vous_bloqué_utilisateur.": "Zablokowałeś tego użytkownika.",
           "Vous_débloqué_utilisateur.": "Odblokowałeś tego użytkownika.",
           "Aucun_ami_bloqué": "Brak zablokowanych znajomych",
-          "Vous_bloqué_aucun_ami": "Nie zablokowałeś jeszcze żadnego znajomego."
+          "Vous_bloqué_aucun_ami":
+              "Nie zablokowałeś jeszcze żadnego znajomego.",
+          "Participants": "Uczestnicy",
+          "La_vidéo_dépasse": "Wideo przekracza 90 MB. Wybierz mniejsze"
         },
         // turkie
         'tr_TR': {
@@ -2521,7 +2535,10 @@ class localStringLanguage extends Translations {
           "Vous_bloqué_utilisateur.": "Bu kullanıcıyı engellediniz.",
           "Vous_débloqué_utilisateur.": "Bu kullanıcının engelini kaldırdınız.",
           "Aucun_ami_bloqué": "Engellenen arkadaş yok",
-          "Vous_bloqué_aucun_ami": "Henüz hiçbir arkadaşınızı engellemediniz."
+          "Vous_bloqué_aucun_ami": "Henüz hiçbir arkadaşınızı engellemediniz.",
+          "Participants": "Katılımcılar",
+          "La_vidéo_dépasse":
+              "Video 90 MB'yi aşıyor. Lütfen daha küçük bir tane seçin"
         },
         // italian
         'it_IT': {
@@ -2949,7 +2966,10 @@ class localStringLanguage extends Translations {
           "Vous_bloqué_utilisateur.": "Hai bloccato questo utente.",
           "Vous_débloqué_utilisateur.": "Hai sbloccato questo utente.",
           "Aucun_ami_bloqué": "Nessun amico bloccato",
-          "Vous_bloqué_aucun_ami": "Non hai ancora bloccato nessun amico."
+          "Vous_bloqué_aucun_ami": "Non hai ancora bloccato nessun amico.",
+          "Participants": "Partecipanti",
+          "La_vidéo_dépasse":
+              "Il video supera i 90 MB. Scegline uno più leggero"
         },
         // espagnol
         'es_ES': {
@@ -3369,7 +3389,9 @@ class localStringLanguage extends Translations {
           "Vous_bloqué_utilisateur.": "Has bloqueado a este usuario.",
           "Vous_débloqué_utilisateur.": "Has desbloqueado a este usuario.",
           "Aucun_ami_bloqué": "Ningún amigo bloqueado",
-          "Vous_bloqué_aucun_ami": "Aún no has bloqueado a ningún amigo."
+          "Vous_bloqué_aucun_ami": "Aún no has bloqueado a ningún amigo.",
+          "Participants": "Participantes",
+          "La_vidéo_dépasse": "El video supera los 90 MB. Elige uno más ligero"
         },
         // anglais
         'en_US': {
@@ -3782,7 +3804,10 @@ class localStringLanguage extends Translations {
           "Vous_bloqué_utilisateur.": "You have blocked this user.",
           "Vous_débloqué_utilisateur.": "You have unblocked this user.",
           "Aucun_ami_bloqué": "No blocked friends",
-          "Vous_bloqué_aucun_ami": "You haven't blocked any friends yet."
+          "Vous_bloqué_aucun_ami": "You haven't blocked any friends yet.",
+          "Participants": "Participants",
+          "La_vidéo_dépasse":
+              "The video exceeds 90 MB. Please choose a smaller one"
         },
       };
 }

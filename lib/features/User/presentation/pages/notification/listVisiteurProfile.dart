@@ -17,7 +17,7 @@ class AllVisiteurByNationality extends StatelessWidget {
     return ThemeSwitchingArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Historique des visites de profil'.tr,
+          title: Text('Participants'.tr,
               style: TextStyle(fontWeight: FontWeight.bold)),
           elevation: 0,
           centerTitle: true,

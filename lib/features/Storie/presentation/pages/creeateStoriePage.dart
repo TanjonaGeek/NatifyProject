@@ -115,7 +115,7 @@ class _GalleryPageState extends State<GalleryPage> {
 
         if (file.lengthSync() > maxSizeInBytes) {
           showCustomSnackBar(
-              "La vidéo dépasse 90 Mo. Choisissez-en une plus légère"); // Affiche une alerte si la vidéo est trop lourde
+              "La_vidéo_dépasse"); // Affiche une alerte si la vidéo est trop lourde
           return;
         }
       }

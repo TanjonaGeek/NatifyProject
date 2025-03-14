@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:natify/core/utils/colors.dart';
 import 'package:natify/core/utils/slideNavigation.dart';
 import 'package:natify/core/utils/snack_bar_helpers.dart';
@@ -58,8 +59,7 @@ class _IsfillagepageState extends ConsumerState<Isfillagepage> {
           ref.read(infoUserStateNotifier.notifier).updateInfoUser(
               FirebaseAuth.instance.currentUser!.uid, 'age', dataAge, '');
         }
-        SlideNavigation.slideToPagePushRemplacement(
-            context, Isfillnationalitepage());
+        SlideNavigation.slideToPage(context, Isfillnationalitepage());
       }
     } catch (e) {
       showCustomSnackBar(
@@ -90,7 +90,11 @@ class _IsfillagepageState extends ConsumerState<Isfillagepage> {
                 ))),
             onPressed: () {
               // Action for the back button
-              Navigator.pop(context);
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              } else {
+                SystemNavigator.pop(); // Quitte l'application
+              }
             },
           ),
           actions: [

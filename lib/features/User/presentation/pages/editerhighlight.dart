@@ -106,6 +106,18 @@ class _EditerhighlightState extends ConsumerState<Editerhighlight> {
     final file = await asset.file;
 
     if (file != null) {
+      String type = asset.type == AssetType.video ? 'video' : 'image';
+      // Vérifier la taille seulement pour les vidéos
+      if (type == 'video') {
+        const int maxSizeInMB = 90;
+        const int maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+
+        if (file.lengthSync() > maxSizeInBytes) {
+          showCustomSnackBar(
+              "La_vidéo_dépasse"); // Affiche une alerte si la vidéo est trop lourde
+          return;
+        }
+      }
       // Vérifier le type du fichier sélectionné
       if (currentType == null) {
         currentType =

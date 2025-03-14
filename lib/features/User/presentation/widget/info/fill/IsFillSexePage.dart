@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:natify/core/utils/colors.dart';
 import 'package:natify/core/utils/slideNavigation.dart';
 import 'package:natify/core/utils/snack_bar_helpers.dart';
@@ -32,7 +33,7 @@ class _IsfillsexepageState extends ConsumerState<Isfillsexepage> {
         ref.read(infoUserStateNotifier.notifier).updateInfoUser(
             FirebaseAuth.instance.currentUser!.uid, 'sexe', selectedGender, '');
       }
-      SlideNavigation.slideToPagePushRemplacement(context, Isfillagepage());
+      SlideNavigation.slideToPage(context, Isfillagepage());
     } catch (e) {
       showCustomSnackBar(
           "Une erreur s'est produite. Veuillez vérifier votre connexion et réessayer.");
@@ -57,7 +58,11 @@ class _IsfillsexepageState extends ConsumerState<Isfillsexepage> {
                   child: FaIcon(FontAwesomeIcons.chevronLeft, size: 20))),
           onPressed: () {
             // Action for the back button
-            Navigator.pop(context);
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            } else {
+              SystemNavigator.pop(); // Quitte l'application
+            }
           },
         ),
         actions: [

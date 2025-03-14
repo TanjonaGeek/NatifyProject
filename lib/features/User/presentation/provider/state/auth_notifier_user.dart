@@ -68,17 +68,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
               if (FirebaseAuth.instance.currentUser != null) {
                 storeInfoAfetLogin(context);
               } else {
-                showCustomSnackBar(
-                    "Une erreur s'est produite. Veuillez vérifier votre connexion et réessayer.");
-                return;
+                // showCustomSnackBar(
+                //     "Une erreur s'est produite. Veuillez vérifier votre connexion et réessayer.");
+                // return;
               }
             }
           } catch (e) {
             if (FirebaseAuth.instance.currentUser != null) {
               storeInfoAfetLogin(context);
             } else {
-              showCustomSnackBar(
-                  "Une erreur s'est produite. Veuillez vérifier votre connexion et réessayer.");
+              // showCustomSnackBar(
+              //     "Une erreur s'est produite. Veuillez vérifier votre connexion et réessayer.");
+              // return;
             }
           }
         });
@@ -87,8 +88,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
       if (FirebaseAuth.instance.currentUser != null) {
         storeInfoAfetLogin(context);
       } else {
-        showCustomSnackBar(
-            "Une erreur s'est produite. Veuillez vérifier votre connexion et réessayer.");
+        // showCustomSnackBar(
+        //     "Une erreur s'est produite. Veuillez vérifier votre connexion et réessayer.");
+        // return;
       }
     }
   }
