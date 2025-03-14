@@ -11,6 +11,13 @@ class SlideNavigation {
     Navigator.of(context).pushReplacement(_createRoute(page));
   }
 
+  static void slideToPagePushRemoveUntil(BuildContext context, Widget page) {
+    Navigator.of(context).pushAndRemoveUntil(
+      _createRoute(page),
+      (Route<dynamic> route) => false,
+    );
+  }
+
   // Méthode privée pour créer une transition personnalisée
   static Route _createRoute(Widget page) {
     return PageRouteBuilder(

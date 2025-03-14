@@ -64,7 +64,7 @@ class _AuthUserPageState extends ConsumerState<AuthUserPage> {
       body: Stack(
         children: [
           Positioned(
-            top: 250,
+            top: 150,
             right: 10,
             left: 10,
             child: Image.asset(

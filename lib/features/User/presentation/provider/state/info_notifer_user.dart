@@ -245,6 +245,7 @@ class InfoNotifierUser extends StateNotifier<InfoStateUser> {
   Future<void> updateInfoUser(
       String userId, String champsName, var dataUpdate, String flag) async {
     await _updateInfoUseCase.call(userId, champsName, dataUpdate, flag);
+    await getMyInfoUser(userId);
   }
 
   Future<void> resetInfo() async {

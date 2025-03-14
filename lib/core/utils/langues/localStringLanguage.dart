@@ -431,7 +431,8 @@ class localStringLanguage extends Translations {
           "Vous_bloqué_aucun_ami": "Sie haben noch keine Freunde blockiert.",
           "Participants": "Teilnehmer",
           "La_vidéo_dépasse":
-              "Das Video überschreitet 90 MB. Bitte wählen Sie ein kleineres"
+              "Das Video überschreitet 90 MB. Bitte wählen Sie ein kleineres",
+          "Passer à l’accueil": "Zur Startseite gehen"
         },
         // francais
         'fr_FR': {
@@ -862,7 +863,8 @@ class localStringLanguage extends Translations {
               "Vous n'avez bloqué aucun ami pour le moment.",
           "Participants": "Participants",
           "La_vidéo_dépasse":
-              "La vidéo dépasse 90 Mo. Choisissez-en une plus légère"
+              "La vidéo dépasse 90 Mo. Choisissez-en une plus légère",
+          "Passer à l’accueil": "Passer à l’accueil"
         },
         // portugais
         'pt_PT': {
@@ -1285,7 +1287,8 @@ class localStringLanguage extends Translations {
           "Aucun_ami_bloqué": "Nenhum amigo bloqueado",
           "Vous_bloqué_aucun_ami": "Você ainda não bloqueou nenhum amigo.",
           "Participants": "Participantes",
-          "La_vidéo_dépasse": "O vídeo excede 90 MB. Escolha um menor"
+          "La_vidéo_dépasse": "O vídeo excede 90 MB. Escolha um menor",
+          "Passer à l’accueil": "Ir para a página inicial"
         },
         // arabe
         'ar_AR': {
@@ -1692,7 +1695,8 @@ class localStringLanguage extends Translations {
           "Vous_bloqué_aucun_ami": "لم تقم بحظر أي صديق حتى الآن.",
           "Participants": "المشاركون",
           "La_vidéo_dépasse":
-              "يتجاوز الفيديو 90 ميغابايت. الرجاء اختيار واحد أصغر"
+              "يتجاوز الفيديو 90 ميغابايت. الرجاء اختيار واحد أصغر",
+          "Passer à l’accueil": "الانتقال إلى الصفحة الرئيسية"
         },
         // pologne
         'pl_PL': {
@@ -2115,7 +2119,8 @@ class localStringLanguage extends Translations {
           "Vous_bloqué_aucun_ami":
               "Nie zablokowałeś jeszcze żadnego znajomego.",
           "Participants": "Uczestnicy",
-          "La_vidéo_dépasse": "Wideo przekracza 90 MB. Wybierz mniejsze"
+          "La_vidéo_dépasse": "Wideo przekracza 90 MB. Wybierz mniejsze",
+          "Passer à l’accueil": "Przejdź do strony głównej"
         },
         // turkie
         'tr_TR': {
@@ -2538,7 +2543,8 @@ class localStringLanguage extends Translations {
           "Vous_bloqué_aucun_ami": "Henüz hiçbir arkadaşınızı engellemediniz.",
           "Participants": "Katılımcılar",
           "La_vidéo_dépasse":
-              "Video 90 MB'yi aşıyor. Lütfen daha küçük bir tane seçin"
+              "Video 90 MB'yi aşıyor. Lütfen daha küçük bir tane seçin",
+          "Passer à l’accueil": "Ana sayfaya git"
         },
         // italian
         'it_IT': {
@@ -2969,7 +2975,8 @@ class localStringLanguage extends Translations {
           "Vous_bloqué_aucun_ami": "Non hai ancora bloccato nessun amico.",
           "Participants": "Partecipanti",
           "La_vidéo_dépasse":
-              "Il video supera i 90 MB. Scegline uno più leggero"
+              "Il video supera i 90 MB. Scegline uno più leggero",
+          "Passer à l’accueil": "Vai alla home"
         },
         // espagnol
         'es_ES': {
@@ -3391,7 +3398,8 @@ class localStringLanguage extends Translations {
           "Aucun_ami_bloqué": "Ningún amigo bloqueado",
           "Vous_bloqué_aucun_ami": "Aún no has bloqueado a ningún amigo.",
           "Participants": "Participantes",
-          "La_vidéo_dépasse": "El video supera los 90 MB. Elige uno más ligero"
+          "La_vidéo_dépasse": "El video supera los 90 MB. Elige uno más ligero",
+          "Passer à l’accueil": "Ir a inicio"
         },
         // anglais
         'en_US': {
@@ -3807,7 +3815,8 @@ class localStringLanguage extends Translations {
           "Vous_bloqué_aucun_ami": "You haven't blocked any friends yet.",
           "Participants": "Participants",
           "La_vidéo_dépasse":
-              "The video exceeds 90 MB. Please choose a smaller one"
+              "The video exceeds 90 MB. Please choose a smaller one",
+          "Passer à l’accueil": "Go to Home"
         },
       };
 }

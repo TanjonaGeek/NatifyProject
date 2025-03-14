@@ -6,6 +6,7 @@ import 'package:natify/core/utils/snack_bar_helpers.dart';
 import 'package:natify/core/utils/widget/nationaliteListPage.dart';
 import 'package:natify/core/utils/widget/paysListPage.dart';
 import 'package:natify/features/HomeScreen.dart';
+import 'package:natify/features/User/presentation/pages/editerProfileInit.dart';
 import 'package:natify/features/User/presentation/provider/user_provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -65,26 +66,34 @@ class _IsfillnationalitepageState extends ConsumerState<Isfillnationalitepage> {
         showCustomSnackBar("Pas de connexion internet");
         return;
       }
+      if (!mounted) return;
       if (Pays.isEmpty || Nationalite.isEmpty) {
         showCustomSnackBar(
             "Veuillez ajouter les informations. Merci de les fournir pour continuer.");
       } else {
-        if (mounted) {
-          ref.read(infoUserStateNotifier.notifier).updateInfoUser(
-              FirebaseAuth.instance.currentUser!.uid,
-              'nationalite',
-              Nationalite,
-              flag);
-        }
-        if (mounted) {
-          ref.read(infoUserStateNotifier.notifier).updateInfoUser(
-              FirebaseAuth.instance.currentUser!.uid, 'pays', Pays, '');
-        }
-        SlideNavigation.slideToPagePushRemplacement(
+        await ref.read(infoUserStateNotifier.notifier).updateInfoUser(
+            FirebaseAuth.instance.currentUser!.uid,
+            'nationalite',
+            Nationalite,
+            flag);
+
+        // Assure-toi que le widget est monté avant de mettre à jour la deuxième information
+        if (!mounted) return;
+
+        await ref.read(infoUserStateNotifier.notifier).updateInfoUser(
+            FirebaseAuth.instance.currentUser!.uid, 'pays', Pays, '');
+        final notifier = ref.read(infoUserStateNotifier);
+        // Vérifie que les données sont valides avant de naviguer
+        if (notifier.MydataPersiste != null && mounted) {
+          // Navigue vers la page suivante, en toute sécurité
+          SlideNavigation.slideToPagePushRemoveUntil(
             context,
-            HomeScreen(
-              index: 0,
-            ));
+            EditerprofileInit(
+              uid: FirebaseAuth.instance.currentUser!.uid,
+              myOwnData: notifier.MydataPersiste!,
+            ),
+          );
+        }
       }
     } catch (e) {
       showCustomSnackBar(

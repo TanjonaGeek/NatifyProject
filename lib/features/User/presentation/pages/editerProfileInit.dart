@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:natify/core/utils/colors.dart';
 import 'package:natify/core/utils/helpers.dart';
+import 'package:natify/core/utils/slideNavigation.dart';
 import 'package:natify/core/utils/widget/nationaliteListPage.dart';
 import 'package:natify/core/utils/widget/paysListPage.dart';
+import 'package:natify/features/HomeScreen.dart';
 import 'package:natify/features/User/data/models/user_model.dart';
 import 'package:natify/features/User/presentation/provider/user_provider.dart';
 import 'package:natify/features/User/presentation/widget/imageGallery.dart';
@@ -15,16 +17,17 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 
-class Editerprofile extends ConsumerStatefulWidget {
+class EditerprofileInit extends ConsumerStatefulWidget {
   final UserModel myOwnData;
   final String uid;
-  const Editerprofile({super.key, required this.myOwnData, required this.uid});
+  const EditerprofileInit(
+      {super.key, required this.myOwnData, required this.uid});
 
   @override
-  ConsumerState<Editerprofile> createState() => _EditerprofileState();
+  ConsumerState<EditerprofileInit> createState() => _EditerprofileInitState();
 }
 
-class _EditerprofileState extends ConsumerState<Editerprofile> {
+class _EditerprofileInitState extends ConsumerState<EditerprofileInit> {
   final _formKey = GlobalKey<FormState>();
   final List<File> photoProfile = [];
   var listSituation = [
@@ -301,11 +304,15 @@ class _EditerprofileState extends ConsumerState<Editerprofile> {
                         college,
                         emploi);
                   }
-                  Navigator.pop(context);
+                  SlideNavigation.slideToPagePushRemoveUntil(
+                      context,
+                      HomeScreen(
+                        index: 0,
+                      ));
                 }
               },
               child: Text(
-                "Enregistrer".tr,
+                "Passer à l’accueil".tr,
                 style: TextStyle(
                     color: kPrimaryColor, fontWeight: FontWeight.bold),
               ),
