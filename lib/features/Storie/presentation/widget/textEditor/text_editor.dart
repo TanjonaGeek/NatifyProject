@@ -196,7 +196,7 @@ class _TextEditorState extends ConsumerState<TextEditor> {
           .findRenderObject() as RenderRepaintBoundary;
       var image = await boundary.toImage();
       ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
-      return byteData?.buffer.asUint8List();
+      return byteData!.buffer.asUint8List();
     } catch (e) {
       print('Erreur : $e');
       return null;

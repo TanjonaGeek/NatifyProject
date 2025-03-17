@@ -142,8 +142,8 @@ class MapsUserhNotifier extends StateNotifier<MapsUserState> {
       // Vérifier si rangeOfageDebutAndFin est bien formaté avant de le parser
       String? rangeString = prefs.getString('rangeOfageDebutAndFin');
       RangeValues loadedRangeOfageDebutAndFin;
-      if (rangeString != null && rangeString.contains(',')) {
-        List<String> parts = rangeString.split(',');
+      if (rangeString!.contains(',')) {
+        List<String> parts = rangeString!.split(',');
         if (parts.length == 2) {
           try {
             loadedRangeOfageDebutAndFin = RangeValues(
@@ -171,16 +171,14 @@ class MapsUserhNotifier extends StateNotifier<MapsUserState> {
       // Vérifier si nationaliteGroup est bien formaté avant de le décoder
       String? nationaliteGroupJson = prefs.getString('nationaliteGroup');
       List<Map<String, String>> loadedNationaliteGroup = [];
-      if (nationaliteGroupJson != null) {
-        try {
-          loadedNationaliteGroup = List<Map<String, String>>.from(
-            jsonDecode(nationaliteGroupJson)
-                .map((e) => Map<String, String>.from(e)),
-          );
-        } catch (e) {
-          print("Erreur parsing nationaliteGroup: $e");
-          loadedNationaliteGroup = [];
-        }
+      try {
+        loadedNationaliteGroup = List<Map<String, String>>.from(
+          jsonDecode(nationaliteGroupJson!)
+              .map((e) => Map<String, String>.from(e)),
+        );
+      } catch (e) {
+        print("Erreur parsing nationaliteGroup: $e");
+        loadedNationaliteGroup = [];
       }
 
       final GeoFirePoint mapCenter = GeoFirePoint(

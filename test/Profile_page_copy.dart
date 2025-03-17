@@ -14,9 +14,7 @@ import 'package:natify/features/User/data/models/user_model.dart';
 import 'package:natify/features/User/domaine/entities/highlight_entity.dart';
 import 'package:natify/features/User/domaine/entities/user_entities.dart';
 import 'package:natify/features/User/presentation/pages/createHighLight.dart';
-import 'package:natify/features/User/presentation/pages/createannoncemarket.dart';
 import 'package:natify/features/User/presentation/pages/editerhighlight.dart';
-import 'package:natify/features/User/presentation/pages/editerprofile.dart';
 import 'package:natify/features/User/presentation/pages/highlightViewForAll.dart';
 import 'package:natify/features/User/presentation/pages/highlightViewForMe.dart';
 import 'package:natify/features/User/presentation/pages/informationprofile.dart';
@@ -300,208 +298,409 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16.0, vertical: 10),
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               // Informations de base du profil
-                              FutureBuilder<Map<String, dynamic>>(
-                                  future: ref
-                                      .read(allUserListStateNotifier.notifier)
-                                      .checkifHasStorie(widget.uid),
-                                  builder: (context, snapshot) {
-                                    if (!snapshot.hasData) {
-                                      return Shimmer.fromColors(
-                                        key: ValueKey(users.first.profilePic
-                                                ?.toString() ??
-                                            ""),
-                                        baseColor: Colors.grey[300]!,
-                                        highlightColor: Colors.grey[100]!,
-                                        child: ClipOval(
-                                          child: Container(
-                                            width: 100,
-                                            height: 100,
-                                            decoration: BoxDecoration(
-                                              color: Colors.grey,
+                              Row(
+                                children: [
+                                  FutureBuilder<Map<String, dynamic>>(
+                                      future: ref
+                                          .read(
+                                              allUserListStateNotifier.notifier)
+                                          .checkifHasStorie(widget.uid),
+                                      builder: (context, snapshot) {
+                                        if (!snapshot.hasData) {
+                                          return Shimmer.fromColors(
+                                            key: ValueKey(users.first.profilePic
+                                                    ?.toString() ??
+                                                ""),
+                                            baseColor: Colors.grey[300]!,
+                                            highlightColor: Colors.grey[100]!,
+                                            child: ClipOval(
+                                              child: Container(
+                                                width: 100,
+                                                height: 100,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                    bool hasStorie =
-                                        snapshot.data!['hasStorie'] ?? false;
-                                    return GestureDetector(
-                                      onTap: () async {
-                                        List<StorieEntity> storieList = [];
-                                        if (hasStorie == true) {
-                                          StorieEntity storie = StorieEntity(
-                                            uid: snapshot.data?['data']?.uid ??
-                                                "",
-                                            username: snapshot
-                                                    .data?['data']?.username ??
-                                                "",
-                                            photoUrl: snapshot.data?['data']
-                                                        ?.photoUrl !=
-                                                    null
-                                                ? List<
-                                                    Map<String,
-                                                        dynamic>>.from(snapshot
-                                                    .data!['data'].photoUrl)
-                                                : [],
-                                            createdAt: snapshot
-                                                    .data?['data']?.createdAt ??
-                                                DateTime.now(),
-                                            profilePic: snapshot.data?['data']
-                                                    ?.profilePic ??
-                                                '',
-                                            statusId: snapshot
-                                                    .data?['data']?.statusId ??
-                                                '',
-                                            QuivoirStorie: snapshot
-                                                        .data?['data']
-                                                        ?.QuivoirStorie !=
-                                                    null
-                                                ? List<
-                                                    Map<String,
-                                                        dynamic>>.from(snapshot
-                                                    .data!['data']
-                                                    .QuivoirStorie)
-                                                : [],
-                                            storyAvailableForUser: snapshot
-                                                        .data?['data']
-                                                        ?.storyAvailableForUser !=
-                                                    null
-                                                ? List<String>.from(snapshot
-                                                    .data!['data']
-                                                    .storyAvailableForUser)
-                                                : [],
                                           );
-                                          List<Map<String, dynamic>> photoUrl =
-                                              snapshot.data!['data'].photoUrl;
-                                          storieList.add(storie);
-                                          await Future.delayed(
-                                              const Duration(milliseconds: 50));
-                                          _showMoreOption2(
-                                              users.first.profilePic
-                                                      ?.toString() ??
-                                                  "",
-                                              photoUrl.last['url'],
-                                              storieList,
-                                              widget.uid);
-                                        } else {
-                                          _showMoreOption2(
-                                              users.first.profilePic
-                                                      ?.toString() ??
-                                                  "",
-                                              "",
-                                              [],
-                                              widget.uid);
                                         }
-                                      },
-                                      child: Stack(
-                                        children: [
-                                          hasStorie
-                                              ? AnimatedDashedCircle().show(
-                                                  image: users.first.profilePic!
-                                                          .isEmpty
-                                                      ? AssetImage(
-                                                          'assets/noimage.png')
-                                                      : CachedNetworkImageProvider(
-                                                          users.first.profilePic
-                                                              .toString()),
-                                                  contentPadding: 04,
-                                                  autoPlay: true,
-                                                  duration: const Duration(
-                                                      seconds: 5),
-                                                  height: 100,
-                                                  borderWidth: 8,
-                                                )
-                                              : Container(
-                                                  decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                        color: Colors
-                                                            .white, // Condition pour la bordure bleue
-                                                        width:
-                                                            3, // Épaisseur de la bordure
-                                                      ),
-                                                      shape: BoxShape.circle),
-                                                  child: ClipOval(
-                                                    child: CachedNetworkImage(
-                                                      key: ValueKey(users
-                                                              .first.profilePic
-                                                              ?.toString() ??
-                                                          ""),
-                                                      imageUrl: users
-                                                              .first.profilePic
-                                                              ?.toString() ??
-                                                          "",
-                                                      placeholder:
-                                                          (context, url) {
-                                                        return Shimmer
-                                                            .fromColors(
+                                        bool hasStorie =
+                                            snapshot.data!['hasStorie'] ??
+                                                false;
+                                        return GestureDetector(
+                                          onTap: () async {
+                                            List<StorieEntity> storieList = [];
+                                            if (hasStorie == true) {
+                                              StorieEntity storie =
+                                                  StorieEntity(
+                                                uid: snapshot
+                                                        .data?['data']?.uid ??
+                                                    "",
+                                                username: snapshot.data?['data']
+                                                        ?.username ??
+                                                    "",
+                                                photoUrl: snapshot.data?['data']
+                                                            ?.photoUrl !=
+                                                        null
+                                                    ? List<
+                                                            Map<String,
+                                                                dynamic>>.from(
+                                                        snapshot.data!['data']
+                                                            .photoUrl)
+                                                    : [],
+                                                createdAt: snapshot
+                                                        .data?['data']
+                                                        ?.createdAt ??
+                                                    DateTime.now(),
+                                                profilePic: snapshot
+                                                        .data?['data']
+                                                        ?.profilePic ??
+                                                    '',
+                                                statusId: snapshot.data?['data']
+                                                        ?.statusId ??
+                                                    '',
+                                                QuivoirStorie: snapshot
+                                                            .data?['data']
+                                                            ?.QuivoirStorie !=
+                                                        null
+                                                    ? List<
+                                                            Map<String,
+                                                                dynamic>>.from(
+                                                        snapshot.data!['data']
+                                                            .QuivoirStorie)
+                                                    : [],
+                                                storyAvailableForUser: snapshot
+                                                            .data?['data']
+                                                            ?.storyAvailableForUser !=
+                                                        null
+                                                    ? List<String>.from(snapshot
+                                                        .data!['data']
+                                                        .storyAvailableForUser)
+                                                    : [],
+                                              );
+                                              List<Map<String, dynamic>>
+                                                  photoUrl = snapshot
+                                                      .data!['data'].photoUrl;
+                                              storieList.add(storie);
+                                              await Future.delayed(
+                                                  const Duration(
+                                                      milliseconds: 50));
+                                              _showMoreOption2(
+                                                  users.first.profilePic
+                                                          ?.toString() ??
+                                                      "",
+                                                  photoUrl.last['url'],
+                                                  storieList,
+                                                  widget.uid);
+                                            } else {
+                                              _showMoreOption2(
+                                                  users.first.profilePic
+                                                          ?.toString() ??
+                                                      "",
+                                                  "",
+                                                  [],
+                                                  widget.uid);
+                                            }
+                                          },
+                                          child: Stack(
+                                            children: [
+                                              hasStorie
+                                                  ? AnimatedDashedCircle().show(
+                                                      image: users
+                                                              .first
+                                                              .profilePic!
+                                                              .isEmpty
+                                                          ? AssetImage(
+                                                              'assets/noimage.png')
+                                                          : CachedNetworkImageProvider(
+                                                              users.first
+                                                                  .profilePic
+                                                                  .toString()),
+                                                      contentPadding: 04,
+                                                      autoPlay: true,
+                                                      duration: const Duration(
+                                                          seconds: 5),
+                                                      height: 100,
+                                                      borderWidth: 8,
+                                                    )
+                                                  : Container(
+                                                      decoration: BoxDecoration(
+                                                          border: Border.all(
+                                                            color: Colors
+                                                                .white, // Condition pour la bordure bleue
+                                                            width:
+                                                                3, // Épaisseur de la bordure
+                                                          ),
+                                                          shape:
+                                                              BoxShape.circle),
+                                                      child: ClipOval(
+                                                        child:
+                                                            CachedNetworkImage(
                                                           key: ValueKey(users
                                                                   .first
                                                                   .profilePic
                                                                   ?.toString() ??
                                                               ""),
-                                                          baseColor:
-                                                              Colors.grey[300]!,
-                                                          highlightColor:
-                                                              Colors.grey[100]!,
-                                                          child: ClipOval(
-                                                            child: Container(
-                                                              width: 100,
-                                                              height: 100,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color:
-                                                                    Colors.grey,
+                                                          imageUrl: users.first
+                                                                  .profilePic
+                                                                  ?.toString() ??
+                                                              "",
+                                                          placeholder:
+                                                              (context, url) {
+                                                            return Shimmer
+                                                                .fromColors(
+                                                              key: ValueKey(users
+                                                                      .first
+                                                                      .profilePic
+                                                                      ?.toString() ??
+                                                                  ""),
+                                                              baseColor: Colors
+                                                                  .grey[300]!,
+                                                              highlightColor:
+                                                                  Colors.grey[
+                                                                      100]!,
+                                                              child: ClipOval(
+                                                                child:
+                                                                    Container(
+                                                                  width: 100,
+                                                                  height: 100,
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    color: Colors
+                                                                        .grey,
+                                                                  ),
+                                                                ),
                                                               ),
+                                                            );
+                                                          },
+                                                          errorWidget: (context,
+                                                                  url, error) =>
+                                                              Container(
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Colors.grey
+                                                                  .shade200,
+                                                              image:
+                                                                  const DecorationImage(
+                                                                image: AssetImage(
+                                                                    'assets/noimage.png'),
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                              ),
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                              border: Border.all(
+                                                                  color: Colors
+                                                                      .grey),
                                                             ),
                                                           ),
-                                                        );
-                                                      },
-                                                      errorWidget: (context,
-                                                              url, error) =>
-                                                          Container(
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color: Colors
-                                                              .grey.shade200,
-                                                          image:
-                                                              const DecorationImage(
-                                                            image: AssetImage(
-                                                                'assets/noimage.png'),
-                                                            fit: BoxFit.cover,
-                                                          ),
-                                                          shape:
-                                                              BoxShape.circle,
-                                                          border: Border.all(
-                                                              color:
-                                                                  Colors.grey),
+                                                          width: 100,
+                                                          height: 100,
+                                                          fit: BoxFit.cover,
                                                         ),
                                                       ),
-                                                      width: 100,
-                                                      height: 100,
-                                                      fit: BoxFit.cover,
+                                                    ),
+                                              Positioned(
+                                                  bottom: 0,
+                                                  right: 0,
+                                                  child: Text(users.first.flag
+                                                          ?.toString() ??
+                                                      ""))
+                                            ],
+                                          ),
+                                        );
+                                      }),
+                                  SizedBox(width: 20),
+                                  Expanded(
+                                    child: Column(
+                                      children: [
+                                        // SingleChildScrollView(
+                                        //   scrollDirection: Axis.horizontal,
+                                        //   child: Row(
+                                        //     mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                        //     children: [
+                                        //       ProfileStat(count: "${users.first.abonnee!.length}", label: 'Followers'.tr,onTap: () =>  SlideNavigation.slideToPage(context, AllUserFollower(uid: widget.uid,)),),
+                                        //       SizedBox(width: 10,),
+                                        //       ProfileStat(count: "${users.first.abonnement!.length}", label: 'Following'.tr ,onTap: () =>  SlideNavigation.slideToPage(context, AllUserFollowing(uid: widget.uid,)),),
+                                        //     ],
+                                        //   ),
+                                        // ),
+                                        // SizedBox(height: 20),
+                                        widget.uid == uidUser
+                                            ? Container(
+                                                width: double.infinity,
+                                                decoration: BoxDecoration(
+                                                  gradient: LinearGradient(
+                                                    begin: Alignment.topLeft,
+                                                    end: Alignment.bottomRight,
+                                                    colors: <Color>[
+                                                      newColorBlueElevate,
+                                                      newColorGreenDarkElevate
+                                                    ],
+                                                  ),
+                                                  borderRadius: BorderRadius
+                                                      .all(Radius.circular(
+                                                          8)), // Bords arrondis
+                                                ),
+                                                child: ElevatedButton.icon(
+                                                  icon: SizedBox.shrink(),
+                                                  onPressed: () {
+                                                    SlideNavigation.slideToPage(
+                                                        context,
+                                                        ProfileInformation(
+                                                          uid: widget.uid,
+                                                          MyOwnData: users,
+                                                        ));
+                                                  },
+                                                  label: Text("Information".tr,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    backgroundColor: Colors
+                                                        .transparent, // Fond transparent pour laisser voir le gradient
+                                                    shadowColor: Colors
+                                                        .transparent, // Supprime l'ombre
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 40),
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius
+                                                          .all(Radius.circular(
+                                                              8)), // Angle carré
                                                     ),
                                                   ),
                                                 ),
-                                          Positioned(
-                                              bottom: 0,
-                                              right: 0,
-                                              child: Text(users.first.flag
-                                                      ?.toString() ??
-                                                  ""))
-                                        ],
-                                      ),
-                                    );
-                                  }),
+                                              )
+                                            : ValueListenableBuilder<bool>(
+                                                valueListenable:
+                                                    isFollowedNotifier,
+                                                builder: (context, isFollowed,
+                                                    child) {
+                                                  return Container(
+                                                    width: double.infinity,
+                                                    decoration: BoxDecoration(
+                                                      gradient: LinearGradient(
+                                                        begin:
+                                                            Alignment.topLeft,
+                                                        end: Alignment
+                                                            .bottomRight,
+                                                        colors: <Color>[
+                                                          newColorBlueElevate,
+                                                          newColorGreenDarkElevate
+                                                        ],
+                                                      ),
+                                                      borderRadius: BorderRadius
+                                                          .all(Radius.circular(
+                                                              8)), // Bords arrondis
+                                                    ),
+                                                    child: ElevatedButton.icon(
+                                                      icon: isFollowed
+                                                          ? FaIcon(
+                                                              FontAwesomeIcons
+                                                                  .userSlash,
+                                                              size: 15,
+                                                              color:
+                                                                  Colors.white)
+                                                          : FaIcon(
+                                                              FontAwesomeIcons
+                                                                  .userPlus,
+                                                              size: 14,
+                                                              color:
+                                                                  Colors.white),
+                                                      onPressed: () async {
+                                                        isFollowedNotifier
+                                                                .value =
+                                                            !isFollowedNotifier
+                                                                .value;
+                                                        // Définition d'une attente pour simuler un délai
+                                                        // Vérifie si le widget est monté avant d'effectuer des actions
+                                                        if (mounted) {
+                                                          if (isFollowedNotifier
+                                                              .value) {
+                                                            // Appel de la fonction abonner
+                                                            await ref
+                                                                .read(infoUserStateNotifier
+                                                                    .notifier)
+                                                                .abonner(
+                                                                    widget.uid,
+                                                                    'dd')
+                                                                .then(
+                                                                    (onValue) {
+                                                              isShowNotificationFollow
+                                                                      .value =
+                                                                  isFollowedNotifier
+                                                                      .value;
+                                                            });
+                                                          } else {
+                                                            // Appel de la fonction desabonner
+                                                            await ref
+                                                                .read(infoUserStateNotifier
+                                                                    .notifier)
+                                                                .desabonner(
+                                                                    widget.uid,
+                                                                    'dd')
+                                                                .then(
+                                                                    (onValues) {
+                                                              isShowNotificationFollow
+                                                                      .value =
+                                                                  isFollowedNotifier
+                                                                      .value;
+                                                            });
+                                                          }
+                                                        }
+                                                      },
+                                                      label: Text(
+                                                          isFollowed
+                                                              ? "Suivi(e)".tr
+                                                              : "Suivre".tr,
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold)),
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor: Colors
+                                                            .transparent, // Fond transparent pour laisser voir le gradient
+                                                        shadowColor: Colors
+                                                            .transparent, // Supprime l'ombre
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal: 40),
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                  Radius.circular(
+                                                                      8)), // Angle carré
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                               SizedBox(height: 10),
                               // Description du profil
                               Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 5),
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       users.first.name?.toString() ?? "",
@@ -572,306 +771,6 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                   },
                                 ),
                               ),
-                              SizedBox(height: 10),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 25),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    // Bouton "Marketplace" avec un gradient et un icône
-                                    widget.uid == uidUser
-                                        ? Expanded(
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(
-                                                    30), // Border radius commun
-                                                gradient: LinearGradient(
-                                                  begin: Alignment.topLeft,
-                                                  end: Alignment.bottomRight,
-                                                  colors: <Color>[
-                                                    newColorBlueElevate,
-                                                    newColorGreenDarkElevate
-                                                  ],
-                                                ),
-                                                border: Border.all(
-                                                    color: Colors.transparent,
-                                                    width: 1), // Bordure noire
-                                              ),
-                                              child: ElevatedButton(
-                                                onPressed: () {
-                                                  SlideNavigation.slideToPage(
-                                                      context,
-                                                      ProfileInformation(
-                                                        uid: widget.uid,
-                                                        MyOwnData: users,
-                                                      ));
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 10),
-                                                  backgroundColor: Colors
-                                                      .transparent, // Transparent pour ne pas masquer le dégradé
-                                                  elevation: 0, // Pas d'ombre
-                                                ),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Image.asset(
-                                                      'assets/utilisateur (1).png',
-                                                      color: Colors.white,
-                                                      width: 15,
-                                                      height: 15,
-                                                    ), // Icône
-                                                    SizedBox(width: 6),
-                                                    Flexible(
-                                                      child: Text(
-                                                        "Information".tr,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          )
-                                        : ValueListenableBuilder<bool>(
-                                            valueListenable: isFollowedNotifier,
-                                            builder:
-                                                (context, isFollowed, child) {
-                                              return Expanded(
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            30), // Border radius commun
-                                                    gradient: LinearGradient(
-                                                      begin: Alignment.topLeft,
-                                                      end:
-                                                          Alignment.bottomRight,
-                                                      colors: <Color>[
-                                                        newColorBlueElevate,
-                                                        newColorGreenDarkElevate
-                                                      ],
-                                                    ),
-                                                    border: Border.all(
-                                                        color:
-                                                            Colors.transparent,
-                                                        width:
-                                                            1), // Bordure noire
-                                                  ),
-                                                  child: ElevatedButton(
-                                                    onPressed: () async {
-                                                      isFollowedNotifier.value =
-                                                          !isFollowedNotifier
-                                                              .value;
-                                                      // Définition d'une attente pour simuler un délai
-                                                      // Vérifie si le widget est monté avant d'effectuer des actions
-                                                      if (mounted) {
-                                                        if (isFollowedNotifier
-                                                            .value) {
-                                                          // Appel de la fonction abonner
-                                                          await ref
-                                                              .read(
-                                                                  infoUserStateNotifier
-                                                                      .notifier)
-                                                              .abonner(
-                                                                  widget.uid,
-                                                                  'dd')
-                                                              .then((onValue) {
-                                                            isShowNotificationFollow
-                                                                    .value =
-                                                                isFollowedNotifier
-                                                                    .value;
-                                                          });
-                                                        } else {
-                                                          // Appel de la fonction desabonner
-                                                          await ref
-                                                              .read(
-                                                                  infoUserStateNotifier
-                                                                      .notifier)
-                                                              .desabonner(
-                                                                  widget.uid,
-                                                                  'dd')
-                                                              .then((onValues) {
-                                                            isShowNotificationFollow
-                                                                    .value =
-                                                                isFollowedNotifier
-                                                                    .value;
-                                                          });
-                                                        }
-                                                      }
-                                                    },
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 10),
-                                                      backgroundColor: Colors
-                                                          .transparent, // Transparent pour ne pas masquer le dégradé
-                                                      elevation:
-                                                          0, // Pas d'ombre
-                                                    ),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Image.asset(
-                                                          'assets/utilisateur (1).png',
-                                                          color: Colors.white,
-                                                          width: 15,
-                                                          height: 15,
-                                                        ), // Icône
-                                                        SizedBox(width: 8),
-                                                        Flexible(
-                                                          child: Text(
-                                                            isFollowed
-                                                                ? "Suivi(e)".tr
-                                                                : "Suivre".tr,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              );
-                                            }),
-                                    SizedBox(width: 10),
-                                    // Bouton "Événement" avec OutlinedButton et un icône
-                                    widget.uid == uidUser
-                                        ? Expanded(
-                                            child: OutlinedButton(
-                                              onPressed: () {
-                                                Navigator.of(context,
-                                                        rootNavigator: true)
-                                                    .push(
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          Editerprofile(
-                                                            uid: widget.uid,
-                                                            myOwnData: UserModel
-                                                                .fromEntity(
-                                                                    users
-                                                                        .first),
-                                                          )),
-                                                );
-                                              },
-                                              style: OutlinedButton.styleFrom(
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          30), // Border radius commun
-                                                ),
-                                                side: BorderSide(
-                                                    color: Colors.black,
-                                                    width: 1),
-                                                padding: EdgeInsets.symmetric(
-                                                    vertical: 16,
-                                                    horizontal: 10),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Image.asset(
-                                                    'assets/editer-le-texte.png',
-                                                    color: Colors.black,
-                                                    width: 15,
-                                                    height: 15,
-                                                  ), // Icône
-                                                  SizedBox(width: 8),
-                                                  Flexible(
-                                                    child: Text(
-                                                      "edite_profile".tr,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          )
-                                        : Expanded(
-                                            child: OutlinedButton(
-                                              onPressed: () {
-                                                Navigator.of(context,
-                                                        rootNavigator: true)
-                                                    .push(
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        MessageDetail(
-                                                      urlPhoto:
-                                                          userProfilePic.value,
-                                                      uid: userUid.value,
-                                                      name: userName.value,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              style: OutlinedButton.styleFrom(
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          30), // Border radius commun
-                                                ),
-                                                side: BorderSide(
-                                                    color: Colors.black,
-                                                    width: 1),
-                                                padding: EdgeInsets.symmetric(
-                                                    vertical: 16,
-                                                    horizontal: 10),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Image.asset(
-                                                    'assets/discuter (1).png',
-                                                    color: Colors.black,
-                                                    width: 20,
-                                                    height: 20,
-                                                  ), // Icône
-                                                  SizedBox(width: 8),
-                                                  Flexible(
-                                                    child: Text(
-                                                      "Message".tr,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                  ],
-                                ),
-                              ),
                             ],
                           ),
                         ),
@@ -882,34 +781,27 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                       pinned: true,
                       delegate: _SliverAppBarDelegate(
                         TabBar(
-                          labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                          labelColor: kPrimaryColor,
-                          indicatorColor: kPrimaryColor,
+                          indicatorColor:
+                              Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black,
                           controller: _tabController,
                           tabs: [
                             Tab(
-                                icon: Text(
-                              'Highlights',
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                                icon: Icon(
+                              Icons.grid_on_outlined,
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black,
                             )),
                             Tab(
-                                icon: Text(
-                              'Photos',
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            )),
-                            Tab(
-                                icon: Text(
-                              'Evenement',
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            )),
-                            Tab(
-                                icon: Text(
-                              'Marketplace',
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                                icon: Icon(
+                              Icons.image_outlined,
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black,
                             )),
                           ],
                         ),
@@ -1447,37 +1339,42 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
             FloatingActionButtonLocation.endDocked, // Centre en bas
         floatingActionButton: Padding(
           padding: const EdgeInsets.only(bottom: 40.0),
-          child: Visibility(
-            visible: widget.uid == uidUser,
-            child: FloatingActionButton(
-              backgroundColor: kPrimaryColor,
-              onPressed: () {
-                _showMoreOption(
-                  widget.uid,
-                  userName.value,
-                  userDataGet.value,
-                  notifier.MydataPersiste!.abonnee!.length.toString(),
-                  notifier.MydataPersiste!.abonnement!.length.toString(),
-                );
-              },
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(50), // Coins arrondis
-              ),
-              heroTag: null,
-              child: widget.uid == uidUser
-                  ? FaIcon(
-                      FontAwesomeIcons.ellipsis,
-                      size: 20,
-                      color: Colors.white,
-                    )
-                  : SizedBox(
-                      width: 30,
-                      height: 30,
-                      child: Image.asset(
-                        'assets/message-de-chat.png',
-                        color: Colors.white,
-                      )), // Utilisé pour éviter les conflits de héros
+          child: FloatingActionButton(
+            backgroundColor: kPrimaryColor,
+            onPressed: () => widget.uid == uidUser
+                ? _showMoreOption(
+                    widget.uid,
+                    userName.value,
+                    userDataGet.value,
+                    notifier.MydataPersiste!.abonnee!.length.toString(),
+                    notifier.MydataPersiste!.abonnement!.length.toString(),
+                  )
+                : Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(
+                      builder: (context) => MessageDetail(
+                        urlPhoto: userProfilePic.value,
+                        uid: userUid.value,
+                        name: userName.value,
+                      ),
+                    ),
+                  ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(50), // Coins arrondis
             ),
+            heroTag: null,
+            child: widget.uid == uidUser
+                ? FaIcon(
+                    FontAwesomeIcons.ellipsis,
+                    size: 20,
+                    color: Colors.white,
+                  )
+                : SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: Image.asset(
+                      'assets/message-de-chat.png',
+                      color: Colors.white,
+                    )), // Utilisé pour éviter les conflits de héros
           ),
         ),
       ),
@@ -1920,8 +1817,11 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                         child: ListTile(
                           onTap: () async {
                             Navigator.pop(context);
-                            SlideNavigation.slideToPage(
-                                context, Createhighlight());
+                            Navigator.of(context, rootNavigator: true).push(
+                              MaterialPageRoute(
+                                builder: (context) => Createhighlight(),
+                              ),
+                            );
                           },
                           leading: Container(
                               height: 40,
@@ -1956,55 +1856,6 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                           ),
                         ),
                       ),
-                    if (userUid == uidUser)
-                      SizedBox(
-                        height: 2.0,
-                      ),
-                    if (userUid == uidUser)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 1, top: 1),
-                        child: ListTile(
-                          onTap: () async {
-                            Navigator.pop(context);
-                            SlideNavigation.slideToPage(
-                                context, CreateAnnonceMarket());
-                          },
-                          leading: Container(
-                              height: 40,
-                              width: 40,
-                              decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(30)),
-                                color: Colors.grey.shade300,
-                              ),
-                              child: Center(
-                                child: Image.asset(
-                                  'assets/photo.png',
-                                  width: 20,
-                                  height: 20,
-                                ),
-                              )),
-                          title: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Publiez sur notre Marketplace'.tr,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                "Partagez vos produits avec une large audience et concluez des ventes rapidement."
-                                    .tr,
-                                style: TextStyle(fontSize: 15),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    SizedBox(
-                      height: 2.0,
-                    ),
                     Padding(
                       padding: const EdgeInsets.only(left: 1, top: 1),
                       child: ListTile(

@@ -18,7 +18,11 @@ class OverlappingAvatars extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: imageSize,
+      width:
+          imageSize + (imageUrls.length - 1) * overlapOffset, // Largeur ajustée
       child: Stack(
+        alignment: Alignment.center,
+        clipBehavior: Clip.none,
         children: imageUrls.asMap().entries.map((entry) {
           int index = entry.key;
           String url = entry.value;
