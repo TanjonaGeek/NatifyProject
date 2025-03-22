@@ -143,7 +143,7 @@ class MapsUserhNotifier extends StateNotifier<MapsUserState> {
       String? rangeString = prefs.getString('rangeOfageDebutAndFin');
       RangeValues loadedRangeOfageDebutAndFin;
       if (rangeString!.contains(',')) {
-        List<String> parts = rangeString!.split(',');
+        List<String> parts = rangeString.split(',');
         if (parts.length == 2) {
           try {
             loadedRangeOfageDebutAndFin = RangeValues(

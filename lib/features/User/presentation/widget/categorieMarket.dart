@@ -61,18 +61,6 @@ class CategoriesDialog extends StatelessWidget {
       ],
     },
     {
-      "title": "Entreprises, Services & Événements",
-      "icon": Icons.business,
-      "subcategories": [
-        "Offres d’emploi & Recrutement",
-        "Cours & Formations",
-        "Services à domicile",
-        "Marketing & Communication",
-        "Services financiers & Juridiques",
-        "Billetterie & Événements",
-      ],
-    },
-    {
       "title": "Loisirs, Sports & Divertissement",
       "icon": Icons.sports_soccer,
       "subcategories": [
@@ -105,13 +93,15 @@ class CategoriesDialog extends StatelessWidget {
     },
   ];
 
+  CategoriesDialog({super.key});
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text("Choisissez une catégorie",
           textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.bold)),
-      content: Container(
+      content: SizedBox(
         width: double.maxFinite,
         child: ListView.builder(
           shrinkWrap: true,

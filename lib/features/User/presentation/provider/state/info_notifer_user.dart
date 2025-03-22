@@ -14,6 +14,7 @@ import 'package:natify/features/User/domaine/usecases/useCaseGetInfoUser.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseIsFillUser.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseModifierPhotoProfile.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseMyInfoData.dart';
+import 'package:natify/features/User/domaine/usecases/useCasePublierVente.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseRemoveReceiveNotificatonByUser.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseSaveVersionAppUseByUser.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseSendNotificationHighLightFollowers.dart';
@@ -86,8 +87,55 @@ class InfoNotifierUser extends StateNotifier<InfoStateUser> {
       injector.get<UseCaseSupprimerPhotoProfiles>();
   final UseCaseModifierPhotoProfiles _editPhotoUserUseCase =
       injector.get<UseCaseModifierPhotoProfiles>();
+  final UseCasePublierVente _publierVenteUseCase =
+      injector.get<UseCasePublierVente>();
   InfoNotifierUser() : super(const InfoStateUser.initial());
   bool get isFetching => state.state != InfoUserConcreteState.loading;
+
+  Future<void> publierVente(
+    UserModel users,
+    String title,
+    String description,
+    double latitude,
+    double longitude,
+    List<File> images,
+    String codeCoutargetCountryntry,
+    String targetNationality,
+    List<String> jaime,
+    List<String> commentaire,
+    String prix,
+    String categorie,
+  ) async {
+    try {
+      final List<ConnectivityResult> connectivityResult =
+          await (Connectivity().checkConnectivity());
+      if (connectivityResult.contains(ConnectivityResult.none)) {
+        showCustomSnackBar("Pas de connexion internet");
+        return;
+      }
+      await _publierVenteUseCase
+          .call(
+        users,
+        title,
+        description,
+        latitude,
+        longitude,
+        images,
+        codeCoutargetCountryntry,
+        targetNationality,
+        jaime,
+        commentaire,
+        prix,
+        categorie,
+      )
+          .then((onValue) {
+        showCustomSnackBar("Vente publier avec succes");
+      });
+    } catch (e) {
+      showCustomSnackBar(
+          "Une erreur s'est produite. Veuillez vérifier votre connexion et réessayer.");
+    }
+  }
 
   Future<void> updatePhotoProfileUser(
       String userId, List<File> profilePic) async {

@@ -15,6 +15,8 @@ class MarketPlaceEntity extends Equatable {
   final int? createdAt;
   final List<Map<String, dynamic>>? jaime;
   final List<Map<String, dynamic>>? commentaire;
+  final String? prix;
+  final String? categorie;
 
   const MarketPlaceEntity({
     required this.title,
@@ -30,6 +32,8 @@ class MarketPlaceEntity extends Equatable {
     required this.createdAt,
     required this.jaime,
     required this.commentaire,
+    required this.prix,
+    required this.categorie,
   });
 
   @override
@@ -48,6 +52,8 @@ class MarketPlaceEntity extends Equatable {
       createdAt,
       jaime,
       commentaire,
+      prix,
+      categorie
     ];
   }
 }

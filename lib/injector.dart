@@ -42,6 +42,7 @@ import 'package:natify/features/User/domaine/usecases/useCaseGetInfoUser.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseIsFillUser.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseModifierPhotoProfile.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseMyInfoData.dart';
+import 'package:natify/features/User/domaine/usecases/useCasePublierVente.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseRemoveReceiveNotificatonByUser.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseSaveVersionAppUseByUser.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseSendNotificationHighLightFollowers.dart';
@@ -57,6 +58,7 @@ import 'package:natify/features/User/domaine/usecases/useCaseUpdateInfoInAccount
 import 'package:natify/features/User/domaine/usecases/useCaseUpdateStatusUser.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseVoirHighLight.dart';
 import 'package:natify/features/User/domaine/usecases/useCasegetUserTokenNotification.dart';
+import 'package:natify/features/User/domaine/usecases/useCasesAddComment.dart';
 import 'package:natify/features/User/domaine/usecases/useCasesGetPhotoPrrofile.dart';
 import 'package:natify/features/User/domaine/usecases/useCasesGetAllPhotoProfile.dart';
 import 'package:natify/features/User/domaine/usecases/useCasesGetPartPhotoProfile.dart';
@@ -164,6 +166,10 @@ Future<void> initializationDepencies() async {
   injector.registerFactory<UseCaseModifierPhotoProfiles>(() =>
       UseCaseModifierPhotoProfiles(
           userRepository: injector.get<UserRepository>()));
+  injector.registerFactory<UseCasePublierVente>(() =>
+      UseCasePublierVente(userRepository: injector.get<UserRepository>()));
+  injector.registerFactory<useCaseAddCommentVente>(() =>
+      useCaseAddCommentVente(userRepository: injector.get<UserRepository>()));
 
   injector.registerFactory<UseCaseGetStorie>(() =>
       UseCaseGetStorie(storieRepository: injector.get<StorieRepository>()));

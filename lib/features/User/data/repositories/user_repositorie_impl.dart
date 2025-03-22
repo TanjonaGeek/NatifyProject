@@ -216,4 +216,41 @@ class UserRepositoryImpl implements UserRepository {
   Future<void> ModifierPhotoProfile(String uidUser, List<File> profilePic) {
     return dataSourceUser.ModifierPhotoProfile(uidUser, profilePic);
   }
+
+  @override
+  Future<void> publierVente(
+    UserModel users,
+    String title,
+    String description,
+    double latitude,
+    double longitude,
+    List<File> images,
+    String codeCoutargetCountryntry,
+    String targetNationality,
+    List<String> jaime,
+    List<String> commentaire,
+    String prix,
+    String categorie,
+  ) {
+    return dataSourceUser.publierVente(
+      users,
+      title,
+      description,
+      latitude,
+      longitude,
+      images,
+      codeCoutargetCountryntry,
+      targetNationality,
+      jaime,
+      commentaire,
+      prix,
+      categorie,
+    );
+  }
+
+  @override
+  Future<void> addCommentVente(
+      String venteId, String userId, String text, String parentId) {
+    return dataSourceUser.addCommentVente(venteId, userId, text, parentId);
+  }
 }

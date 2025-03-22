@@ -2,21 +2,22 @@ import 'package:natify/features/User/domaine/entities/marketplace_entity.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MarketplaceModel extends MarketPlaceEntity {
-  const MarketplaceModel({
-    super.title,
-    super.description,
-    super.location,
-    super.images,
-    super.uidVente,
-    super.organizerUid,
-    super.organizerName,
-    super.organizerPhoto,
-    super.codeCoutargetCountryntry,
-    super.targetNationality,
-    super.createdAt,
-    super.jaime,
-    super.commentaire,
-  });
+  const MarketplaceModel(
+      {super.title,
+      super.description,
+      super.location,
+      super.images,
+      super.uidVente,
+      super.organizerUid,
+      super.organizerName,
+      super.organizerPhoto,
+      super.codeCoutargetCountryntry,
+      super.targetNationality,
+      super.createdAt,
+      super.jaime,
+      super.commentaire,
+      super.prix,
+      super.categorie});
 
   factory MarketplaceModel.fromJson(Map<String, dynamic> map) {
     return MarketplaceModel(
@@ -33,6 +34,8 @@ class MarketplaceModel extends MarketPlaceEntity {
       createdAt: map['createdAt'] ?? 0,
       jaime: List<Map<String, dynamic>>.from(map['jaime']),
       commentaire: List<Map<String, dynamic>>.from(map['commentaire']),
+      prix: map['prix'] ?? '',
+      categorie: map['categorie'] ?? '',
     );
   }
 
@@ -51,6 +54,8 @@ class MarketplaceModel extends MarketPlaceEntity {
       'createdAt': createdAt,
       'jaime': jaime,
       'commentaire': commentaire,
+      'prix': prix,
+      'categorie': categorie,
     };
   }
 
@@ -70,6 +75,8 @@ class MarketplaceModel extends MarketPlaceEntity {
       createdAt: data['createdAt'],
       jaime: data['jaime'],
       commentaire: data['commentaire'],
+      prix: data['prix'],
+      categorie: data['categorie'],
     );
   }
 
@@ -88,24 +95,27 @@ class MarketplaceModel extends MarketPlaceEntity {
       createdAt: entity.createdAt,
       jaime: entity.jaime,
       commentaire: entity.commentaire,
+      prix: entity.prix,
+      categorie: entity.categorie,
     );
   }
 
   MarketPlaceEntity toEntity() {
     return MarketPlaceEntity(
-      title: title,
-      description: description,
-      location: location,
-      images: images,
-      uidVente: uidVente,
-      organizerUid: organizerUid,
-      organizerName: organizerName,
-      organizerPhoto: organizerPhoto,
-      codeCoutargetCountryntry: codeCoutargetCountryntry,
-      targetNationality: targetNationality,
-      createdAt: createdAt,
-      jaime: jaime,
-      commentaire: commentaire,
-    );
+        title: title,
+        description: description,
+        location: location,
+        images: images,
+        uidVente: uidVente,
+        organizerUid: organizerUid,
+        organizerName: organizerName,
+        organizerPhoto: organizerPhoto,
+        codeCoutargetCountryntry: codeCoutargetCountryntry,
+        targetNationality: targetNationality,
+        createdAt: createdAt,
+        jaime: jaime,
+        commentaire: commentaire,
+        prix: prix,
+        categorie: categorie);
   }
 }

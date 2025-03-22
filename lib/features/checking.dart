@@ -33,7 +33,7 @@ class _ChekingState extends ConsumerState<Cheking> {
     if (mounted) {
       setState(() {
         _appVersion = '${packageInfo.version}+${packageInfo.buildNumber}';
-        _appVersion2 = '${packageInfo.version}';
+        _appVersion2 = packageInfo.version;
       });
     }
   }
@@ -196,7 +196,7 @@ class _ChekingState extends ConsumerState<Cheking> {
                       height: 10,
                     ),
                     Text(
-                      "${messageversion} (v${_appVersion2})".tr,
+                      "$messageversion (v$_appVersion2)".tr,
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:natify/core/Services/LocationService.dart';
 import 'package:natify/core/Services/globalFocusService.dart';
 import 'package:natify/core/utils/colors.dart';
@@ -20,6 +21,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:natify/features/User/presentation/widget/list/listVenteMarketplace.dart';
 import 'package:shimmer/shimmer.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -81,9 +83,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     } catch (e) {}
   }
 
+  Future<void> updateOnlineUsers() async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    // Récupérer tous les utilisateurs avec isOnline == true
+    QuerySnapshot querySnapshot = await firestore
+        .collection('users')
+        .where('isOnline', isEqualTo: true)
+        .get();
+
+    // Parcourir chaque document et mettre à jour isOnline à false
+    for (var doc in querySnapshot.docs) {
+      await doc.reference.update({'isOnline': false});
+    }
+
+    print("Mise à jour terminée !");
+  }
+
   @override
   void initState() {
     super.initState();
+    // updateOnlineUsers();
     _updateLocationOnce();
     WidgetsBinding.instance.addObserver(this);
   }
@@ -96,12 +116,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   // Liste des titres pour chaque page
-  final List<String> appBarTitles = ['Discussion', 'Decouvert', 'Stories'];
+  final List<String> appBarTitles = [
+    'Discussion',
+    'Decouvert',
+    'Stories',
+    'Marketplaces'
+  ];
 
   void _onItemTapped(
     int index,
   ) {
-    if (index == 3) {
+    if (index == 4) {
       Navigator.of(context, rootNavigator: true).push(
         MaterialPageRoute(
           builder: (context) => UserProfileScreen(uid: uidUser),
@@ -306,6 +331,7 @@ class _AnimatedBottomNavBarState extends ConsumerState<AnimatedBottomNavBar>
     Container(),
     KeepAlivePage(child: Allstoriepage()),
     //  AllUserList(),
+    MarketplacePage()
   ];
 
   late final StreamSubscription<bool> _keyboardSubscription;
@@ -395,13 +421,23 @@ class _AnimatedBottomNavBarState extends ConsumerState<AnimatedBottomNavBar>
                             ),
                             BottomNavigationBarItem(
                               icon: AnimatedBottomIcon(
+                                isProfile: '',
+                                icon: FontAwesomeIcons.shopify,
+                                label: "Marketplaces".tr,
+                                isSelected: selectedIndex ==
+                                    3, // Vérifie si c'est sélectionné
+                              ),
+                              label: '',
+                            ),
+                            BottomNavigationBarItem(
+                              icon: AnimatedBottomIcon(
                                 isProfile: widget
                                     .notifier.MydataPersiste!.profilePic
                                     .toString(),
                                 icon: FontAwesomeIcons.solidUserCircle,
                                 label: "Profile".tr,
                                 isSelected: selectedIndex ==
-                                    3, // Vérifie si c'est sélectionné
+                                    4, // Vérifie si c'est sélectionné
                               ),
                               label: '',
                             ),

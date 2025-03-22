@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:geoflutterfire2/geoflutterfire2.dart';
 import 'package:natify/core/Services/NotificationService.dart';
 import 'package:natify/features/Storie/data/models/story_model.dart';
 import 'package:natify/features/User/data/datasources/local/data_source_user.dart';
@@ -23,6 +24,7 @@ class DataSourceUserImpl implements DataSourceUser {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseStorage firebaseStorage = FirebaseStorage.instance;
+  final GeoFlutterFire geo = GeoFlutterFire();
   @override
   Future DeleteAccount(String userId) {
     // TODO: implement DeleteAccount
@@ -1406,5 +1408,101 @@ class DataSourceUserImpl implements DataSourceUser {
         });
       }
     } catch (e) {}
+  }
+
+  @override
+  Future<void> publierVente(
+    UserModel users,
+    String title,
+    String description,
+    double latitude,
+    double longitude,
+    List<File> images,
+    String codeCoutargetCountryntry,
+    String targetNationality,
+    List<String> jaime,
+    List<String> commentaire,
+    String prix,
+    String categorie,
+  ) async {
+    try {
+      final userUid = FirebaseAuth.instance.currentUser;
+      var venteUidGenerate = const Uuid().v1();
+      var timeCreated = DateTime.now().millisecondsSinceEpoch;
+      if (userUid == null) {
+        return;
+      }
+      if (users.name!.isEmpty ||
+          users.profilePic!.isEmpty ||
+          users.uid!.isEmpty ||
+          title.isEmpty ||
+          description.isEmpty ||
+          prix.isEmpty) {
+        return;
+      }
+
+      if (images.isEmpty) {
+        return;
+      }
+      GeoFirePoint geoPoint =
+          geo.point(latitude: latitude, longitude: longitude);
+      final docRef = FirebaseFirestore.instance
+          .collection('marketplace')
+          .doc(venteUidGenerate);
+
+      List<String> collectionImagePath = [];
+      String ref = "/ProduitImage/$venteUidGenerate/";
+      String titles = "Importation image";
+
+      // Utilisation de Future.wait pour uploader toutes les images
+      await Future.wait(images.map((image) async {
+        // Appel de la fonction d'upload pour chaque image
+        String imageUrl =
+            await storeFileHighLigthToFirebase(ref, image, titles);
+        collectionImagePath.add(imageUrl);
+      }));
+
+      await docRef.set({
+        "title": title.trim(),
+        "description": description.trim(),
+        "location": geoPoint.data,
+        "images": collectionImagePath ?? [],
+        "uidVente": venteUidGenerate,
+        "organizerUid": users.uid,
+        "organizerName": users.name ?? "",
+        "organizerPhoto": users.profilePic ?? "",
+        "codeCoutargetCountryntry": codeCoutargetCountryntry,
+        "targetNationality": targetNationality,
+        "createdAt": timeCreated,
+        "jaime": jaime ?? [],
+        "commentaire": commentaire ?? [],
+        "prix": prix ?? "",
+        "categorie": categorie ?? "",
+      });
+
+      print("✅ Événement ajouté avec succès !");
+    } catch (e) {
+      print("❌ Erreur lors de l'ajout de l'événement : $e");
+      rethrow; // Permet de remonter l'erreur si nécessaire
+    }
+  }
+
+  @override
+  Future<void> addCommentVente(
+      String venteId, String userId, String text, String parentId) async {
+    DocumentReference commentRef = firestore
+        .collection('marketplace')
+        .doc(venteId)
+        .collection('comments')
+        .doc();
+
+    await commentRef.set({
+      "commentaireId": commentRef.id,
+      "venteId": venteId,
+      "userId": userId,
+      "text": text,
+      "parentId": parentId ?? "", // Vide si c'est un commentaire principal
+      "createdAt": FieldValue.serverTimestamp(),
+    });
   }
 }

@@ -5,7 +5,6 @@ import 'package:natify/core/utils/slideNavigation.dart';
 import 'package:natify/core/utils/snack_bar_helpers.dart';
 import 'package:natify/core/utils/widget/nationaliteListPage.dart';
 import 'package:natify/core/utils/widget/paysListPage.dart';
-import 'package:natify/features/HomeScreen.dart';
 import 'package:natify/features/User/presentation/pages/editerProfileInit.dart';
 import 'package:natify/features/User/presentation/provider/user_provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';

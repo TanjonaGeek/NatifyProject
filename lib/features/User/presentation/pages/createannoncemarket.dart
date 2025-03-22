@@ -8,7 +8,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:natify/core/utils/helpers.dart';
+import 'package:natify/core/utils/snack_bar_helpers.dart';
 import 'package:natify/core/utils/widget/nationaliteListPage.dart';
+import 'package:natify/features/User/presentation/provider/user_provider.dart';
 import 'package:natify/features/User/presentation/widget/categorieMarket.dart';
 import 'package:natify/features/User/presentation/widget/galleryannoncephoto.dart';
 import 'package:natify/features/User/presentation/widget/lieuvente.dart';
@@ -22,6 +24,7 @@ class CreateAnnonceMarket extends ConsumerStatefulWidget {
 }
 
 class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
+  final _formKey = GlobalKey<FormState>();
   List<File> selectedFiles = []; // Liste pour stocker les fichiers sélectionnés
   String cibleNationalite = "Choisissez nationalite";
   final List<Map<String, String>> listNationalitesAndPays =
@@ -29,6 +32,8 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
   String ciblePays = "Choisissez pays";
   String lieu = "Ajouter lieux";
   String flag = "";
+  double latitude = 0.0;
+  double longitude = 0.0;
   final TextEditingController categorieProduit =
       TextEditingController(text: "Selectionnez Categorie");
   final TextEditingController titreProduit = TextEditingController();
@@ -54,8 +59,11 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
     );
 
     if (selectedLieux != null) {
+      print('le lieux est $selectedLieux');
       setState(() {
-        lieu = selectedLieux;
+        lieu = selectedLieux[0]['lieu'];
+        latitude = selectedLieux[0]['latitude'];
+        longitude = selectedLieux[0]['longitude'];
       });
     }
   }
@@ -93,8 +101,35 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
     }
   }
 
-  Future<void> publierVente() async{
-
+  Future<void> publierVente() async {
+    final notifier = ref.read(infoUserStateNotifier);
+    if (categorieProduit.text.isNotEmpty && selectedFiles.isNotEmpty) {
+      String cibleN =
+          cibleNationalite == "Choisissez nationalite" ? "" : cibleNationalite;
+      String cibleP = ciblePays == "Choisissez pays" ? "" : ciblePays;
+      if (mounted) {
+        ref.read(infoUserStateNotifier.notifier).publierVente(
+            notifier.MydataPersiste!,
+            titreProduit.text,
+            descriptionProduit.text,
+            latitude,
+            longitude,
+            selectedFiles,
+            cibleP,
+            cibleN,
+            [],
+            [],
+            prixProduit.text,
+            categorieProduit.text);
+      }
+      Navigator.pop(context);
+    } else {
+      if (categorieProduit.text.isEmpty) {
+        showCustomSnackBar("Choissisez un categorie produit");
+      } else if (selectedFiles.isEmpty) {
+        showCustomSnackBar("Inserer un image pour le produit");
+      }
+    }
   }
 
   @override
@@ -122,7 +157,11 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
           ),
           actions: [
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  publierVente();
+                }
+              },
               child: Text(
                 "Publier".tr,
                 style: TextStyle(
@@ -132,200 +171,221 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
           ],
         ),
         body: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 1),
-                Container(
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: "Partagez des détails sur ce produit...",
-                      border: InputBorder.none,
-                    ),
-                    maxLines: 3,
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Détails annonce',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                TextFormField(
-                  validator: (value) {
-                    if ((value == null || value.isEmpty)) {
-                      return "rempli_champs".tr;
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    labelText: "Que vendez vous".tr,
-                    border: OutlineInputBorder(
+          child: Form(
+            key: _formKey,
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 1),
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    contentPadding: EdgeInsets.all(15),
-                  ),
-                ),
-                SizedBox(height: 10),
-                TextFormField(
-                  controller: categorieProduit,
-                  onTap: () => _showCategoriesDialog(context),
-                  readOnly: true,
-                  validator: (value) {
-                    if ((value == null || value.isEmpty)) {
-                      return "rempli_champs".tr;
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    labelText: "Categorie".tr,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
+                    child: TextFormField(
+                      validator: (value) {
+                        if ((value == null || value.isEmpty)) {
+                          return "rempli_champs".tr;
+                        }
+                        return null;
+                      },
+                      onChanged: (value) {
+                        descriptionProduit.text = value.toString();
+                      },
+                      decoration: InputDecoration(
+                        hintText: "Partagez des détails sur ce produit...",
+                        border: InputBorder.none,
+                      ),
+                      maxLines: 3,
                     ),
-                    contentPadding: EdgeInsets.all(15),
                   ),
-                ),
-                SizedBox(height: 10),
-                TextFormField(
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  validator: (value) {
-                    if ((value == null || value.isEmpty)) {
-                      return "rempli_champs".tr;
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    labelText: "Prix".tr,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    contentPadding: EdgeInsets.all(15),
+                  SizedBox(height: 10),
+                  Text(
+                    'Détails annonce',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                ),
-                SizedBox(height: 10),
-                Text('Localisation',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                SizedBox(height: 10),
-                GestureDetector(
-                    onTap: () => _showLieuxDialog(context),
-                    child: buildOption(Icon(Icons.location_on), "${lieu}")),
-                SizedBox(height: 10),
-                Text('Audience cible',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                SizedBox(height: 10),
-                Row(
-                  children: [
-                    GestureDetector(
-                        onTap: () => _showNationaliteDialog(context),
-                        child: buildOption(
-                            flag.isEmpty ? Icon(Icons.add) : Text('${flag}'),
-                            "${cibleNationalite}")),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    GestureDetector(
-                        onTap: () => _showPaysDialog(context),
-                        child: buildOption(
-                            ciblePays == "Choisissez pays"
-                                ? Icon(Icons.add)
-                                : SizedBox.shrink(),
-                            "${ciblePays}")),
-                  ],
-                ),
-                SizedBox(height: 10),
-                Text('Media', style: TextStyle(fontWeight: FontWeight.bold)),
-                SizedBox(height: 10),
-                GestureDetector(
-                    onTap: () async {
-                      final selectedPhoto = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => GalleryAnnoncePhoto(),
-                        ),
-                      );
-                      if (selectedPhoto != null) {
-                        setState(() {
-                          selectedFiles = selectedPhoto;
-                        });
+                  SizedBox(height: 10),
+                  TextFormField(
+                    validator: (value) {
+                      if ((value == null || value.isEmpty)) {
+                        return "rempli_champs".tr;
                       }
-                      // SlideNavigation.slideToPage(context, GalleryAnnoncePhoto());
+                      return null;
                     },
-                    child: buildOption(Icon(Icons.add), "Ajouter Photos")),
-                SizedBox(height: 10),
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  padding: EdgeInsets.all(10),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4, // Nombre de colonnes
-                    mainAxisSpacing: 10,
-                    crossAxisSpacing: 10,
-                    childAspectRatio: 1, // Ajuster selon le besoin
+                    onChanged: (value) {
+                      titreProduit.text = value.toString();
+                    },
+                    decoration: InputDecoration(
+                      labelText: "Que vendez vous".tr,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      contentPadding: EdgeInsets.all(15),
+                    ),
                   ),
-                  itemCount: selectedFiles.length,
-                  itemBuilder: (context, index) {
-                    final file = selectedFiles[index]; // Fichier à afficher
+                  SizedBox(height: 10),
+                  TextFormField(
+                    controller: categorieProduit,
+                    onTap: () => _showCategoriesDialog(context),
+                    readOnly: true,
+                    validator: (value) {
+                      if ((value == null || value.isEmpty)) {
+                        return "rempli_champs".tr;
+                      }
+                      return null;
+                    },
+                    onChanged: (value) {
+                      categorieProduit.text = value.toString();
+                    },
+                    decoration: InputDecoration(
+                      labelText: "Categorie".tr,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      contentPadding: EdgeInsets.all(15),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  TextFormField(
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    validator: (value) {
+                      if ((value == null || value.isEmpty)) {
+                        return "rempli_champs".tr;
+                      }
+                      return null;
+                    },
+                    onChanged: (value) {
+                      prixProduit.text = value.toString();
+                    },
+                    decoration: InputDecoration(
+                      labelText: "Prix".tr,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      contentPadding: EdgeInsets.all(15),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text('Localisation',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  SizedBox(height: 10),
+                  GestureDetector(
+                      onTap: () => _showLieuxDialog(context),
+                      child: buildOption(Icon(Icons.location_on), lieu)),
+                  SizedBox(height: 10),
+                  Text('Audience cible',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      GestureDetector(
+                          onTap: () => _showNationaliteDialog(context),
+                          child: buildOption(
+                              flag.isEmpty ? Icon(Icons.add) : Text(flag),
+                              cibleNationalite)),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      GestureDetector(
+                          onTap: () => _showPaysDialog(context),
+                          child: buildOption(
+                              ciblePays == "Choisissez pays"
+                                  ? Icon(Icons.add)
+                                  : SizedBox.shrink(),
+                              ciblePays)),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Text('Media', style: TextStyle(fontWeight: FontWeight.bold)),
+                  SizedBox(height: 10),
+                  GestureDetector(
+                      onTap: () async {
+                        final selectedPhoto = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => GalleryAnnoncePhoto(),
+                          ),
+                        );
+                        if (selectedPhoto != null) {
+                          setState(() {
+                            selectedFiles = selectedPhoto;
+                          });
+                        }
+                        // SlideNavigation.slideToPage(context, GalleryAnnoncePhoto());
+                      },
+                      child: buildOption(Icon(Icons.add), "Ajouter Photos")),
+                  SizedBox(height: 10),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.all(10),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4, // Nombre de colonnes
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                      childAspectRatio: 1, // Ajuster selon le besoin
+                    ),
+                    itemCount: selectedFiles.length,
+                    itemBuilder: (context, index) {
+                      final file = selectedFiles[index]; // Fichier à afficher
 
-                    return Stack(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            image: DecorationImage(
-                              image:
-                                  FileImage(file), // Affichage du fichier local
-                              fit: BoxFit.cover,
+                      return Stack(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              image: DecorationImage(
+                                image: FileImage(
+                                    file), // Affichage du fichier local
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
-                        ),
-                        Positioned(
-                          top: 3,
-                          right: 5,
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selectedFiles
-                                    .removeAt(index); // Supprime l'image
-                              });
-                            },
-                            child: Icon(
-                              Icons.close,
-                              color: Colors.red,
-                              size: 20,
+                          Positioned(
+                            top: 3,
+                            right: 5,
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedFiles
+                                      .removeAt(index); // Supprime l'image
+                                });
+                              },
+                              child: Icon(
+                                Icons.close,
+                                color: Colors.red,
+                                size: 20,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-                // Spacer(),
-                // SizedBox(
-                //   width: double.infinity,
-                //   child: ElevatedButton(
-                //     onPressed: () {},
-                //     child: Text(
-                //       "PUBLIER",
-                //       style: TextStyle(fontWeight: FontWeight.bold),
-                //     ),
-                //     style: ElevatedButton.styleFrom(
-                //       backgroundColor: Colors.blue,
-                //       foregroundColor: Colors.white,
-                //       shape: RoundedRectangleBorder(
-                //         borderRadius: BorderRadius.circular(5),
-                //       ),
-                //     ),
-                //   ),
-                // ),
-              ],
+                        ],
+                      );
+                    },
+                  ),
+                  // Spacer(),
+                  // SizedBox(
+                  //   width: double.infinity,
+                  //   child: ElevatedButton(
+                  //     onPressed: () {},
+                  //     child: Text(
+                  //       "PUBLIER",
+                  //       style: TextStyle(fontWeight: FontWeight.bold),
+                  //     ),
+                  //     style: ElevatedButton.styleFrom(
+                  //       backgroundColor: Colors.blue,
+                  //       foregroundColor: Colors.white,
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(5),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                ],
+              ),
             ),
           ),
         ),

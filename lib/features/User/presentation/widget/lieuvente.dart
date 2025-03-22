@@ -222,7 +222,14 @@ class _TrouverParLieuxState extends ConsumerState<TrouverParLieux> {
                           var nameSelected =
                               listLocation[index]['display_name'];
                           // trouverPlace(context, lat, lon);
-                          Navigator.pop(context, nameSelected.toString());
+                          List<Map<String, dynamic>> donnerGet = [
+                            {
+                              'latitude': lat,
+                              'longitude': lon,
+                              'lieu': nameSelected.toString(),
+                            }
+                          ];
+                          Navigator.pop(context, donnerGet);
                         },
                         leading: Container(
                           width: 30,
