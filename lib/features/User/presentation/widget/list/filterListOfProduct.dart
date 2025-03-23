@@ -1,29 +1,33 @@
+import 'dart:convert';
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:natify/core/utils/colors.dart';
 import 'package:natify/core/utils/helpers.dart';
 import 'package:natify/core/utils/widget/nationaliteListPage.dart';
 import 'package:natify/core/utils/widget/paysListPage.dart';
+import 'package:natify/features/User/presentation/pages/map/filterOption.dart';
 import 'package:natify/features/User/presentation/provider/user_provider.dart';
-import 'package:natify/features/User/presentation/widget/list/filterOption.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
-class FilterPage extends ConsumerStatefulWidget {
-  const FilterPage({super.key});
+class FilterProductPage extends ConsumerStatefulWidget {
+  const FilterProductPage({super.key});
 
   @override
-  _FilterPageState createState() => _FilterPageState();
+  _FilterProductPageState createState() => _FilterProductPageState();
 }
 
-class _FilterPageState extends ConsumerState<FilterPage> {
-  String sexe = "";
+class _FilterProductPageState extends ConsumerState<FilterProductPage> {
+  String categorie = "";
   String nationalite = "";
   String pays = "";
   String flag = "";
   String ans = "ans".tr;
-  RangeValues age = RangeValues(14, 90);
+  String a = "à".tr;
+  RangeValues prix = RangeValues(1, 10000);
   List<Map<String, String>> nationaliteGroup = [];
   List<String> nationaliteGroupSansFlag = [];
   List<Map<String, String>> listPaysAnNationalite =
@@ -71,35 +75,111 @@ class _FilterPageState extends ConsumerState<FilterPage> {
 
   void ResetFilter() {
     setState(() {
-      sexe = '';
+      categorie = '';
       nationalite = '';
       pays = '';
       flag = '';
-      age = RangeValues(14, 90);
+      prix = RangeValues(1, 10000);
       nationaliteGroup = [];
       nationaliteGroupSansFlag = [];
     });
-    ref.read(allUserListStateNotifier.notifier).ResetFilter();
+    ref.read(mapsUserStateNotifier.notifier).ResetFilter();
+  }
+
+  Future<void> loadFilterPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    String? loadedFlag = prefs.getString('flagMarket');
+    String? loadedCategorie = prefs.getString('categorieMarket');
+    String? loadedNationalite = prefs.getString('nationaliteMarket');
+    String? loadedPays = prefs.getString('paysMarket');
+
+    // Récupération et conversion des RangeValues
+    String? rangeString = prefs.getString('rangeOfPrixDebutAndFinMarket');
+    RangeValues loadedRangeOfPrixDebutAndFin = rangeString != null
+        ? RangeValues(
+            double.parse(rangeString.split(',')[0]),
+            double.parse(rangeString.split(',')[1]),
+          )
+        : RangeValues(1, 10000); // Valeurs par défaut
+
+    List<String>? loadedNationaliteGroupSansFlag =
+        prefs.getStringList('nationaliteGroupSansFlagMarket');
+
+    // Récupération et conversion de `nationaliteGroup` depuis JSON
+    String? nationaliteGroupJson = prefs.getString('nationaliteGroupMarket');
+    List<Map<String, String>> loadedNationaliteGroup =
+        nationaliteGroupJson != null
+            ? List<Map<String, String>>.from(
+                jsonDecode(nationaliteGroupJson)
+                    .map((e) => Map<String, String>.from(e)),
+              )
+            : [];
+
+    // Mise à jour de l'état avec setState
+    setState(() {
+      flag = loadedFlag ?? '';
+      categorie = loadedCategorie ?? '';
+      nationalite = loadedNationalite ?? '';
+      pays = loadedPays ?? '';
+      prix = loadedRangeOfPrixDebutAndFin;
+      nationaliteGroupSansFlag = loadedNationaliteGroupSansFlag ?? [];
+      nationaliteGroup = loadedNationaliteGroup;
+    });
   }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    final notifier = ref.read(allUserListStateNotifier);
+    loadFilterPreferences();
+  }
+
+  String _currentCurrency = 'USD';
+
+  // Taux de conversion
+  final Map<String, double> _exchangeRates = {
+    'EUR': 1,
+    'USD': 1,
+    'MGA': 5000, // 1 EUR = 5000 MGA (exemple)
+  };
+
+  final Map<String, String> _exchangeFormat = {
+    'EUR': 'fr_FR',
+    'USD': 'en_US',
+    'MGA': 'mg_MG',
+  };
+
+  double rate = 1.1;
+  // Limites dynamiques du slider
+  double _minLimit = 1;
+  double _maxLimit = 10000;
+  // Fonction pour changer la devise et ajuster les prix
+  void _changeCurrency(String newCurrency) {
+    double ratesOld = _exchangeRates[_currentCurrency]!;
+    double ratesNew = _exchangeRates[newCurrency]!;
+    double _minLimitNew = _minLimit / ratesOld * ratesNew;
+    double _maxLimitNew = _maxLimit / ratesOld * ratesNew;
     setState(() {
-      sexe = notifier.sexe;
-      nationalite = notifier.nationalite;
-      pays = notifier.pays;
-      flag = notifier.flag;
-      age = notifier.rangeOfageDebutAndFin;
-      nationaliteGroup = notifier.nationaliteGroup;
-      nationaliteGroupSansFlag = notifier.nationaliteGroupSansFlag;
+      _currentCurrency = newCurrency;
+      _minLimit = _minLimitNew;
+      _maxLimit = _maxLimitNew;
+      prix = RangeValues(
+          prix.start * ratesNew / ratesOld, prix.end * ratesNew / ratesOld);
     });
+    Navigator.pop(context); // Fermer l'AlertDialog
   }
 
   @override
   Widget build(BuildContext context) {
+    // Convertit les valeurs en fonction de la devise
+    String formatDevise = _exchangeFormat[_currentCurrency] ?? "en_US";
+    String PrixDebutformatted =
+        NumberFormat.currency(locale: formatDevise, symbol: '')
+            .format(prix.start);
+    String PrixFinformatted =
+        NumberFormat.currency(locale: formatDevise, symbol: '')
+            .format(prix.end);
     return ThemeSwitchingArea(
       child: Scaffold(
           appBar: AppBar(
@@ -122,7 +202,11 @@ class _FilterPageState extends ConsumerState<FilterPage> {
             ),
             actions: [
               IconButton(
-                icon: FaIcon(FontAwesomeIcons.trash, size: 20),
+                icon: FaIcon(
+                  FontAwesomeIcons.trash,
+                  size: 20,
+                  color: Colors.black,
+                ),
                 onPressed: () => ResetFilter(),
               ),
             ],
@@ -142,7 +226,7 @@ class _FilterPageState extends ConsumerState<FilterPage> {
                   ),
                   Divider(
                     color: Colors.grey.shade500,
-                    thickness: 0.2,
+                    thickness: 0.1,
                   ),
                   SizedBox(
                     height: 10,
@@ -151,28 +235,37 @@ class _FilterPageState extends ConsumerState<FilterPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Sexe'.tr,
+                        'Categorie Produit'.tr,
                         style: TextStyle(
-                            fontSize: 17, fontWeight: FontWeight.w500),
+                            fontSize: 17, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
                   SizedBox(
                     height: 5,
                   ),
-                  FilterOption(
-                    checkIfAge: false,
-                    selectedOptions: Helpers.genders,
-                    selectedItem: sexe,
-                    content: SizedBox(),
-                    onSelected: (String? selected) {
-                      setState(() {
-                        sexe = selected.toString();
-                      });
-                    },
-                  ),
+                  Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade400),
+                          borderRadius: BorderRadius.all(Radius.circular(20))),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 10),
+                        child: Text(
+                          '10.000 MGA a 50.000 MGA',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      )),
                   SizedBox(
-                    height: 10,
+                    height: 5,
+                  ),
+                  Divider(
+                    color: Colors.grey.shade500,
+                    thickness: 0.2,
+                  ),
+                  Text(
+                    'Audience cible'.tr,
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                   ),
                   Divider(
                     color: Colors.grey.shade500,
@@ -311,16 +404,24 @@ class _FilterPageState extends ConsumerState<FilterPage> {
                     color: Colors.grey.shade500,
                     thickness: 0.2,
                   ),
+                  Text(
+                    'Monetaire'.tr,
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                  ),
+                  Divider(
+                    color: Colors.grey.shade500,
+                    thickness: 0.2,
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Âge'.tr,
+                        'Prix'.tr,
                         style: TextStyle(
                             fontSize: 17, fontWeight: FontWeight.w500),
                       ),
                       Text(
-                        "${age.start.toInt()} ${age.end.toInt()} $ans",
+                        "$PrixDebutformatted - $PrixFinformatted $_currentCurrency",
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 15),
                       ),
@@ -335,17 +436,37 @@ class _FilterPageState extends ConsumerState<FilterPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           RangeSlider(
-                              min: 14,
-                              max: 90,
+                              min: _minLimit,
+                              max: _maxLimit,
                               activeColor: kPrimaryColor,
-                              values: age,
+                              values: prix,
                               onChanged: (value) {
                                 setState(() {
-                                  age = value;
+                                  prix = value;
                                 });
                               }),
                         ],
                       )),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    "Devis Appliquer : $_currentCurrency".tr,
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  TextButton(
+                    onPressed: () => _showCurrencyDialog(context, ref),
+                    child: Text(
+                      'Changer Devis'.tr,
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: kPrimaryColor),
+                    ),
+                  )
                 ],
               ),
             );
@@ -361,16 +482,15 @@ class _FilterPageState extends ConsumerState<FilterPage> {
       padding: const EdgeInsets.all(16.0),
       child: ElevatedButton(
         onPressed: () async {
-          ref.read(infoUserStateNotifier.notifier).refreshProfile();
           if (mounted) {
-            ref.read(allUserListStateNotifier.notifier).SetUpdateFieldToFilter(
+            ref.read(mapsUserStateNotifier.notifier).SetUpdateFieldToFilter(
                 nationaliteGroupSansFlag: nationaliteGroupSansFlag,
                 nationaliteGroup: nationaliteGroup,
-                sexe: sexe,
+                sexe: categorie,
                 flag: flag,
                 nationalite: nationalite,
                 pays: pays,
-                rangeOfageDebutAndFin: age);
+                rangeOfageDebutAndFin: prix);
           }
           Navigator.of(context).pop();
         },
@@ -383,6 +503,46 @@ class _FilterPageState extends ConsumerState<FilterPage> {
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),
+    );
+  }
+
+  // 💰 Fonction pour afficher l'AlertDialog de sélection de devise
+  void _showCurrencyDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Devises",
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _currencyTile(context, ref, "EUR", "Euro", Icons.euro),
+              _currencyTile(
+                  context, ref, "USD", "Dollar US", Icons.attach_money),
+              _currencyTile(context, ref, "MGA", "Ariary", Icons.money),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // 🏦 Widget pour afficher chaque devise dans l'AlertDialog
+  Widget _currencyTile(BuildContext context, WidgetRef ref, String code,
+      String name, IconData icon) {
+    return ListTile(
+      leading: Icon(icon, color: kPrimaryColor),
+      title: Text(name,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+      trailing: Text(code,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+      onTap: () {
+        _changeCurrency(code);
+      },
     );
   }
 }

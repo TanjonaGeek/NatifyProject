@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_pagination/firebase_pagination.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:natify/core/utils/slideNavigation.dart';
 import 'package:natify/features/User/presentation/widget/detailMarket.dart';
 import 'package:natify/features/User/presentation/widget/postMarketplace.dart';
@@ -55,8 +56,103 @@ class MarketplacePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: FirestorePagination(
-            physics: AlwaysScrollableScrollPhysics(),
+        body: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Flexible(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey.shade400),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20))),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 10),
+                              child: Row(
+                                children: [
+                                  FaIcon(FontAwesomeIcons.boxOpen,
+                                      color: Colors.black, size: 14),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    'Categorie',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            )),
+                        Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey.shade400),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20))),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 10),
+                              child: Row(
+                                children: [
+                                  FaIcon(FontAwesomeIcons.locationDot,
+                                      color: Colors.black, size: 14),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    'Essen/Deuthland',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            )),
+                        Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey.shade400),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20))),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 10),
+                              child: Text(
+                                'Rayon 1km',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            )),
+                        Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey.shade400),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20))),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 10),
+                              child: Text(
+                                '10.000 MGA a 50.000 MGA',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            )),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        FirestorePagination(
+            shrinkWrap: true,
             limit: 15, // Defaults to 10.
             isLive: false, // Defaults to false.s
             viewType: ViewType.list,
@@ -90,7 +186,9 @@ class MarketplacePage extends StatelessWidget {
                   prix: data['prix'],
                 ),
               );
-            }));
+            }),
+      ],
+    ));
   }
 }
 

@@ -20,7 +20,7 @@ class AllUserList extends ConsumerWidget {
       child: Scaffold(
         // backgroundColor: Colors.white,
         appBar: AppBar(
-          title: Text('Liste des utilisateursssss'.tr,
+          title: Text('Liste des utilisateurs'.tr,
               style: TextStyle(fontWeight: FontWeight.bold)),
           elevation: 0,
           centerTitle: true,

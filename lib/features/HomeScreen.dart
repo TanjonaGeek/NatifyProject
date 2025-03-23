@@ -21,6 +21,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:natify/features/User/presentation/widget/list/filterListOfProduct.dart';
 import 'package:natify/features/User/presentation/widget/list/listVenteMarketplace.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -202,82 +203,99 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       : SizedBox();
                 },
               ),
-              IconButton(
-                iconSize: 50,
-                icon: Stack(
-                  children: [
-                    InkWell(
-                        onTap: () {
-                          SlideNavigation.slideToPage(
-                              context, AllNotification());
-                        },
-                        child: FaIcon(
-                          FontAwesomeIcons.solidBell,
-                          size: 24,
-                        )),
-                    Positioned(
-                        bottom: 10,
-                        left: 0,
-                        child: StreamBuilder<int>(
-                          stream: getUnreadNotificationsCount(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Container(
-                                width: 15,
-                                height: 15,
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(30)),
-                                ),
-                                child: Center(
-                                    child: FittedBox(
-                                        child: Padding(
-                                  padding: const EdgeInsets.all(2.0),
-                                  child: Text(
-                                    '0',
-                                    style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                ))),
-                              ); // Affiche un indicateur de chargement
-                            } else if (snapshot.hasError) {
-                              return Text(
-                                  ''); // Affiche une erreur si elle se produit
-                            } else {
-                              int unreadCount = snapshot.data ??
-                                  0; // Définit à 0 si aucune donnée n'est reçue
-                              return Container(
-                                width: 15,
-                                height: 15,
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(30)),
-                                ),
-                                child: Center(
-                                    child: FittedBox(
-                                        child: Padding(
-                                  padding: const EdgeInsets.all(2.0),
-                                  child: Text(
-                                    '$unreadCount',
-                                    style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                ))),
-                              );
-                            }
+              ValueListenableBuilder<int>(
+                valueListenable: _selectedIndexNotifier,
+                builder: (context, selectedIndex, _) {
+                  return selectedIndex == 3
+                      ? IconButton(
+                          onPressed: () {
+                            SlideNavigation.slideToPage(
+                                context, FilterProductPage());
                           },
-                        ))
-                  ],
-                ),
-                onPressed: () {
-                  Navigator.of(context, rootNavigator: true).push(
-                    MaterialPageRoute(builder: (context) => AllNotification()),
-                  );
+                          icon: FaIcon(
+                            FontAwesomeIcons.sliders,
+                            size: 22,
+                          ),
+                        )
+                      : IconButton(
+                          iconSize: 50,
+                          icon: Stack(
+                            children: [
+                              InkWell(
+                                  onTap: () {
+                                    SlideNavigation.slideToPage(
+                                        context, AllNotification());
+                                  },
+                                  child: FaIcon(
+                                    FontAwesomeIcons.solidBell,
+                                    size: 24,
+                                  )),
+                              Positioned(
+                                  bottom: 10,
+                                  left: 0,
+                                  child: StreamBuilder<int>(
+                                    stream: getUnreadNotificationsCount(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return Container(
+                                          width: 15,
+                                          height: 15,
+                                          decoration: BoxDecoration(
+                                            color: Colors.red,
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(30)),
+                                          ),
+                                          child: Center(
+                                              child: FittedBox(
+                                                  child: Padding(
+                                            padding: const EdgeInsets.all(2.0),
+                                            child: Text(
+                                              '0',
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w700),
+                                            ),
+                                          ))),
+                                        ); // Affiche un indicateur de chargement
+                                      } else if (snapshot.hasError) {
+                                        return Text(
+                                            ''); // Affiche une erreur si elle se produit
+                                      } else {
+                                        int unreadCount = snapshot.data ??
+                                            0; // Définit à 0 si aucune donnée n'est reçue
+                                        return Container(
+                                          width: 15,
+                                          height: 15,
+                                          decoration: BoxDecoration(
+                                            color: Colors.red,
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(30)),
+                                          ),
+                                          child: Center(
+                                              child: FittedBox(
+                                                  child: Padding(
+                                            padding: const EdgeInsets.all(2.0),
+                                            child: Text(
+                                              '$unreadCount',
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w700),
+                                            ),
+                                          ))),
+                                        );
+                                      }
+                                    },
+                                  ))
+                            ],
+                          ),
+                          onPressed: () {
+                            Navigator.of(context, rootNavigator: true).push(
+                              MaterialPageRoute(
+                                  builder: (context) => AllNotification()),
+                            );
+                          },
+                        );
                 },
               ),
             ],

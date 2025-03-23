@@ -161,7 +161,7 @@ class _FilterPageState extends ConsumerState<FilterPage> {
                 icon: FaIcon(
                   FontAwesomeIcons.trash,
                   size: 20,
-                  color: Colors.red,
+                  color: Colors.black,
                 ),
                 onPressed: () => ResetFilter(),
               ),

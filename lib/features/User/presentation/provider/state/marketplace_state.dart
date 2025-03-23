@@ -1,19 +1,18 @@
-import 'package:natify/features/User/domaine/entities/user_entities.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:geoflutterfire2/geoflutterfire2.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-enum MapsUserConcreteState { initial, loading, loaded, failure }
+enum MarketplaceUserConcreteState { initial, loading, loaded, failure }
 
-class MapsUserState extends Equatable {
+class MarketplaceUserState extends Equatable {
   final bool hasData;
   final String message;
   final bool isLoading;
   final bool IsTypeInSearchBar;
-  final RangeValues rangeOfageDebutAndFin;
-  final String sexe;
+  final RangeValues prixProduit;
+  final String Categorie;
   final String nationalite;
   final String pays;
   final String flag;
@@ -25,23 +24,20 @@ class MapsUserState extends Equatable {
   final GeoFirePoint? mapCenter; // Centre de la carte
   final CameraPosition? cameraPosition;
   final Set<Marker> markers; // Marqueurs à afficher sur la carte
-  final Map<String, Map<String, dynamic>> nationaliteCounts;
-  final List<Map<String, dynamic>> listAllUserApproximite;
-  final int nombreUtilisateurAproximite;
   final String adressMaps;
   final double radiusCircle;
   final BitmapDescriptor? customIcon;
   final List<Map<String, String>> nationaliteGroup;
   final List<String> nationaliteGroupSansFlag;
-  final MapsUserConcreteState state;
+  final MarketplaceUserConcreteState state;
 
-  const MapsUserState(
+  const MarketplaceUserState(
       {this.hasData = false,
       this.message = '',
       this.isLoading = false,
       this.IsTypeInSearchBar = false,
-      this.rangeOfageDebutAndFin = const RangeValues(14, 90),
-      this.sexe = "",
+      this.prixProduit = const RangeValues(1, 10000),
+      this.Categorie = "",
       this.nationalite = "",
       this.pays = "",
       this.flag = "",
@@ -53,23 +49,20 @@ class MapsUserState extends Equatable {
       this.mapCenter,
       this.cameraPosition,
       this.markers = const <Marker>{},
-      this.nationaliteCounts = const {},
-      this.listAllUserApproximite = const [],
-      this.nombreUtilisateurAproximite = 0,
       this.adressMaps = "",
       this.radiusCircle = 10000.0, // Valeur par défaut
       this.customIcon,
       this.nationaliteGroup = const [],
       this.nationaliteGroupSansFlag = const [],
-      this.state = MapsUserConcreteState.initial});
+      this.state = MarketplaceUserConcreteState.initial});
 
-  const MapsUserState.initial(
+  const MarketplaceUserState.initial(
       {this.hasData = false,
       this.message = '',
       this.isLoading = false,
       this.IsTypeInSearchBar = false,
-      this.rangeOfageDebutAndFin = const RangeValues(14, 90),
-      this.sexe = "",
+      this.prixProduit = const RangeValues(1, 10000),
+      this.Categorie = "",
       this.nationalite = "",
       this.pays = "",
       this.flag = "",
@@ -81,29 +74,23 @@ class MapsUserState extends Equatable {
       this.mapCenter,
       this.cameraPosition,
       this.markers = const <Marker>{},
-      this.nationaliteCounts = const {},
-      this.listAllUserApproximite = const [],
-      this.nombreUtilisateurAproximite = 0,
       this.adressMaps = "",
       this.radiusCircle = 10000.0, // Valeur par défaut
       this.customIcon,
       this.nationaliteGroup = const [],
       this.nationaliteGroupSansFlag = const [],
-      this.state = MapsUserConcreteState.initial});
+      this.state = MarketplaceUserConcreteState.initial});
 
-  MapsUserState copyWith({
+  MarketplaceUserState copyWith({
     bool? hasData,
     String? message,
     bool? isLoading,
     bool? IsTypeInSearchBar,
-    RangeValues? rangeOfageDebutAndFin,
-    String? sexe,
+    RangeValues? prixProduit,
+    String? Categorie,
     String? nationalite,
     String? pays,
     String? flag,
-    List<UserEntity>? listAlluser,
-    List<UserEntity>? listAlluserTmp,
-    List<UserEntity>? listAlluserDisplay,
     bool? hasMore,
     String? nameSearch,
     bool? isFilter,
@@ -113,24 +100,20 @@ class MapsUserState extends Equatable {
     GeoFirePoint? mapCenter, // Centre de la carte
     CameraPosition? cameraPosition,
     Set<Marker>? markers,
-    Map<String, Map<String, dynamic>>? nationaliteCounts,
-    List<Map<String, dynamic>>? listAllUserApproximite,
-    int? nombreUtilisateurAproximite,
     String? adressMaps,
     double? radiusCircle, // En mètres
     BitmapDescriptor? customIcon,
     List<Map<String, String>>? nationaliteGroup,
     List<String>? nationaliteGroupSansFlag,
-    MapsUserConcreteState? state,
+    MarketplaceUserConcreteState? state,
   }) {
-    return MapsUserState(
+    return MarketplaceUserState(
         hasData: hasData ?? this.hasData,
         message: message ?? this.message,
         isLoading: isLoading ?? this.isLoading,
         IsTypeInSearchBar: IsTypeInSearchBar ?? this.IsTypeInSearchBar,
-        rangeOfageDebutAndFin:
-            rangeOfageDebutAndFin ?? this.rangeOfageDebutAndFin,
-        sexe: sexe ?? this.sexe,
+        prixProduit: prixProduit ?? this.prixProduit,
+        Categorie: Categorie ?? this.Categorie,
         nationalite: nationalite ?? this.nationalite,
         pays: pays ?? this.pays,
         flag: flag ?? this.flag,
@@ -142,11 +125,6 @@ class MapsUserState extends Equatable {
         mapCenter: mapCenter ?? this.mapCenter,
         cameraPosition: cameraPosition ?? this.cameraPosition,
         markers: markers ?? this.markers,
-        nationaliteCounts: nationaliteCounts ?? this.nationaliteCounts,
-        listAllUserApproximite:
-            listAllUserApproximite ?? this.listAllUserApproximite,
-        nombreUtilisateurAproximite:
-            nombreUtilisateurAproximite ?? this.nombreUtilisateurAproximite,
         adressMaps: adressMaps ?? this.adressMaps,
         radiusCircle: radiusCircle ?? this.radiusCircle,
         customIcon: customIcon ?? this.customIcon,
@@ -162,8 +140,8 @@ class MapsUserState extends Equatable {
         message,
         isLoading,
         IsTypeInSearchBar,
-        rangeOfageDebutAndFin,
-        sexe,
+        prixProduit,
+        Categorie,
         nationalite,
         pays,
         flag,
@@ -175,9 +153,6 @@ class MapsUserState extends Equatable {
         mapCenter,
         cameraPosition,
         markers,
-        nationaliteCounts,
-        nombreUtilisateurAproximite,
-        listAllUserApproximite,
         adressMaps,
         radiusCircle,
         customIcon,
