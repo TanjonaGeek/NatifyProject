@@ -4,7 +4,6 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:natify/core/utils/colors.dart';
 import 'package:natify/core/utils/helpers.dart';
-import 'package:natify/core/utils/slideNavigation.dart';
 import 'package:natify/core/utils/widget/nationaliteListPage.dart';
 import 'package:natify/core/utils/widget/paysListPage.dart';
 import 'package:natify/features/User/presentation/pages/map/filterOption.dart';
@@ -27,53 +26,21 @@ class FilterProductPage extends ConsumerStatefulWidget {
 
 class _FilterProductPageState extends ConsumerState<FilterProductPage> {
   String categorie = "";
-  String nationalite = "";
-  String pays = "";
-  String flag = "";
-  String ans = "ans".tr;
   String a = "à".tr;
   bool _useLocationFilter = false; // Booléen pour activer/désactiver le filtre
   String _currentLocation = "Localisation non disponible";
   Position? currentPosition;
+  double latitude = 0.0;
+  double longitude = 0.0;
   bool _isLoading = false; // Indicateur de chargement
   RangeValues prix = RangeValues(1, 10000);
-  List<Map<String, String>> nationaliteGroup = [];
-  List<String> nationaliteGroupSansFlag = [];
-  List<Map<String, String>> listPaysAnNationalite =
-      Helpers.ListeNationaliteHelper;
-
-  void _openNationalityPage() async {
-    List<Map<String, String>> nationaliteGroups = List.from(nationaliteGroup);
-    List<String> nationaliteGroupsSansFlags =
-        List.from(nationaliteGroupSansFlag);
-    final selectedNationality = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            NationaliteListPage(listNationalite: listPaysAnNationalite),
-      ),
-    );
-    if (selectedNationality != null) {
-      nationaliteGroups.add({
-        'nationalite': selectedNationality['nationality'] ?? '',
-        'flag': selectedNationality['flagCode'] ?? ''
-      });
-      nationaliteGroupsSansFlags.add(selectedNationality['nationality']);
-      setState(() {
-        nationaliteGroup = nationaliteGroups;
-        nationaliteGroupSansFlag = nationaliteGroupsSansFlags;
-        flag = selectedNationality['flagCode'] ?? '';
-        nationalite = selectedNationality['nationality'] ?? '';
-      });
-    }
-  }
+  double rayon = 10000.0;
 
   Future<void> _getCurrentLocation() async {
     setState(() {
       _isLoading = true; // Afficher "Chargement..."
       _currentLocation = "Chargement...";
     });
-
     try {
       Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.medium);
@@ -81,16 +48,16 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
       // Obtenir l'adresse détaillée
       List<Placemark> placemarks =
           await placemarkFromCoordinates(position.latitude, position.longitude);
-
       Placemark place = placemarks.first;
       String codePostal = place.postalCode.toString() ?? '';
       String locality = place.subLocality.toString() ?? '';
       String administrativeArea = place.administrativeArea.toString() ?? '';
       String adresse =
           "${place.postalCode} $locality $administrativeArea"; // Ex: "Antananarivo, Madagascar"
-
       setState(() {
         _currentLocation = adresse;
+        longitude = position.longitude;
+        latitude = position.latitude;
         _isLoading = false;
         currentPosition = position;
       });
@@ -102,78 +69,76 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
     }
   }
 
-  void _openPaysPage() async {
-    final selectedPays = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PaysListPage(listPays: listPaysAnNationalite),
-      ),
-    );
-    if (selectedPays != null) {
-      setState(() {
-        pays = selectedPays['country'] ?? '';
-      });
-    }
-  }
-
   void ResetFilter() {
     setState(() {
       categorie = '';
-      nationalite = '';
-      pays = '';
-      flag = '';
+      _useLocationFilter = false;
+      _currentLocation = "";
+      latitude = 0.0;
+      longitude = 0.0;
       _minLimit = 1;
       _maxLimit = 10000;
       _currentCurrency = 'USD';
+      rayon = 10000;
       prix = RangeValues(1, 10000);
-      nationaliteGroup = [];
-      nationaliteGroupSansFlag = [];
     });
     ref.read(marketPlaceUserStateNotifier.notifier).ResetFilter();
   }
 
   Future<void> loadFilterPreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    String? loadedFlag = prefs.getString('flagMarket') ?? '';
     String? loadedCurrency = prefs.getString('currencyMarket') ?? 'USD';
     String? loadedCategorie = prefs.getString('categorieMarket') ?? '';
-    String? loadedNationalite = prefs.getString('nationaliteMarket') ?? '';
-    String? loadedPays = prefs.getString('paysMarket') ?? '';
-
+    String? loadedAdresseMarket = prefs.getString('addressMarket') ?? '';
+    double? loadedLatitudeMarket = prefs.getDouble('latitudeMarket') ?? 0.0;
+    double? loadedLongitudeMarket = prefs.getDouble('longitudeMarket') ?? 0.0;
+    double? loadedRadiusMarket = prefs.getDouble('radiusMarket') ?? 10000.0;
+    bool? loadedIsFilterLocationMarket =
+        prefs.getBool('isFilterLocationMarket') ?? false;
     // Récupération et conversion des RangeValues
     String? rangeString = prefs.getString('rangeOfPrixDebutAndFinMarket');
-    RangeValues loadedRangeOfPrixDebutAndFin = rangeString != null
-        ? RangeValues(
-            double.parse(rangeString.split(',')[0]),
-            double.parse(rangeString.split(',')[1]),
-          )
-        : RangeValues(1, 10000); // Valeurs par défaut
-
-    List<String>? loadedNationaliteGroupSansFlag =
-        prefs.getStringList('nationaliteGroupSansFlagMarket') ?? [];
-
-    // Récupération et conversion de `nationaliteGroup` depuis JSON
-    String? nationaliteGroupJson = prefs.getString('nationaliteGroupMarket');
-    List<Map<String, String>> loadedNationaliteGroup =
-        nationaliteGroupJson != null
-            ? List<Map<String, String>>.from(
-                jsonDecode(nationaliteGroupJson)
-                    .map((e) => Map<String, String>.from(e)),
-              )
-            : [];
+    RangeValues loadedRangeOfPrixDebutAndFin;
+    if (rangeString != null && rangeString.contains(',')) {
+      try {
+        List<String> parts = rangeString.split(',');
+        double debut = double.tryParse(parts[0]) ?? 1;
+        double fin = double.tryParse(parts[1]) ?? 10000;
+        loadedRangeOfPrixDebutAndFin = RangeValues(debut, fin);
+      } catch (e) {
+        loadedRangeOfPrixDebutAndFin =
+            RangeValues(1, 10000); // Valeurs par défaut
+      }
+    } else {
+      loadedRangeOfPrixDebutAndFin =
+          RangeValues(1, 10000); // Valeurs par défaut
+    }
     double? ratesOld = _exchangeRates[loadedCurrency] ?? 1.0;
+
+    Position positionNews = Position(
+      latitude: loadedLatitudeMarket,
+      longitude: loadedLongitudeMarket,
+      accuracy: 0.0, // Précision, vous pouvez ajuster cette valeur
+      altitude: 0.0, // Altitude par défaut
+      heading: 0.0, // Direction par défaut
+      speed: 0.0, // Vitesse par défaut
+      speedAccuracy: 0.0, // Précision de la vitesse
+      timestamp: DateTime.now(),
+      altitudeAccuracy: 0.0, // Ajoutez l'altitudeAccuracy par défaut
+      headingAccuracy: 0.0,
+    );
     // Mise à jour de l'état avec setState
     setState(() {
       _minLimit = _minLimit * ratesOld;
       _maxLimit = _maxLimit * ratesOld;
-      flag = loadedFlag;
+      latitude = loadedLatitudeMarket;
+      longitude = loadedLongitudeMarket;
       categorie = loadedCategorie;
       _currentCurrency = loadedCurrency;
-      nationalite = loadedNationalite;
-      pays = loadedPays;
+      currentPosition = positionNews;
+      _currentLocation = loadedAdresseMarket;
+      _useLocationFilter = loadedIsFilterLocationMarket;
       prix = loadedRangeOfPrixDebutAndFin;
-      nationaliteGroupSansFlag = loadedNationaliteGroupSansFlag;
-      nationaliteGroup = loadedNationaliteGroup;
+      rayon = loadedRadiusMarket;
     });
   }
 
@@ -330,147 +295,6 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                     thickness: 0.2,
                   ),
                   Text(
-                    'Audience cible'.tr,
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                  ),
-                  Divider(
-                    color: Colors.grey.shade500,
-                    thickness: 0.2,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Nationalité'.tr,
-                        style: TextStyle(
-                            fontSize: 17, fontWeight: FontWeight.w500),
-                      ),
-                      GestureDetector(
-                        onTap: () => _openNationalityPage(),
-                        child: Container(
-                            width: 30,
-                            height: 30,
-                            decoration: BoxDecoration(
-                                color: Colors.grey.shade300,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(30))),
-                            child: Center(
-                                child: FaIcon(FontAwesomeIcons.add,
-                                    size: 15, color: Colors.black))),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Wrap(
-                    spacing: 8.0, // Espacement horizontal entre les éléments
-                    runSpacing: 8.0, // Espacement vertical entre les lignes
-                    children: nationaliteGroup.map((item) {
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            nationaliteGroup.removeWhere((element) =>
-                                element['nationalite'] == item['nationalite']);
-                            nationaliteGroupSansFlag
-                                .remove(item['nationalite']);
-                          });
-                        },
-                        child: Chip(
-                          label: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                "${item['flag']} ${item['nationalite']}",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 13),
-                              ),
-                              SizedBox(width: 4),
-                              FaIcon(FontAwesomeIcons.close,
-                                  size: 18, color: Colors.white),
-                            ],
-                          ),
-                          shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(20))),
-                          backgroundColor: kPrimaryColor,
-                          side: BorderSide(style: BorderStyle.none),
-                          labelPadding: EdgeInsets.only(
-                              top: 2, left: 6, right: 6, bottom: 2),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Pays'.tr,
-                        style: TextStyle(
-                            fontSize: 17, fontWeight: FontWeight.w500),
-                      ),
-                      GestureDetector(
-                        onTap: () => _openPaysPage(),
-                        child: Container(
-                            width: 30,
-                            height: 30,
-                            decoration: BoxDecoration(
-                                color: Colors.grey.shade300,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(30))),
-                            child: Center(
-                                child: FaIcon(FontAwesomeIcons.add,
-                                    size: 15, color: Colors.black))),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  FilterOption(
-                      checkIfAge: false,
-                      content: pays == ""
-                          ? SizedBox()
-                          : Padding(
-                              padding: const EdgeInsets.only(left: 8),
-                              child: GestureDetector(
-                                onTap: () async {
-                                  setState(() {
-                                    pays = "";
-                                  });
-                                },
-                                child: Wrap(spacing: 8.0, children: [
-                                  Chip(
-                                    label: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          pays,
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 13),
-                                        ),
-                                        SizedBox(width: 4),
-                                        FaIcon(FontAwesomeIcons.close,
-                                            size: 18, color: Colors.white)
-                                      ],
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(20))),
-                                    backgroundColor: kPrimaryColor,
-                                    side: BorderSide(style: BorderStyle.none),
-                                    labelPadding: EdgeInsets.only(
-                                        top: 2, left: 6, right: 6, bottom: 2),
-                                  )
-                                ]),
-                              ),
-                            )),
-                  Divider(
-                    color: Colors.grey.shade500,
-                    thickness: 0.2,
-                  ),
-                  Text(
                     'Monetaire'.tr,
                     style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                   ),
@@ -517,9 +341,23 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                   SizedBox(
                     height: 5,
                   ),
-                  Text(
-                    "Devis Appliquer : $_currentCurrency".tr,
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Devis Appliquer :".tr,
+                        style: TextStyle(
+                            fontSize: 17, fontWeight: FontWeight.w500),
+                      ),
+                      SizedBox(
+                        width: 7,
+                      ),
+                      Text(
+                        "$_currentCurrency",
+                        style: TextStyle(
+                            fontSize: 17, fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
                   SizedBox(
                     height: 5,
@@ -553,11 +391,16 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                           activeColor: kPrimaryColor,
                           checkColor: Colors.white,
                           value: _useLocationFilter,
-                          onChanged: (bool? value) {
+                          onChanged: (bool? value) async {
                             setState(() {
                               _useLocationFilter = value ?? false;
                               if (_useLocationFilter) {
                                 _getCurrentLocation();
+                              } else {
+                                latitude = 0.0;
+                                longitude = 0.0;
+                                _currentLocation = "";
+                                currentPosition == null;
                               }
                             });
                           },
@@ -581,25 +424,27 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                                 currentPosition != null)
                             ? GestureDetector(
                                 onTap: () async {
+                                  final prefs =
+                                      await SharedPreferences.getInstance();
                                   final selectedLieux = await Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => MapsMarketPlace(
-                                        lieuAdress: _currentLocation,
-                                        currentPosition: currentPosition!,
-                                      ),
+                                          lieuAdress: _currentLocation,
+                                          currentPosition: currentPosition!,
+                                          rayon: rayon),
                                     ),
                                   );
 
                                   if (selectedLieux != null) {
-                                    print('le lieux est $selectedLieux');
-
                                     var lat = double.parse(selectedLieux[0]
                                             ['latitude']
                                         .toString());
                                     var lon = double.parse(selectedLieux[0]
                                             ['longitude']
                                         .toString());
+                                    var rad = double.parse(
+                                        selectedLieux[0]['radius'].toString());
                                     Position positionNews = Position(
                                       latitude: lat,
                                       longitude: lon,
@@ -617,8 +462,11 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                                     );
                                     setState(() {
                                       currentPosition = positionNews;
+                                      latitude = lat;
+                                      longitude = lon;
                                       _currentLocation =
                                           selectedLieux[0]['lieu'];
+                                      rayon = rad;
                                     });
                                   }
                                 },
@@ -685,6 +533,28 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                               )
                         : SizedBox.shrink(),
                   ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  if (_currentLocation.isNotEmpty && currentPosition != null)
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Avec rayon :".tr,
+                          style: TextStyle(
+                              fontSize: 17, fontWeight: FontWeight.w500),
+                        ),
+                        SizedBox(
+                          width: 7,
+                        ),
+                        Text(
+                          "${(rayon / 1000).toInt()} Km",
+                          style: TextStyle(
+                              fontSize: 17, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
                 ],
               ),
             );
@@ -704,12 +574,12 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
             ref
                 .read(marketPlaceUserStateNotifier.notifier)
                 .SetUpdateFieldToFilter(
-                    nationaliteGroupSansFlag: nationaliteGroupSansFlag,
-                    nationaliteGroup: nationaliteGroup,
+                    radius: rayon,
+                    adresse: _currentLocation,
+                    isFilterLocation: _useLocationFilter,
+                    latitude: latitude,
+                    longitude: longitude,
                     categorie: categorie,
-                    flag: flag,
-                    nationalite: nationalite,
-                    pays: pays,
                     currency: _currentCurrency,
                     rangeOfPriceDebutAndFin: prix);
           }
@@ -720,7 +590,7 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
           backgroundColor: kPrimaryColor,
         ),
         child: Text(
-          'Trouver'.tr.toUpperCase(),
+          'Appliquer'.tr.toUpperCase(),
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),

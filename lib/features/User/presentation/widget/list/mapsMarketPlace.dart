@@ -13,8 +13,12 @@ import 'package:natify/features/User/presentation/widget/lieuvente.dart';
 class MapsMarketPlace extends ConsumerStatefulWidget {
   final Position currentPosition;
   final String lieuAdress;
+  final double rayon;
   MapsMarketPlace(
-      {super.key, required this.currentPosition, required this.lieuAdress});
+      {super.key,
+      required this.currentPosition,
+      required this.lieuAdress,
+      required this.rayon});
 
   @override
   ConsumerState<MapsMarketPlace> createState() => _MapsMarketPlaceState();
@@ -26,7 +30,7 @@ class _MapsMarketPlaceState extends ConsumerState<MapsMarketPlace>
   final Completer<GoogleMapController> _controller = Completer();
   Timer? _debounce;
   late Position currentPosition;
-  double radius = 10000; // Rayon par défaut
+  late double radius = 10000; // Rayon par défaut
   double zoom = 11.2; // Zoom par défaut
   bool _isLoading = false; // Indicateur de chargement
   Map<String, Marker> markers = {};
@@ -37,6 +41,16 @@ class _MapsMarketPlaceState extends ConsumerState<MapsMarketPlace>
     super.initState();
     currentPosition = widget.currentPosition;
     lieuAdress = widget.lieuAdress;
+    radius = widget.rayon;
+    double levelZoom = zoom;
+    if (radius > 10000) {
+      double radiusElevated = radius + radius / 2;
+      double scale = radiusElevated / 500;
+      levelZoom = 16 - log(scale) / log(2);
+    }
+    var zooms = levelZoom.toStringAsFixed(1);
+    double zoomParse = double.parse(zooms);
+    zoom = zoomParse;
     _getCurrentLocationMarket();
   }
 
@@ -80,6 +94,14 @@ class _MapsMarketPlaceState extends ConsumerState<MapsMarketPlace>
         double scale = radiusElevated / 500;
         levelZoom = 16 - log(scale) / log(2);
       }
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+
+      Placemark place = placemarks.first;
+      String codePostal = place.postalCode.toString() ?? '';
+      String locality = place.subLocality.toString() ?? '';
+      String administrativeArea = place.administrativeArea.toString() ?? '';
+      String adresse = "${place.postalCode} $locality $administrativeArea";
       var zooms = levelZoom.toStringAsFixed(1);
       double zoomParse = double.parse(zooms);
       _debounce = Timer(const Duration(milliseconds: 1000), () async {
@@ -99,11 +121,8 @@ class _MapsMarketPlaceState extends ConsumerState<MapsMarketPlace>
         markers['current_location'] = markersd;
         currentPosition = position;
         zoom = zoomParse;
+        lieuAdress = adresse;
       });
-      // setState(() {
-      //   _isLoading = false;
-      //   currentPosition = position;
-      // });
     } catch (e) {}
   }
 
@@ -213,6 +232,7 @@ class _MapsMarketPlaceState extends ConsumerState<MapsMarketPlace>
             'latitude': lat,
             'longitude': lon,
             'lieu': nameSelected.toString(),
+            'radius': radius
           }
         ];
         Navigator.pop(context, donnerGet);
@@ -328,9 +348,6 @@ class _MapsMarketPlaceState extends ConsumerState<MapsMarketPlace>
                                     selectedLieux[0]['longitude'].toString());
                                 LatLng tappedPosition = LatLng(lat, lon);
                                 _addMarkerOnTap(tappedPosition);
-                                setState(() {
-                                  lieuAdress = selectedLieux[0]['lieu'];
-                                });
                               }
                             },
                             readOnly: true,

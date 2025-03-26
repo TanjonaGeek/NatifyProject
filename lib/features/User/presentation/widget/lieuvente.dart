@@ -58,8 +58,6 @@ class _TrouverParLieuxState extends ConsumerState<TrouverParLieux> {
         return [];
       }
     } catch (e) {
-      showCustomSnackBar(
-          "Une erreur s'est produite. Veuillez vérifier votre connexion et réessayer.");
       return [];
     }
   }
