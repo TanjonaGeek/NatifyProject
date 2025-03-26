@@ -76,8 +76,10 @@ class ProductDetailScreen extends StatelessWidget {
             return Container();
           }
           GeoPoint emplacement = product['location']['geopoint'];
-          double montant =
-              double.tryParse(product['prix']) ?? 0.0; // Convertir en double
+          double montant = (product['prix'] is int)
+              ? product['prix'].toDouble()
+              : double.tryParse(product['prix'].toString()) ?? 0.0;
+
           String Prixformatted =
               NumberFormat.currency(locale: 'mg_MG').format(montant);
           // Récupérer l'adresse

@@ -1,11 +1,7 @@
-import 'dart:convert';
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:natify/core/utils/colors.dart';
-import 'package:natify/core/utils/helpers.dart';
-import 'package:natify/core/utils/widget/nationaliteListPage.dart';
-import 'package:natify/core/utils/widget/paysListPage.dart';
 import 'package:natify/features/User/presentation/pages/map/filterOption.dart';
 import 'package:natify/features/User/presentation/provider/user_provider.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +10,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:natify/features/User/presentation/widget/categorieMarket.dart';
 import 'package:natify/features/User/presentation/widget/list/mapsMarketPlace.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
 class FilterProductPage extends ConsumerStatefulWidget {
@@ -86,37 +81,12 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
   }
 
   Future<void> loadFilterPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    String? loadedCurrency = prefs.getString('currencyMarket') ?? 'USD';
-    String? loadedCategorie = prefs.getString('categorieMarket') ?? '';
-    String? loadedAdresseMarket = prefs.getString('addressMarket') ?? '';
-    double? loadedLatitudeMarket = prefs.getDouble('latitudeMarket') ?? 0.0;
-    double? loadedLongitudeMarket = prefs.getDouble('longitudeMarket') ?? 0.0;
-    double? loadedRadiusMarket = prefs.getDouble('radiusMarket') ?? 10000.0;
-    bool? loadedIsFilterLocationMarket =
-        prefs.getBool('isFilterLocationMarket') ?? false;
-    // Récupération et conversion des RangeValues
-    String? rangeString = prefs.getString('rangeOfPrixDebutAndFinMarket');
-    RangeValues loadedRangeOfPrixDebutAndFin;
-    if (rangeString != null && rangeString.contains(',')) {
-      try {
-        List<String> parts = rangeString.split(',');
-        double debut = double.tryParse(parts[0]) ?? 1;
-        double fin = double.tryParse(parts[1]) ?? 10000;
-        loadedRangeOfPrixDebutAndFin = RangeValues(debut, fin);
-      } catch (e) {
-        loadedRangeOfPrixDebutAndFin =
-            RangeValues(1, 10000); // Valeurs par défaut
-      }
-    } else {
-      loadedRangeOfPrixDebutAndFin =
-          RangeValues(1, 10000); // Valeurs par défaut
-    }
-    double? ratesOld = _exchangeRates[loadedCurrency] ?? 1.0;
+    final notifier = ref.read(marketPlaceUserStateNotifier);
+    double? ratesOld = _exchangeRates[notifier.currency] ?? 1.0;
 
     Position positionNews = Position(
-      latitude: loadedLatitudeMarket,
-      longitude: loadedLongitudeMarket,
+      latitude: notifier.latitude,
+      longitude: notifier.longitude,
       accuracy: 0.0, // Précision, vous pouvez ajuster cette valeur
       altitude: 0.0, // Altitude par défaut
       heading: 0.0, // Direction par défaut
@@ -130,15 +100,15 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
     setState(() {
       _minLimit = _minLimit * ratesOld;
       _maxLimit = _maxLimit * ratesOld;
-      latitude = loadedLatitudeMarket;
-      longitude = loadedLongitudeMarket;
-      categorie = loadedCategorie;
-      _currentCurrency = loadedCurrency;
+      latitude = notifier.latitude;
+      longitude = notifier.longitude;
+      categorie = notifier.Categorie;
+      _currentCurrency = notifier.currency;
       currentPosition = positionNews;
-      _currentLocation = loadedAdresseMarket;
-      _useLocationFilter = loadedIsFilterLocationMarket;
-      prix = loadedRangeOfPrixDebutAndFin;
-      rayon = loadedRadiusMarket;
+      _currentLocation = notifier.adressMaps;
+      _useLocationFilter = notifier.isFilterLocation;
+      prix = notifier.prixProduit;
+      rayon = notifier.radius;
     });
   }
 
@@ -424,8 +394,6 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                                 currentPosition != null)
                             ? GestureDetector(
                                 onTap: () async {
-                                  final prefs =
-                                      await SharedPreferences.getInstance();
                                   final selectedLieux = await Navigator.push(
                                     context,
                                     MaterialPageRoute(

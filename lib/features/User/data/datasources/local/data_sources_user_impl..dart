@@ -1412,19 +1412,18 @@ class DataSourceUserImpl implements DataSourceUser {
 
   @override
   Future<void> publierVente(
-    UserModel users,
-    String title,
-    String description,
-    double latitude,
-    double longitude,
-    List<File> images,
-    String codeCoutargetCountryntry,
-    String targetNationality,
-    List<String> jaime,
-    List<String> commentaire,
-    String prix,
-    String categorie,
-  ) async {
+      UserModel users,
+      String title,
+      String description,
+      double latitude,
+      double longitude,
+      List<File> images,
+      List<String> jaime,
+      List<String> commentaire,
+      int prix,
+      String categorie,
+      String currency,
+      String nameProduit) async {
     try {
       final userUid = FirebaseAuth.instance.currentUser;
       var venteUidGenerate = const Uuid().v1();
@@ -1437,7 +1436,7 @@ class DataSourceUserImpl implements DataSourceUser {
           users.uid!.isEmpty ||
           title.isEmpty ||
           description.isEmpty ||
-          prix.isEmpty) {
+          prix < 1) {
         return;
       }
 
@@ -1471,13 +1470,13 @@ class DataSourceUserImpl implements DataSourceUser {
         "organizerUid": users.uid,
         "organizerName": users.name ?? "",
         "organizerPhoto": users.profilePic ?? "",
-        "codeCoutargetCountryntry": codeCoutargetCountryntry,
-        "targetNationality": targetNationality,
         "createdAt": timeCreated,
         "jaime": jaime ?? [],
         "commentaire": commentaire ?? [],
         "prix": prix ?? "",
         "categorie": categorie ?? "",
+        "currency": currency ?? "USD",
+        "nameProduit": generateAllSubstrings(nameProduit),
       });
 
       print("✅ Événement ajouté avec succès !");

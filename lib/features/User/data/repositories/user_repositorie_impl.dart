@@ -219,33 +219,31 @@ class UserRepositoryImpl implements UserRepository {
 
   @override
   Future<void> publierVente(
-    UserModel users,
-    String title,
-    String description,
-    double latitude,
-    double longitude,
-    List<File> images,
-    String codeCoutargetCountryntry,
-    String targetNationality,
-    List<String> jaime,
-    List<String> commentaire,
-    String prix,
-    String categorie,
-  ) {
+      UserModel users,
+      String title,
+      String description,
+      double latitude,
+      double longitude,
+      List<File> images,
+      List<String> jaime,
+      List<String> commentaire,
+      int prix,
+      String categorie,
+      String currency,
+      String nameProduit) {
     return dataSourceUser.publierVente(
-      users,
-      title,
-      description,
-      latitude,
-      longitude,
-      images,
-      codeCoutargetCountryntry,
-      targetNationality,
-      jaime,
-      commentaire,
-      prix,
-      categorie,
-    );
+        users,
+        title,
+        description,
+        latitude,
+        longitude,
+        images,
+        jaime,
+        commentaire,
+        prix,
+        categorie,
+        currency,
+        nameProduit);
   }
 
   @override

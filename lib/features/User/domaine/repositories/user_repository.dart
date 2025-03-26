@@ -69,19 +69,18 @@ abstract class UserRepository {
   Future<void> SuprrimerPhotoProfile(String uidUser, String urlPhoto);
   Future<void> ModifierPhotoProfile(String uidUser, List<File> profilePic);
   Future<void> publierVente(
-    UserModel users,
-    String title,
-    String description,
-    double latitude,
-    double longitude,
-    List<File> images,
-    String codeCoutargetCountryntry,
-    String targetNationality,
-    List<String> jaime,
-    List<String> commentaire,
-    String prix,
-    String categorie,
-  );
+      UserModel users,
+      String title,
+      String description,
+      double latitude,
+      double longitude,
+      List<File> images,
+      List<String> jaime,
+      List<String> commentaire,
+      int prix,
+      String categorie,
+      String currency,
+      String nameProduit);
   Future<void> addCommentVente(
       String venteId, String userId, String text, String parentId);
 }

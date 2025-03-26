@@ -38,24 +38,6 @@ class MarketplaceUserState extends Equatable {
     this.radius = 10000.0,
   });
 
-  const MarketplaceUserState.initial({
-    this.hasData = false,
-    this.message = '',
-    this.isLoading = false,
-    this.IsTypeInSearchBar = false,
-    this.prixProduit = const RangeValues(1, 10000),
-    this.Categorie = "",
-    this.nameSearch = '',
-    this.isFilter = false,
-    this.isFilterLocation = false,
-    this.latitude = 0.0,
-    this.longitude = 0.0,
-    this.adressMaps = "",
-    this.state = MarketplaceUserConcreteState.initial,
-    this.currency = "USD",
-    this.radius = 10000.0,
-  });
-
   MarketplaceUserState copyWith({
     bool? hasData,
     String? message,
@@ -93,6 +75,50 @@ class MarketplaceUserState extends Equatable {
     );
   }
 
+  // Convertir en JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'hasData': hasData,
+      'message': message,
+      'isLoading': isLoading,
+      'IsTypeInSearchBar': IsTypeInSearchBar,
+      'prixProduit': [prixProduit.start, prixProduit.end],
+      'Categorie': Categorie,
+      'nameSearch': nameSearch,
+      'isFilter': isFilter,
+      'isFilterLocation': isFilterLocation,
+      'latitude': latitude,
+      'longitude': longitude,
+      'adressMaps': adressMaps,
+      'state': state.index,
+      'currency': currency,
+      'radius': radius,
+    };
+  }
+
+  // Reconstruire depuis JSON
+  factory MarketplaceUserState.fromJson(Map<String, dynamic> json) {
+    return MarketplaceUserState(
+      hasData: json['hasData'] ?? false,
+      message: json['message'] ?? '',
+      isLoading: json['isLoading'] ?? false,
+      IsTypeInSearchBar: json['IsTypeInSearchBar'] ?? false,
+      prixProduit: json['prixProduit'] != null
+          ? RangeValues(json['prixProduit'][0], json['prixProduit'][1])
+          : const RangeValues(1, 10000),
+      Categorie: json['Categorie'] ?? '',
+      nameSearch: json['nameSearch'] ?? '',
+      isFilter: json['isFilter'] ?? false,
+      isFilterLocation: json['isFilterLocation'] ?? false,
+      latitude: json['latitude'] ?? 0.0,
+      longitude: json['longitude'] ?? 0.0,
+      adressMaps: json['adressMaps'] ?? '',
+      state: MarketplaceUserConcreteState.values[json['state'] ?? 0],
+      currency: json['currency'] ?? 'USD',
+      radius: json['radius'] ?? 10000.0,
+    );
+  }
+
   @override
   List<Object?> get props => [
         hasData,
@@ -109,6 +135,6 @@ class MarketplaceUserState extends Equatable {
         adressMaps,
         state,
         currency,
-        radius
+        radius,
       ];
 }

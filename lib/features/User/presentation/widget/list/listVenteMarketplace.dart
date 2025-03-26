@@ -1,60 +1,38 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_pagination/firebase_pagination.dart';
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:natify/core/utils/slideNavigation.dart';
+import 'package:natify/features/User/presentation/provider/user_provider.dart';
 import 'package:natify/features/User/presentation/widget/detailMarket.dart';
 import 'package:natify/features/User/presentation/widget/postMarketplace.dart';
+import 'package:uuid/uuid.dart';
 
-class MarketplacePage extends StatelessWidget {
-  final List<Map<String, dynamic>> posts = [
-    {
-      "sellerName": "iTsena Technology",
-      "sellerProfileImage": "https://via.placeholder.com/50",
-      "postTitle": "💻 MACBOOK PRO 13\" disponible maintenant !",
-      "imageUrls": [
-        "https://via.placeholder.com/200",
-        "https://via.placeholder.com/200",
-        "https://via.placeholder.com/200",
-        "https://via.placeholder.com/200",
-        "https://via.placeholder.com/200",
-        "https://via.placeholder.com/200",
-      ],
-      "likes": 471,
-      "comments": 2,
-      "shares": 4,
-    },
-    {
-      "sellerName": "Boutique SmartTech",
-      "sellerProfileImage": "https://via.placeholder.com/50",
-      "postTitle": "📱 iPhone 15 Pro Max - Meilleur prix garanti !",
-      "imageUrls": [
-        "https://via.placeholder.com/200",
-        "https://via.placeholder.com/200",
-      ],
-      "likes": 300,
-      "comments": 10,
-      "shares": 5,
-    },
-    {
-      "sellerName": "Store Gamer",
-      "sellerProfileImage": "https://via.placeholder.com/50",
-      "postTitle": "🎮 PS5 édition digitale - Disponible en stock !",
-      "imageUrls": [
-        "https://via.placeholder.com/200",
-        "https://via.placeholder.com/200",
-      ],
-      "likes": 150,
-      "comments": 5,
-      "shares": 2,
-    },
-  ];
-
+class MarketplacePage extends ConsumerWidget {
   MarketplacePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifier = ref.watch(marketPlaceUserStateNotifier);
+    var requeteId = const Uuid().v1();
+    Query query = FirebaseFirestore.instance.collection('marketplace');
+    // Ajouter les filtres de recherche
+    if (notifier.nameSearch.isNotEmpty) {
+      query = query.where('nameProduit',
+          arrayContains: notifier.nameSearch.toLowerCase());
+    }
+    if (notifier.currency.isNotEmpty) {
+      query = query.where('currency', isEqualTo: notifier.currency);
+    }
+    if (notifier.Categorie.isNotEmpty) {
+      query = query.where('categorie', isEqualTo: notifier.Categorie);
+    }
+    query = query
+        .orderBy('prix') // Ordre par âge
+        .startAt([notifier.prixProduit.start.toInt()]).endAt(
+            [notifier.prixProduit.end.toInt()]);
     return Scaffold(
         body: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,6 +130,7 @@ class MarketplacePage extends StatelessWidget {
           ),
         ),
         FirestorePagination(
+            key: ValueKey(requeteId),
             shrinkWrap: true,
             limit: 15, // Defaults to 10.
             isLive: false, // Defaults to false.s
@@ -159,38 +138,46 @@ class MarketplacePage extends StatelessWidget {
             bottomLoader: SizedBox(),
             initialLoader: // Section de post
                 SizedBox(),
-            query: FirebaseFirestore.instance
-                .collection('marketplace')
-                .orderBy('createdAt', descending: true),
+            query: query,
             itemBuilder: (context, documentSnapshot, index) {
               final data = documentSnapshot.data() as Map<String, dynamic>?;
               if (data == null) {
                 return Container();
               }
+              String prix = data['prix'].toString();
               return InkWell(
-                onTap: () {
-                  SlideNavigation.slideToPage(
-                    context,
-                    ProductDetailScreen(
-                      productId: data['uidVente'],
-                    ),
-                  );
-                },
-                child: MarketplacePost(
-                  sellerName: data['organizerName'],
-                  sellerProfileImage: data['organizerPhoto'],
-                  postTitle: data['title'],
-                  description: data['description'],
-                  categorie: data['categorie'],
-                  imageUrls: data['images'],
-                  prix: data['prix'],
-                ),
-              );
+                  onTap: () {
+                    SlideNavigation.slideToPage(
+                      context,
+                      ProductDetailScreen(
+                        productId: data['uidVente'],
+                      ),
+                    );
+                  },
+                  child: MarketplacePost(
+                    sellerName: data['organizerName'],
+                    sellerProfileImage: data['organizerPhoto'],
+                    postTitle: data['title'],
+                    description: data['description'],
+                    categorie: data['categorie'],
+                    imageUrls: data['images'],
+                    prix: prix,
+                  ));
             }),
       ],
     ));
   }
 }
+
+// MarketplacePost(
+//                   sellerName: data['organizerName'],
+//                   sellerProfileImage: data['organizerPhoto'],
+//                   postTitle: data['title'],
+//                   description: data['description'],
+//                   categorie: data['categorie'],
+//                   imageUrls: data['images'],
+//                   prix: data['prix'],
+//                 ),
 
 // GridView.builder(
 //                 shrinkWrap: true,

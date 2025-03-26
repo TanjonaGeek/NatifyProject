@@ -99,12 +99,12 @@ class InfoNotifierUser extends StateNotifier<InfoStateUser> {
     double latitude,
     double longitude,
     List<File> images,
-    String codeCoutargetCountryntry,
-    String targetNationality,
     List<String> jaime,
     List<String> commentaire,
-    String prix,
+    int prix,
     String categorie,
+    String currency,
+    String nameProduit,
   ) async {
     try {
       final List<ConnectivityResult> connectivityResult =
@@ -114,20 +114,8 @@ class InfoNotifierUser extends StateNotifier<InfoStateUser> {
         return;
       }
       await _publierVenteUseCase
-          .call(
-        users,
-        title,
-        description,
-        latitude,
-        longitude,
-        images,
-        codeCoutargetCountryntry,
-        targetNationality,
-        jaime,
-        commentaire,
-        prix,
-        categorie,
-      )
+          .call(users, title, description, latitude, longitude, images, jaime,
+              commentaire, prix, categorie, currency, nameProduit)
           .then((onValue) {
         showCustomSnackBar("Vente publier avec succes");
       });

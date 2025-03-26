@@ -2,22 +2,25 @@ import 'package:natify/features/User/domaine/entities/marketplace_entity.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MarketplaceModel extends MarketPlaceEntity {
-  const MarketplaceModel(
-      {super.title,
-      super.description,
-      super.location,
-      super.images,
-      super.uidVente,
-      super.organizerUid,
-      super.organizerName,
-      super.organizerPhoto,
-      super.codeCoutargetCountryntry,
-      super.targetNationality,
-      super.createdAt,
-      super.jaime,
-      super.commentaire,
-      super.prix,
-      super.categorie});
+  const MarketplaceModel({
+    super.title,
+    super.description,
+    super.location,
+    super.images,
+    super.uidVente,
+    super.organizerUid,
+    super.organizerName,
+    super.organizerPhoto,
+    super.codeCoutargetCountryntry,
+    super.targetNationality,
+    super.createdAt,
+    super.jaime,
+    super.commentaire,
+    super.prix,
+    super.categorie,
+    super.currency,
+    super.nameProduit,
+  });
 
   factory MarketplaceModel.fromJson(Map<String, dynamic> map) {
     return MarketplaceModel(
@@ -34,8 +37,10 @@ class MarketplaceModel extends MarketPlaceEntity {
       createdAt: map['createdAt'] ?? 0,
       jaime: List<Map<String, dynamic>>.from(map['jaime']),
       commentaire: List<Map<String, dynamic>>.from(map['commentaire']),
-      prix: map['prix'] ?? '',
+      prix: map['prix'] ?? 1,
       categorie: map['categorie'] ?? '',
+      currency: map['currency'] ?? 'USD',
+      nameProduit: List<String>.from(map['nameProduit']) ?? [],
     );
   }
 
@@ -56,6 +61,8 @@ class MarketplaceModel extends MarketPlaceEntity {
       'commentaire': commentaire,
       'prix': prix,
       'categorie': categorie,
+      'currency': currency,
+      'nameProduit': nameProduit,
     };
   }
 
@@ -77,6 +84,8 @@ class MarketplaceModel extends MarketPlaceEntity {
       commentaire: data['commentaire'],
       prix: data['prix'],
       categorie: data['categorie'],
+      currency: data['currency'],
+      nameProduit: data['nameProduit'],
     );
   }
 
@@ -97,6 +106,8 @@ class MarketplaceModel extends MarketPlaceEntity {
       commentaire: entity.commentaire,
       prix: entity.prix,
       categorie: entity.categorie,
+      currency: entity.currency,
+      nameProduit: entity.nameProduit,
     );
   }
 
@@ -116,6 +127,8 @@ class MarketplaceModel extends MarketPlaceEntity {
         jaime: jaime,
         commentaire: commentaire,
         prix: prix,
-        categorie: categorie);
+        categorie: categorie,
+        currency: currency,
+        nameProduit: nameProduit);
   }
 }

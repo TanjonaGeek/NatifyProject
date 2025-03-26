@@ -26,14 +26,11 @@ class CreateAnnonceMarket extends ConsumerStatefulWidget {
 class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
   final _formKey = GlobalKey<FormState>();
   List<File> selectedFiles = []; // Liste pour stocker les fichiers sélectionnés
-  String cibleNationalite = "Choisissez nationalite";
-  final List<Map<String, String>> listNationalitesAndPays =
-      Helpers.ListeNationaliteHelper;
-  String ciblePays = "Choisissez pays";
   String lieu = "Ajouter lieux";
   String flag = "";
   double latitude = 0.0;
   double longitude = 0.0;
+  String _currentCurrency = "USD";
   final TextEditingController categorieProduit =
       TextEditingController(text: "Selectionnez Categorie");
   final TextEditingController titreProduit = TextEditingController();
@@ -48,6 +45,54 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
     if (selectedCategory != null) {
       categorieProduit.text = selectedCategory;
     }
+  }
+
+  // Fonction pour changer la devise et ajuster les prix
+  void _changeCurrency(String newCurrency) {
+    setState(() {
+      _currentCurrency = newCurrency;
+    });
+    Navigator.pop(context); // Fermer l'AlertDialog
+  }
+
+  // 💰 Fonction pour afficher l'AlertDialog de sélection de devise
+  void _showCurrencyDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Devises",
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _currencyTile(context, ref, "EUR", "Euro", Icons.euro),
+              _currencyTile(
+                  context, ref, "USD", "Dollar US", Icons.attach_money),
+              _currencyTile(context, ref, "MGA", "Ariary", Icons.money),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // 🏦 Widget pour afficher chaque devise dans l'AlertDialog
+  Widget _currencyTile(BuildContext context, WidgetRef ref, String code,
+      String name, IconData icon) {
+    return ListTile(
+      leading: Icon(icon, color: kPrimaryColor),
+      title: Text(name,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+      trailing: Text(code,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+      onTap: () {
+        _changeCurrency(code);
+      },
+    );
   }
 
   void _showLieuxDialog(BuildContext context) async {
@@ -68,45 +113,9 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
     }
   }
 
-  void _showNationaliteDialog(BuildContext context) async {
-    final selectedNationalite = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            NationaliteListPage(listNationalite: listNationalitesAndPays),
-      ),
-    );
-
-    if (selectedNationalite != null) {
-      setState(() {
-        cibleNationalite = selectedNationalite['nationality'] ?? '';
-        flag = selectedNationalite['flagCode'] ?? '';
-      });
-    }
-  }
-
-  void _showPaysDialog(BuildContext context) async {
-    final selectedPays = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            NationaliteListPage(listNationalite: listNationalitesAndPays),
-      ),
-    );
-
-    if (selectedPays != null) {
-      setState(() {
-        ciblePays = selectedPays['country'] ?? '';
-      });
-    }
-  }
-
   Future<void> publierVente() async {
     final notifier = ref.read(infoUserStateNotifier);
     if (categorieProduit.text.isNotEmpty && selectedFiles.isNotEmpty) {
-      String cibleN =
-          cibleNationalite == "Choisissez nationalite" ? "" : cibleNationalite;
-      String cibleP = ciblePays == "Choisissez pays" ? "" : ciblePays;
       if (mounted) {
         ref.read(infoUserStateNotifier.notifier).publierVente(
             notifier.MydataPersiste!,
@@ -115,12 +124,12 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
             latitude,
             longitude,
             selectedFiles,
-            cibleP,
-            cibleN,
             [],
             [],
-            prixProduit.text,
-            categorieProduit.text);
+            int.parse(prixProduit.text),
+            categorieProduit.text,
+            _currentCurrency,
+            titreProduit.text);
       }
       Navigator.pop(context);
     } else {
@@ -262,11 +271,25 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
                       prixProduit.text = value.toString();
                     },
                     decoration: InputDecoration(
+                      suffix: Text(
+                        _currentCurrency,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       labelText: "Prix".tr,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                       contentPadding: EdgeInsets.all(15),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => _showCurrencyDialog(context, ref),
+                    child: Text(
+                      'Changer Devis'.tr,
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: kPrimaryColor),
                     ),
                   ),
                   SizedBox(height: 10),
@@ -276,29 +299,6 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
                   GestureDetector(
                       onTap: () => _showLieuxDialog(context),
                       child: buildOption(Icon(Icons.location_on), lieu)),
-                  SizedBox(height: 10),
-                  Text('Audience cible',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  SizedBox(height: 10),
-                  Row(
-                    children: [
-                      GestureDetector(
-                          onTap: () => _showNationaliteDialog(context),
-                          child: buildOption(
-                              flag.isEmpty ? Icon(Icons.add) : Text(flag),
-                              cibleNationalite)),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      GestureDetector(
-                          onTap: () => _showPaysDialog(context),
-                          child: buildOption(
-                              ciblePays == "Choisissez pays"
-                                  ? Icon(Icons.add)
-                                  : SizedBox.shrink(),
-                              ciblePays)),
-                    ],
-                  ),
                   SizedBox(height: 10),
                   Text('Media', style: TextStyle(fontWeight: FontWeight.bold)),
                   SizedBox(height: 10),
@@ -366,24 +366,6 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
                       );
                     },
                   ),
-                  // Spacer(),
-                  // SizedBox(
-                  //   width: double.infinity,
-                  //   child: ElevatedButton(
-                  //     onPressed: () {},
-                  //     child: Text(
-                  //       "PUBLIER",
-                  //       style: TextStyle(fontWeight: FontWeight.bold),
-                  //     ),
-                  //     style: ElevatedButton.styleFrom(
-                  //       backgroundColor: Colors.blue,
-                  //       foregroundColor: Colors.white,
-                  //       shape: RoundedRectangleBorder(
-                  //         borderRadius: BorderRadius.circular(5),
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
                 ],
               ),
             ),
