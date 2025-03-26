@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:natify/core/utils/colors.dart';
 import 'package:natify/core/utils/helpers.dart';
+import 'package:natify/core/utils/slideNavigation.dart';
 import 'package:natify/core/utils/widget/nationaliteListPage.dart';
 import 'package:natify/core/utils/widget/paysListPage.dart';
 import 'package:natify/features/User/presentation/pages/map/filterOption.dart';
@@ -10,6 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:natify/features/User/presentation/widget/categorieMarket.dart';
+import 'package:natify/features/User/presentation/widget/list/mapsMarketPlace.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
@@ -27,6 +32,10 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
   String flag = "";
   String ans = "ans".tr;
   String a = "à".tr;
+  bool _useLocationFilter = false; // Booléen pour activer/désactiver le filtre
+  String _currentLocation = "Localisation non disponible";
+  Position? currentPosition;
+  bool _isLoading = false; // Indicateur de chargement
   RangeValues prix = RangeValues(1, 10000);
   List<Map<String, String>> nationaliteGroup = [];
   List<String> nationaliteGroupSansFlag = [];
@@ -59,6 +68,40 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
     }
   }
 
+  Future<void> _getCurrentLocation() async {
+    setState(() {
+      _isLoading = true; // Afficher "Chargement..."
+      _currentLocation = "Chargement...";
+    });
+
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.medium);
+
+      // Obtenir l'adresse détaillée
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+
+      Placemark place = placemarks.first;
+      String codePostal = place.postalCode.toString() ?? '';
+      String locality = place.subLocality.toString() ?? '';
+      String administrativeArea = place.administrativeArea.toString() ?? '';
+      String adresse =
+          "${place.postalCode} $locality $administrativeArea"; // Ex: "Antananarivo, Madagascar"
+
+      setState(() {
+        _currentLocation = adresse;
+        _isLoading = false;
+        currentPosition = position;
+      });
+    } catch (e) {
+      setState(() {
+        _currentLocation = "Impossible d'obtenir la localisation";
+        _isLoading = false;
+      });
+    }
+  }
+
   void _openPaysPage() async {
     final selectedPays = await Navigator.push(
       context,
@@ -79,20 +122,23 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
       nationalite = '';
       pays = '';
       flag = '';
+      _minLimit = 1;
+      _maxLimit = 10000;
+      _currentCurrency = 'USD';
       prix = RangeValues(1, 10000);
       nationaliteGroup = [];
       nationaliteGroupSansFlag = [];
     });
-    ref.read(mapsUserStateNotifier.notifier).ResetFilter();
+    ref.read(marketPlaceUserStateNotifier.notifier).ResetFilter();
   }
 
   Future<void> loadFilterPreferences() async {
     final prefs = await SharedPreferences.getInstance();
-
-    String? loadedFlag = prefs.getString('flagMarket');
-    String? loadedCategorie = prefs.getString('categorieMarket');
-    String? loadedNationalite = prefs.getString('nationaliteMarket');
-    String? loadedPays = prefs.getString('paysMarket');
+    String? loadedFlag = prefs.getString('flagMarket') ?? '';
+    String? loadedCurrency = prefs.getString('currencyMarket') ?? 'USD';
+    String? loadedCategorie = prefs.getString('categorieMarket') ?? '';
+    String? loadedNationalite = prefs.getString('nationaliteMarket') ?? '';
+    String? loadedPays = prefs.getString('paysMarket') ?? '';
 
     // Récupération et conversion des RangeValues
     String? rangeString = prefs.getString('rangeOfPrixDebutAndFinMarket');
@@ -104,7 +150,7 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
         : RangeValues(1, 10000); // Valeurs par défaut
 
     List<String>? loadedNationaliteGroupSansFlag =
-        prefs.getStringList('nationaliteGroupSansFlagMarket');
+        prefs.getStringList('nationaliteGroupSansFlagMarket') ?? [];
 
     // Récupération et conversion de `nationaliteGroup` depuis JSON
     String? nationaliteGroupJson = prefs.getString('nationaliteGroupMarket');
@@ -115,15 +161,18 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                     .map((e) => Map<String, String>.from(e)),
               )
             : [];
-
+    double? ratesOld = _exchangeRates[loadedCurrency] ?? 1.0;
     // Mise à jour de l'état avec setState
     setState(() {
-      flag = loadedFlag ?? '';
-      categorie = loadedCategorie ?? '';
-      nationalite = loadedNationalite ?? '';
-      pays = loadedPays ?? '';
+      _minLimit = _minLimit * ratesOld;
+      _maxLimit = _maxLimit * ratesOld;
+      flag = loadedFlag;
+      categorie = loadedCategorie;
+      _currentCurrency = loadedCurrency;
+      nationalite = loadedNationalite;
+      pays = loadedPays;
       prix = loadedRangeOfPrixDebutAndFin;
-      nationaliteGroupSansFlag = loadedNationaliteGroupSansFlag ?? [];
+      nationaliteGroupSansFlag = loadedNationaliteGroupSansFlag;
       nationaliteGroup = loadedNationaliteGroup;
     });
   }
@@ -135,7 +184,7 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
     loadFilterPreferences();
   }
 
-  String _currentCurrency = 'USD';
+  String _currentCurrency = "";
 
   // Taux de conversion
   final Map<String, double> _exchangeRates = {
@@ -149,8 +198,6 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
     'USD': 'en_US',
     'MGA': 'mg_MG',
   };
-
-  double rate = 1.1;
   // Limites dynamiques du slider
   double _minLimit = 1;
   double _maxLimit = 10000;
@@ -168,6 +215,19 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
           prix.start * ratesNew / ratesOld, prix.end * ratesNew / ratesOld);
     });
     Navigator.pop(context); // Fermer l'AlertDialog
+  }
+
+  void _showCategoriesDialog(BuildContext context) async {
+    final selectedCategory = await showDialog<String>(
+      context: context,
+      builder: (context) => CategoriesDialog(),
+    );
+
+    if (selectedCategory != null) {
+      setState(() {
+        categorie = selectedCategory;
+      });
+    }
   }
 
   @override
@@ -244,18 +304,24 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                   SizedBox(
                     height: 5,
                   ),
-                  Container(
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade400),
-                          borderRadius: BorderRadius.all(Radius.circular(20))),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 10),
-                        child: Text(
-                          '10.000 MGA a 50.000 MGA',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      )),
+                  InkWell(
+                    onTap: () => _showCategoriesDialog(context),
+                    child: Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade400),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(20))),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 10),
+                          child: Text(
+                            categorie.isEmpty
+                                ? "Choisissez categories produits"
+                                : categorie,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        )),
+                  ),
                   SizedBox(
                     height: 5,
                   ),
@@ -436,6 +502,7 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           RangeSlider(
+                              divisions: 5,
                               min: _minLimit,
                               max: _maxLimit,
                               activeColor: kPrimaryColor,
@@ -466,7 +533,158 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                           fontWeight: FontWeight.bold,
                           color: kPrimaryColor),
                     ),
-                  )
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  // ✅ Case à cocher pour activer le filtre par position
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _useLocationFilter = !_useLocationFilter;
+                        if (_useLocationFilter) {
+                          _getCurrentLocation(); // Récupérer la position
+                        }
+                      });
+                    },
+                    child: Row(
+                      children: [
+                        Checkbox(
+                          activeColor: kPrimaryColor,
+                          checkColor: Colors.white,
+                          value: _useLocationFilter,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              _useLocationFilter = value ?? false;
+                              if (_useLocationFilter) {
+                                _getCurrentLocation();
+                              }
+                            });
+                          },
+                        ),
+                        Text(
+                          "Filtrer par localisation",
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: 10),
+
+                  // ✅ Affichage conditionnel de la localisation actuelle
+                  AnimatedSwitcher(
+                    duration: Duration(milliseconds: 300),
+                    child: _useLocationFilter
+                        ? (_currentLocation.isNotEmpty &&
+                                currentPosition != null)
+                            ? GestureDetector(
+                                onTap: () async {
+                                  final selectedLieux = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => MapsMarketPlace(
+                                        lieuAdress: _currentLocation,
+                                        currentPosition: currentPosition!,
+                                      ),
+                                    ),
+                                  );
+
+                                  if (selectedLieux != null) {
+                                    print('le lieux est $selectedLieux');
+
+                                    var lat = double.parse(selectedLieux[0]
+                                            ['latitude']
+                                        .toString());
+                                    var lon = double.parse(selectedLieux[0]
+                                            ['longitude']
+                                        .toString());
+                                    Position positionNews = Position(
+                                      latitude: lat,
+                                      longitude: lon,
+                                      accuracy:
+                                          0.0, // Précision, vous pouvez ajuster cette valeur
+                                      altitude: 0.0, // Altitude par défaut
+                                      heading: 0.0, // Direction par défaut
+                                      speed: 0.0, // Vitesse par défaut
+                                      speedAccuracy:
+                                          0.0, // Précision de la vitesse
+                                      timestamp: DateTime.now(),
+                                      altitudeAccuracy:
+                                          0.0, // Ajoutez l'altitudeAccuracy par défaut
+                                      headingAccuracy: 0.0,
+                                    );
+                                    setState(() {
+                                      currentPosition = positionNews;
+                                      _currentLocation =
+                                          selectedLieux[0]['lieu'];
+                                    });
+                                  }
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.shade50,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: kPrimaryColor),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.location_on,
+                                          color: kPrimaryColor, size: 28),
+                                      SizedBox(width: 10),
+                                      Expanded(
+                                        child: Text(
+                                          _currentLocation,
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ),
+                                      if (!_isLoading)
+                                        IconButton(
+                                          icon: Icon(Icons.refresh,
+                                              color: kPrimaryColor),
+                                          onPressed: _getCurrentLocation,
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : Container(
+                                padding: EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.shade50,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: kPrimaryColor),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.location_on,
+                                        color: kPrimaryColor, size: 28),
+                                    SizedBox(width: 10),
+                                    Expanded(
+                                      child: Text(
+                                        _isLoading
+                                            ? "Chargement..."
+                                            : _currentLocation,
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    ),
+                                    if (!_isLoading)
+                                      IconButton(
+                                        icon: Icon(Icons.refresh,
+                                            color: kPrimaryColor),
+                                        onPressed: _getCurrentLocation,
+                                      ),
+                                  ],
+                                ),
+                              )
+                        : SizedBox.shrink(),
+                  ),
                 ],
               ),
             );
@@ -483,14 +701,17 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
       child: ElevatedButton(
         onPressed: () async {
           if (mounted) {
-            ref.read(mapsUserStateNotifier.notifier).SetUpdateFieldToFilter(
-                nationaliteGroupSansFlag: nationaliteGroupSansFlag,
-                nationaliteGroup: nationaliteGroup,
-                sexe: categorie,
-                flag: flag,
-                nationalite: nationalite,
-                pays: pays,
-                rangeOfageDebutAndFin: prix);
+            ref
+                .read(marketPlaceUserStateNotifier.notifier)
+                .SetUpdateFieldToFilter(
+                    nationaliteGroupSansFlag: nationaliteGroupSansFlag,
+                    nationaliteGroup: nationaliteGroup,
+                    categorie: categorie,
+                    flag: flag,
+                    nationalite: nationalite,
+                    pays: pays,
+                    currency: _currentCurrency,
+                    rangeOfPriceDebutAndFin: prix);
           }
           Navigator.of(context).pop();
         },

@@ -645,21 +645,24 @@ class MarketplaceUserNotifier extends StateNotifier<MarketplaceUserState> {
     }
   }
 
-  SetUpdateFieldToFilter(
-      {required List<String> nationaliteGroupSansFlag,
-      required List<Map<String, String>> nationaliteGroup,
-      required String sexe,
-      required String flag,
-      required String nationalite,
-      required String pays,
-      required RangeValues rangeOfageDebutAndFin}) async {
+  SetUpdateFieldToFilter({
+    required List<String> nationaliteGroupSansFlag,
+    required List<Map<String, String>> nationaliteGroup,
+    required String categorie,
+    required String flag,
+    required String nationalite,
+    required String pays,
+    required RangeValues rangeOfPriceDebutAndFin,
+    required String currency,
+  }) async {
     state = state.copyWith(
         flag: flag,
-        Categorie: sexe == "tout" ? '' : sexe,
+        Categorie: categorie,
         nationalite: nationalite,
+        currency: currency,
         pays: pays,
         isFilter: true,
-        prixProduit: rangeOfageDebutAndFin,
+        prixProduit: rangeOfPriceDebutAndFin,
         nationaliteGroup: nationaliteGroup,
         nationaliteGroupSansFlag: nationaliteGroupSansFlag);
 
@@ -667,34 +670,36 @@ class MarketplaceUserNotifier extends StateNotifier<MarketplaceUserState> {
     final prefs = await SharedPreferences.getInstance();
 
     // Sauvegarde des valeurs simples
-    await prefs.setString('flag', flag);
-    await prefs.setString('sexe', sexe == "tout" ? '' : sexe);
-    await prefs.setString('nationalite', nationalite);
-    await prefs.setString('pays', pays);
+    await prefs.setString('flagMarket', flag);
+    await prefs.setString('categorieMarket', categorie);
+    await prefs.setString('currencyMarket', currency);
+    await prefs.setString('nationaliteMarket', nationalite);
+    await prefs.setString('paysMarket', pays);
     await prefs.setBool('isFilter', true);
 
     // Sauvegarde des RangeValues comme une chaîne
-    await prefs.setString('rangeOfageDebutAndFin',
-        '${rangeOfageDebutAndFin.start.toString()},${rangeOfageDebutAndFin.end.toString()}');
+    await prefs.setString('rangeOfPrixDebutAndFinMarket',
+        '${rangeOfPriceDebutAndFin.start.toString()},${rangeOfPriceDebutAndFin.end.toString()}');
 
     // Sauvegarde des listes
     await prefs.setStringList(
-        'nationaliteGroupSansFlag', nationaliteGroupSansFlag);
+        'nationaliteGroupSansFlagMarket', nationaliteGroupSansFlag);
 
     // Convertir `nationaliteGroup` en une chaîne JSON
     String nationaliteGroupJson = jsonEncode(nationaliteGroup);
-    await prefs.setString('nationaliteGroup', nationaliteGroupJson);
+    await prefs.setString('nationaliteGroupMarket', nationaliteGroupJson);
 
-    await searchNearbyUsers();
+    // await searchNearbyUsers();
   }
 
   Future<void> ResetFilter() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     state = state.copyWith(
-        prixProduit: RangeValues(14, 90),
+        prixProduit: RangeValues(1, 10000),
         Categorie: '',
         pays: '',
         flag: '',
+        currency: 'USD',
         nationalite: '',
         nameSearch: '',
         nationaliteGroup: [],
@@ -702,16 +707,18 @@ class MarketplaceUserNotifier extends StateNotifier<MarketplaceUserState> {
         isFilter: false);
 
     // Sauvegarder les valeurs réinitialisées dans SharedPreferences
-    await prefs.setString('rangeOfageDebutAndFin', '');
-    await prefs.setString('sexe', '');
-    await prefs.setString('pays', '');
-    await prefs.setString('flag', '');
-    await prefs.setString('nationalite', '');
-    await prefs.setString('nameSearch', '');
-    await prefs.setString(
-        'nationaliteGroup', jsonEncode([])); // Stocker la liste de Map en JSON
-    await prefs.setStringList('nationaliteGroupSansFlag',
-        []); // Stocker directement la liste de chaînes
+    await prefs.setString('flagMarket', '');
+    await prefs.setString('categorieMarket', '');
+    await prefs.setString('currencyMarket', 'USD');
+    await prefs.setString('nationaliteMarket', '');
+    await prefs.setString('paysMarket', '');
     await prefs.setBool('isFilter', false);
+
+    await prefs.setString('rangeOfPrixDebutAndFinMarket', '');
+    await prefs.setString('nameSearchMarket', '');
+    await prefs.setString('nationaliteGroupMarket',
+        jsonEncode([])); // Stocker la liste de Map en JSON
+    await prefs.setStringList('nationaliteGroupSansFlagMarket',
+        []); // Stocker directement la liste de chaînes
   }
 }

@@ -7,6 +7,8 @@ import 'package:natify/features/User/presentation/provider/state/list_state_user
 import 'package:natify/features/User/presentation/provider/state/maps_notifier_user.dart';
 import 'package:natify/features/User/presentation/provider/state/maps_state_user.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:natify/features/User/presentation/provider/state/marketplace_notifier.dart';
+import 'package:natify/features/User/presentation/provider/state/marketplace_state.dart';
 
 final userAuthStateNotifier =
     AutoDisposeStateNotifierProvider<AuthNotifier, AuthState>(
@@ -20,3 +22,6 @@ final infoUserStateNotifier =
 final mapsUserStateNotifier =
     StateNotifierProvider<MapsUserhNotifier, MapsUserState>(
         (ref) => MapsUserhNotifier(ref));
+final marketPlaceUserStateNotifier =
+    StateNotifierProvider<MarketplaceUserNotifier, MarketplaceUserState>(
+        (ref) => MarketplaceUserNotifier(ref));

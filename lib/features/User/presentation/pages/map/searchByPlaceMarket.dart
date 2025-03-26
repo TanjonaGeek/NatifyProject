@@ -12,14 +12,15 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
-class TrouverParLieux extends ConsumerStatefulWidget {
-  const TrouverParLieux({super.key});
+class TrouverParPlaceMarket extends ConsumerStatefulWidget {
+  TrouverParPlaceMarket({super.key});
 
   @override
-  ConsumerState<TrouverParLieux> createState() => _TrouverParLieuxState();
+  ConsumerState<TrouverParPlaceMarket> createState() =>
+      _TrouverParPlaceMarketState();
 }
 
-class _TrouverParLieuxState extends ConsumerState<TrouverParLieux> {
+class _TrouverParPlaceMarketState extends ConsumerState<TrouverParPlaceMarket> {
   final TextEditingController fieldRechercheController =
       TextEditingController();
   FocusNode searchFocusNode = FocusNode();
@@ -29,9 +30,6 @@ class _TrouverParLieuxState extends ConsumerState<TrouverParLieux> {
   static const Map<String, String> headers = {
     'User-Agent': 'Natify/1.2 (natifyteam@gmail.com)' // Remplace avec tes infos
   };
-
-  // ValueNotifier pour gérer l'état des lieux
-  ValueNotifier<List<dynamic>> placesNotifier = ValueNotifier([]);
 
   // Future pour récupérer les lieux
   Future<List<dynamic>> fetchPlaceSuggestions(String placeInput) async {
@@ -55,6 +53,8 @@ class _TrouverParLieuxState extends ConsumerState<TrouverParLieux> {
             jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
         return decodedResponse;
       } else {
+        // showCustomSnackBar(
+        //     "Une erreur s'est produite. Veuillez vérifier votre connexion et réessayer.");
         return [];
       }
     } catch (e) {
@@ -64,18 +64,35 @@ class _TrouverParLieuxState extends ConsumerState<TrouverParLieux> {
     }
   }
 
+  void hideKeyboard(BuildContext context) {
+    FocusScope.of(context).unfocus();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+  }
+
+  // Callback de sélection de lieu
+  void trouverPlace(BuildContext context, double lat, double lon) {
+    hideKeyboard(context);
+    Navigator.pop(context);
+  }
+
   // Gestion du changement de texte avec debounce
   void _onChange() {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () async {
-      final places = await fetchPlaceSuggestions(fieldRechercheController.text);
-      placesNotifier.value = places; // Met à jour la valeur du notifier
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      setState(() {
+        // No need for isLoading anymore
+      });
     });
   }
 
   @override
   void initState() {
     super.initState();
+    searchFocusNode.addListener(() {
+      if (searchFocusNode.hasFocus) {
+        SystemChannels.textInput.invokeMethod('TextInput.hide');
+      }
+    });
     fieldRechercheController.addListener(_onChange);
   }
 
@@ -83,7 +100,6 @@ class _TrouverParLieuxState extends ConsumerState<TrouverParLieux> {
   void dispose() {
     fieldRechercheController.dispose();
     client.close();
-    placesNotifier.dispose(); // Libère la mémoire du ValueNotifier
     super.dispose();
   }
 
@@ -98,15 +114,16 @@ class _TrouverParLieuxState extends ConsumerState<TrouverParLieux> {
           centerTitle: true,
           leading: IconButton(
             icon: Container(
-                width: 30,
-                height: 30,
-                decoration:
-                    BoxDecoration(borderRadius: BorderRadius.circular(30)),
-                child: Center(
-                    child: FaIcon(
-                  FontAwesomeIcons.chevronLeft,
-                  size: 20,
-                ))),
+              width: 30,
+              height: 30,
+              decoration:
+                  BoxDecoration(borderRadius: BorderRadius.circular(30)),
+              child: Center(
+                  child: FaIcon(
+                FontAwesomeIcons.chevronLeft,
+                size: 20,
+              )),
+            ),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -153,9 +170,22 @@ class _TrouverParLieuxState extends ConsumerState<TrouverParLieux> {
               ),
             ),
             Expanded(
-              child: ValueListenableBuilder<List<dynamic>>(
-                valueListenable: placesNotifier, // Surveille le ValueNotifier
-                builder: (context, listLocation, child) {
+              child: FutureBuilder<List<dynamic>>(
+                future: fetchPlaceSuggestions(fieldRechercheController.text),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Loading();
+                  }
+
+                  if (snapshot.hasError) {
+                    return Center(
+                        child: Text(
+                            "Une erreur s'est produite. Veuillez vérifier votre connexion et réessayer."
+                                .tr));
+                  }
+
+                  final listLocation = snapshot.data ?? [];
+
                   if (listLocation.isEmpty) {
                     return SingleChildScrollView(
                       child: Column(
@@ -191,17 +221,7 @@ class _TrouverParLieuxState extends ConsumerState<TrouverParLieux> {
                         onTap: () {
                           var lat = double.parse(listLocation[index]['lat']);
                           var lon = double.parse(listLocation[index]['lon']);
-                          var nameSelected =
-                              listLocation[index]['display_name'];
-                          // Retourner les informations du lieu
-                          List<Map<String, dynamic>> donnerGet = [
-                            {
-                              'latitude': lat,
-                              'longitude': lon,
-                              'lieu': nameSelected.toString(),
-                            }
-                          ];
-                          Navigator.pop(context, donnerGet);
+                          trouverPlace(context, lat, lon);
                         },
                         leading: Container(
                           width: 30,

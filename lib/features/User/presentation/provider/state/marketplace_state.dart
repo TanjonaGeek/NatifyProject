@@ -30,108 +30,115 @@ class MarketplaceUserState extends Equatable {
   final List<Map<String, String>> nationaliteGroup;
   final List<String> nationaliteGroupSansFlag;
   final MarketplaceUserConcreteState state;
+  final String currency;
 
-  const MarketplaceUserState(
-      {this.hasData = false,
-      this.message = '',
-      this.isLoading = false,
-      this.IsTypeInSearchBar = false,
-      this.prixProduit = const RangeValues(1, 10000),
-      this.Categorie = "",
-      this.nationalite = "",
-      this.pays = "",
-      this.flag = "",
-      this.nameSearch = '',
-      this.isFilter = false,
-      this.position,
-      this.zoom = 11.2,
-      this.radius = 10000.0, // Valeur par défaut
-      this.mapCenter,
-      this.cameraPosition,
-      this.markers = const <Marker>{},
-      this.adressMaps = "",
-      this.radiusCircle = 10000.0, // Valeur par défaut
-      this.customIcon,
-      this.nationaliteGroup = const [],
-      this.nationaliteGroupSansFlag = const [],
-      this.state = MarketplaceUserConcreteState.initial});
+  const MarketplaceUserState({
+    this.hasData = false,
+    this.message = '',
+    this.isLoading = false,
+    this.IsTypeInSearchBar = false,
+    this.prixProduit = const RangeValues(1, 10000),
+    this.Categorie = "",
+    this.nationalite = "",
+    this.pays = "",
+    this.flag = "",
+    this.nameSearch = '',
+    this.isFilter = false,
+    this.position,
+    this.zoom = 11.2,
+    this.radius = 10000.0, // Valeur par défaut
+    this.mapCenter,
+    this.cameraPosition,
+    this.markers = const <Marker>{},
+    this.adressMaps = "",
+    this.radiusCircle = 10000.0, // Valeur par défaut
+    this.customIcon,
+    this.nationaliteGroup = const [],
+    this.nationaliteGroupSansFlag = const [],
+    this.state = MarketplaceUserConcreteState.initial,
+    this.currency = "USD",
+  });
 
-  const MarketplaceUserState.initial(
-      {this.hasData = false,
-      this.message = '',
-      this.isLoading = false,
-      this.IsTypeInSearchBar = false,
-      this.prixProduit = const RangeValues(1, 10000),
-      this.Categorie = "",
-      this.nationalite = "",
-      this.pays = "",
-      this.flag = "",
-      this.nameSearch = '',
-      this.isFilter = false,
-      this.position,
-      this.zoom = 11.2,
-      this.radius = 10000.0, // Valeur par défaut
-      this.mapCenter,
-      this.cameraPosition,
-      this.markers = const <Marker>{},
-      this.adressMaps = "",
-      this.radiusCircle = 10000.0, // Valeur par défaut
-      this.customIcon,
-      this.nationaliteGroup = const [],
-      this.nationaliteGroupSansFlag = const [],
-      this.state = MarketplaceUserConcreteState.initial});
+  const MarketplaceUserState.initial({
+    this.hasData = false,
+    this.message = '',
+    this.isLoading = false,
+    this.IsTypeInSearchBar = false,
+    this.prixProduit = const RangeValues(1, 10000),
+    this.Categorie = "",
+    this.nationalite = "",
+    this.pays = "",
+    this.flag = "",
+    this.nameSearch = '',
+    this.isFilter = false,
+    this.position,
+    this.zoom = 11.2,
+    this.radius = 10000.0, // Valeur par défaut
+    this.mapCenter,
+    this.cameraPosition,
+    this.markers = const <Marker>{},
+    this.adressMaps = "",
+    this.radiusCircle = 10000.0, // Valeur par défaut
+    this.customIcon,
+    this.nationaliteGroup = const [],
+    this.nationaliteGroupSansFlag = const [],
+    this.state = MarketplaceUserConcreteState.initial,
+    this.currency = "USD",
+  });
 
-  MarketplaceUserState copyWith({
-    bool? hasData,
-    String? message,
-    bool? isLoading,
-    bool? IsTypeInSearchBar,
-    RangeValues? prixProduit,
-    String? Categorie,
-    String? nationalite,
-    String? pays,
-    String? flag,
-    bool? hasMore,
-    String? nameSearch,
-    bool? isFilter,
-    Position? position,
-    double? zoom,
-    double? radius, // En mètres
-    GeoFirePoint? mapCenter, // Centre de la carte
-    CameraPosition? cameraPosition,
-    Set<Marker>? markers,
-    String? adressMaps,
-    double? radiusCircle, // En mètres
-    BitmapDescriptor? customIcon,
-    List<Map<String, String>>? nationaliteGroup,
-    List<String>? nationaliteGroupSansFlag,
-    MarketplaceUserConcreteState? state,
-  }) {
+  MarketplaceUserState copyWith(
+      {bool? hasData,
+      String? message,
+      bool? isLoading,
+      bool? IsTypeInSearchBar,
+      RangeValues? prixProduit,
+      String? Categorie,
+      String? nationalite,
+      String? pays,
+      String? flag,
+      bool? hasMore,
+      String? nameSearch,
+      bool? isFilter,
+      Position? position,
+      double? zoom,
+      double? radius, // En mètres
+      GeoFirePoint? mapCenter, // Centre de la carte
+      CameraPosition? cameraPosition,
+      Set<Marker>? markers,
+      String? adressMaps,
+      double? radiusCircle, // En mètres
+      BitmapDescriptor? customIcon,
+      List<Map<String, String>>? nationaliteGroup,
+      List<String>? nationaliteGroupSansFlag,
+      MarketplaceUserConcreteState? state,
+      String? currency}) {
     return MarketplaceUserState(
-        hasData: hasData ?? this.hasData,
-        message: message ?? this.message,
-        isLoading: isLoading ?? this.isLoading,
-        IsTypeInSearchBar: IsTypeInSearchBar ?? this.IsTypeInSearchBar,
-        prixProduit: prixProduit ?? this.prixProduit,
-        Categorie: Categorie ?? this.Categorie,
-        nationalite: nationalite ?? this.nationalite,
-        pays: pays ?? this.pays,
-        flag: flag ?? this.flag,
-        isFilter: isFilter ?? this.isFilter,
-        nameSearch: nameSearch ?? this.nameSearch,
-        position: position ?? this.position,
-        zoom: zoom ?? this.zoom,
-        radius: radius ?? this.radius,
-        mapCenter: mapCenter ?? this.mapCenter,
-        cameraPosition: cameraPosition ?? this.cameraPosition,
-        markers: markers ?? this.markers,
-        adressMaps: adressMaps ?? this.adressMaps,
-        radiusCircle: radiusCircle ?? this.radiusCircle,
-        customIcon: customIcon ?? this.customIcon,
-        nationaliteGroup: nationaliteGroup ?? this.nationaliteGroup,
-        nationaliteGroupSansFlag:
-            nationaliteGroupSansFlag ?? this.nationaliteGroupSansFlag,
-        state: state ?? this.state);
+      hasData: hasData ?? this.hasData,
+      message: message ?? this.message,
+      isLoading: isLoading ?? this.isLoading,
+      IsTypeInSearchBar: IsTypeInSearchBar ?? this.IsTypeInSearchBar,
+      prixProduit: prixProduit ?? this.prixProduit,
+      Categorie: Categorie ?? this.Categorie,
+      nationalite: nationalite ?? this.nationalite,
+      pays: pays ?? this.pays,
+      flag: flag ?? this.flag,
+      isFilter: isFilter ?? this.isFilter,
+      nameSearch: nameSearch ?? this.nameSearch,
+      position: position ?? this.position,
+      zoom: zoom ?? this.zoom,
+      radius: radius ?? this.radius,
+      mapCenter: mapCenter ?? this.mapCenter,
+      cameraPosition: cameraPosition ?? this.cameraPosition,
+      markers: markers ?? this.markers,
+      adressMaps: adressMaps ?? this.adressMaps,
+      radiusCircle: radiusCircle ?? this.radiusCircle,
+      customIcon: customIcon ?? this.customIcon,
+      nationaliteGroup: nationaliteGroup ?? this.nationaliteGroup,
+      nationaliteGroupSansFlag:
+          nationaliteGroupSansFlag ?? this.nationaliteGroupSansFlag,
+      state: state ?? this.state,
+      currency: currency ?? this.currency,
+    );
   }
 
   @override
@@ -158,6 +165,7 @@ class MarketplaceUserState extends Equatable {
         customIcon,
         nationaliteGroup,
         nationaliteGroupSansFlag,
-        state
+        state,
+        currency
       ];
 }
