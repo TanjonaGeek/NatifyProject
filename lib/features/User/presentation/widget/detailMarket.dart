@@ -11,10 +11,17 @@ import 'package:intl/intl.dart';
 import 'package:natify/features/Chat/presentation/pages/messageDetail.dart';
 import 'package:natify/features/User/presentation/pages/userProfilePage.dart';
 
-class ProductDetailScreen extends StatelessWidget {
+class ProductDetailScreen extends StatefulWidget {
   final String productId;
 
   ProductDetailScreen({Key? key, required this.productId}) : super(key: key);
+
+  @override
+  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+}
+
+class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  final ValueNotifier<int> _currentIndex = ValueNotifier<int>(0);
 
   // Fonction pour récupérer l'adresse depuis les coordonnées
   Future<String> _getAddressFromCoordinates(
@@ -34,8 +41,13 @@ class ProductDetailScreen extends StatelessWidget {
   }
 
   @override
+  void dispose() {
+    _currentIndex.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    int maxImages = 3;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -69,7 +81,7 @@ class ProductDetailScreen extends StatelessWidget {
             SizedBox(),
         query: FirebaseFirestore.instance
             .collection('marketplace')
-            .where('uidVente', isEqualTo: productId),
+            .where('uidVente', isEqualTo: widget.productId),
         itemBuilder: (context, documentSnapshot, index) {
           final product = documentSnapshot.data() as Map<String, dynamic>?;
           if (product == null) {
@@ -91,67 +103,50 @@ class ProductDetailScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, // 2 images par ligne
-                    crossAxisSpacing: 4,
-                    mainAxisSpacing: 4,
-                  ),
-                  itemCount: product['images'].length > maxImages
-                      ? maxImages + 1
-                      : product['images'].length,
-                  itemBuilder: (context, index) {
-                    bool isLast = index == 3 && product['images'].length > 4;
-                    if (index == maxImages &&
-                        product['images'].length > maxImages) {
-                      // Si plus d'images que maxImages, afficher "+X"
-                      int remaining = product['images'].length - maxImages;
-                      return Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: CachedNetworkImage(
-                              imageUrl: product['images'][maxImages],
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) => Container(
-                                color: Colors.grey.shade200,
+                Container(
+                  height: 250,
+                  child: Stack(
+                    children: [
+                      PageView.builder(
+                        itemCount: product['images'].length,
+                        onPageChanged: (index) => _currentIndex.value = index,
+                        itemBuilder: (context, index) {
+                          return CachedNetworkImage(
+                            imageUrl: product['images'][index],
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            placeholder: (context, url) =>
+                                Center(child: CircularProgressIndicator()),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error, color: Colors.red),
+                          );
+                        },
+                      ),
+                      // === IMAGE COUNT (en bas à droite) ===
+                      Positioned(
+                        bottom: 10,
+                        right: 10,
+                        child: ValueListenableBuilder<int>(
+                          valueListenable: _currentIndex,
+                          builder: (context, value, _) {
+                            return Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.black54,
+                                borderRadius: BorderRadius.circular(15),
                               ),
-                              errorWidget: (context, url, error) => Container(
-                                color: Colors.grey.shade200,
+                              child: Text(
+                                "${value + 1} / ${product['images'].length}",
+                                style: const TextStyle(
+                                    color: Colors.white, fontSize: 14),
                               ),
-                            ),
-                          ),
-                          Container(
-                            color: Colors.black54,
-                            alignment: Alignment.center,
-                            child: Text(
-                              "+$remaining",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ],
-                      );
-                    }
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: CachedNetworkImage(
-                        imageUrl: product['images'][index],
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
-                          color: Colors.grey.shade200,
-                        ),
-                        errorWidget: (context, url, error) => Container(
-                          color: Colors.grey.shade200,
+                            );
+                          },
                         ),
                       ),
-                    );
-                  },
+                    ],
+                  ),
                 ),
                 SizedBox(height: 10),
                 // Titre & Prix
@@ -177,10 +172,13 @@ class ProductDetailScreen extends StatelessWidget {
                         ? SizedBox.shrink()
                         : Row(
                             children: [
-                              FaIcon(FontAwesomeIcons.locationDot,
-                                  color: Colors.red, size: 15),
                               SizedBox(
-                                width: 5,
+                                width: 3,
+                              ),
+                              FaIcon(FontAwesomeIcons.locationDot,
+                                  color: Colors.black, size: 15),
+                              SizedBox(
+                                width: 10,
                               ),
                               Text("${snapshot.data}",
                                   style: TextStyle(
