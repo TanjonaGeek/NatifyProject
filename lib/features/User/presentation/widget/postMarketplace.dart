@@ -11,6 +11,7 @@ class MarketplacePost extends StatelessWidget {
   final String categorie;
   final List<dynamic> imageUrls;
   final String prix;
+  final String currency;
 
   const MarketplacePost({
     super.key,
@@ -21,19 +22,16 @@ class MarketplacePost extends StatelessWidget {
     required this.categorie,
     required this.imageUrls,
     required this.prix,
+    required this.currency,
   });
 
   @override
   Widget build(BuildContext context) {
-    int maxImages = 3; // Nombre maximum d'images visibles
-    double montant = double.tryParse(prix) ?? 0.0; // Convertir en double
-    String Prixformatted =
-        NumberFormat.currency(locale: 'mg_MG').format(montant);
     return Card(
       color: Theme.of(context).brightness == Brightness.dark
           ? Colors.black
           : Colors.white,
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+      margin: const EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,7 +72,7 @@ class MarketplacePost extends StatelessWidget {
                   ),
                   SizedBox(height: 5),
                   Text(
-                    Prixformatted,
+                    "${prix} ${currency}",
                     style: TextStyle(
                         color: kPrimaryColor,
                         fontSize: 16,

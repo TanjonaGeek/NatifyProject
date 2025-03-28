@@ -166,60 +166,79 @@ class MarketplacePage extends ConsumerWidget {
           ),
         ),
         FirestorePagination(
-            key: ValueKey(requeteId),
-            shrinkWrap: true,
-            limit: 15, // Defaults to 10.
-            isLive: false, // Defaults to false.s
-            viewType: ViewType.grid,
-            physics: NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              childAspectRatio: 0.7,
-            ),
-            bottomLoader: SizedBox(),
-            initialLoader: // Section de post
-                SizedBox(),
-            query: query,
-            itemBuilder: (context, documentSnapshot, index) {
-              final data = documentSnapshot.data() as Map<String, dynamic>?;
-              if (data == null) {
-                return Container();
-              }
-              double montant = (data['prix'] is int)
-                  ? data['prix'].toDouble()
-                  : double.tryParse(data['prix'].toString()) ?? 0.0;
-              String formatDevise =
-                  _exchangeFormat[data['currency']] ?? "en_US";
-              String prix =
-                  NumberFormat.currency(locale: formatDevise, symbol: '')
-                      .format(montant);
-              return InkWell(
-                  onTap: () {
-                    SlideNavigation.slideToPage(
-                      context,
-                      ProductDetailScreen(
+          key: ValueKey(requeteId),
+          shrinkWrap: true,
+          limit: 15, // Defaults to 10.
+          isLive: false, // Defaults to false.s
+          viewType: ViewType.grid,
+          physics: NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 0.7,
+          ),
+          bottomLoader: SizedBox(),
+          initialLoader: // Section de post
+              SizedBox(),
+          query: query,
+          itemBuilder: (context, documentSnapshot, index) {
+            final data = documentSnapshot.data() as Map<String, dynamic>?;
+            if (data == null) {
+              return Container();
+            }
+            double montant = (data['prix'] is int)
+                ? data['prix'].toDouble()
+                : double.tryParse(data['prix'].toString()) ?? 0.0;
+            String formatDevise = _exchangeFormat[data['currency']] ?? "en_US";
+            String prix =
+                NumberFormat.currency(locale: formatDevise, symbol: '')
+                    .format(montant);
+            return InkWell(
+                onTap: () {
+                  SlideNavigation.slideToPage(
+                    context,
+                    ProductDetailScreen(
+                        categ: data['categorie'],
                         productId: data['uidVente'],
-                      ),
-                    );
-                  },
-                  child: ProductCard(
-                      imageUrl: data['images'][0],
-                      title: data['title'],
-                      price: prix,
-                      currency: data['currency'],
-                      emplacement: data['location']['geopoint']));
-              // child: MarketplacePost(
-              //   sellerName: data['organizerName'],
-              //   sellerProfileImage: data['organizerPhoto'],
-              //   postTitle: data['title'],
-              //   description: data['description'],
-              //   categorie: data['categorie'],
-              //   imageUrls: data['images'],
-              //   prix: prix,
-              // ));
-            }),
+                        emplacement: data['location']['geopoint']),
+                  );
+                },
+                child: ProductCard(
+                    imageUrl: data['images'][0],
+                    title: data['title'],
+                    price: prix,
+                    currency: data['currency'],
+                    emplacement: data['location']['geopoint']));
+          },
+          onEmpty: Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 130,
+                  height: 130,
+                  child: Image.asset(
+                    'assets/marketplace (1).png',
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  textAlign: TextAlign.center,
+                  "Aucun produit disponible".tr,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  textAlign: TextAlign.center,
+                  "Actuellement, aucun produit n'est en vente sur Marketplace"
+                      .tr,
+                  style: TextStyle(fontWeight: FontWeight.w400, fontSize: 17),
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     ));
   }

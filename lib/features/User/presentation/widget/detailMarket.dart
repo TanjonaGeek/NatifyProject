@@ -8,13 +8,22 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:natify/core/utils/colors.dart';
 import 'package:intl/intl.dart';
+import 'package:natify/core/utils/slideNavigation.dart';
 import 'package:natify/features/Chat/presentation/pages/messageDetail.dart';
 import 'package:natify/features/User/presentation/pages/userProfilePage.dart';
+import 'package:natify/features/User/presentation/widget/postMarketplace.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final String productId;
+  final GeoPoint emplacement;
+  final String categ;
 
-  ProductDetailScreen({Key? key, required this.productId}) : super(key: key);
+  ProductDetailScreen(
+      {Key? key,
+      required this.productId,
+      required this.emplacement,
+      required this.categ})
+      : super(key: key);
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -22,34 +31,57 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   final ValueNotifier<int> _currentIndex = ValueNotifier<int>(0);
-
-  // Fonction pour récupérer l'adresse depuis les coordonnées
-  Future<String> _getAddressFromCoordinates(
-      double latitude, double longitude) async {
+  final ValueNotifier<String> _address = ValueNotifier<String>("");
+  late Future<List<QueryDocumentSnapshot>> _futureProducts;
+  final Map<String, String> _exchangeFormat = {
+    'EUR': 'fr_FR',
+    'USD': 'en_US',
+    'MGA': 'mg_MG',
+  };
+  Future<void> _getAddressFromCoordinates() async {
     try {
-      // Récupérer l'adresse en utilisant la latitude et la longitude
-      List<Placemark> placemarks =
-          await placemarkFromCoordinates(latitude, longitude);
-      Placemark placemark =
-          placemarks[0]; // Vous pouvez aussi traiter plusieurs résultats ici
-
-      // Retourner une adresse lisible, par exemple : "Paris, France"
-      return '${placemark.locality}, ${placemark.country}';
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+          widget.emplacement.latitude, widget.emplacement.longitude);
+      if (placemarks.isNotEmpty) {
+        String codePostal = placemarks.first.postalCode.toString() ?? '';
+        String locality = placemarks.first.subLocality.toString() ?? '';
+        String administrativeArea =
+            placemarks.first.administrativeArea.toString() ?? '';
+        String adresse = "${codePostal} $locality $administrativeArea";
+        _address.value = adresse;
+      }
     } catch (e) {
-      return '';
+      _address.value = "";
     }
+  }
+
+  Future<List<QueryDocumentSnapshot>> fetchProductsSimilar() async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('marketplace')
+        .where('categorie', isEqualTo: widget.categ)
+        .where('uidVente', isNotEqualTo: widget.productId)
+        .limit(5) // 🔥 Limite à 5 produits
+        .get();
+    return querySnapshot.docs;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getAddressFromCoordinates();
+    _futureProducts = fetchProductsSimilar();
   }
 
   @override
   void dispose() {
     _currentIndex.dispose();
+    _address.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text('Marketplaces'.tr,
             style: TextStyle(fontWeight: FontWeight.bold)),
@@ -94,12 +126,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
           String Prixformatted =
               NumberFormat.currency(locale: 'mg_MG').format(montant);
-          // Récupérer l'adresse
-          Future<String> address = _getAddressFromCoordinates(
-              emplacement.latitude, emplacement.longitude);
 
           return SingleChildScrollView(
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -158,35 +187,34 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   Prixformatted,
                   style: TextStyle(fontSize: 18, color: kPrimaryColor),
                 ),
-                SizedBox(height: 5),
-                FutureBuilder<String>(
-                  future: address,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return SizedBox.shrink();
-                    }
-                    if (snapshot.hasError) {
-                      return SizedBox.shrink();
-                    }
-                    return snapshot.data!.isEmpty
-                        ? SizedBox.shrink()
-                        : Row(
-                            children: [
-                              SizedBox(
-                                width: 3,
-                              ),
-                              FaIcon(FontAwesomeIcons.locationDot,
-                                  color: Colors.black, size: 15),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Text("${snapshot.data}",
-                                  style: TextStyle(
-                                      color: Colors.grey, fontSize: 16)),
-                            ],
-                          );
-                  },
-                ),
+                ValueListenableBuilder<String>(
+                    valueListenable: _address,
+                    builder: (context, value, _) {
+                      return value.isEmpty
+                          ? SizedBox.shrink()
+                          : SizedBox(height: 5);
+                    }),
+                ValueListenableBuilder<String>(
+                    valueListenable: _address,
+                    builder: (context, value, _) {
+                      return value.isEmpty
+                          ? SizedBox.shrink()
+                          : Row(
+                              children: [
+                                SizedBox(
+                                  width: 3,
+                                ),
+                                FaIcon(FontAwesomeIcons.locationDot,
+                                    color: Colors.black, size: 15),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text("${_address.value}",
+                                    style: TextStyle(
+                                        color: Colors.grey, fontSize: 16)),
+                              ],
+                            );
+                    }),
                 SizedBox(height: 6),
                 Row(
                   children: [
@@ -287,143 +315,122 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     },
                     icon: FaIcon(FontAwesomeIcons.chevronRight, size: 14),
                   ),
-                  // trailing: ElevatedButton(
-                  //     style: ElevatedButton.styleFrom(
-                  //       backgroundColor: kPrimaryColor,
-                  //       shape: RoundedRectangleBorder(
-                  //           borderRadius: BorderRadius.zero), // Pas d'arrondi
-                  //     ),
-                  //     onPressed: () {},
-                  //     child: Text(
-                  //       "Voir profile",
-                  //       style: TextStyle(
-                  //           color: Colors.white, fontWeight: FontWeight.bold),
-                  //     )),
                 ),
                 SizedBox(height: 10),
                 Divider(
                   color: Colors.grey.shade300,
                 ),
-                if (emplacement.latitude != 0 && emplacement.longitude != 0)
-                  Text("Emplacement",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                SizedBox(height: 5),
-                // Utilisez FutureBuilder ou StreamBuilder ici pour attendre le chargement des données
-                if (emplacement.latitude != 0 && emplacement.longitude != 0)
-                  FutureBuilder(
-                    future: Future.delayed(
-                        Duration(seconds: 1),
-                        () =>
-                            emplacement), // Simuler le délai de récupération de données
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Container(
-                          width: double.infinity,
-                          height: 120,
-                          color: Colors.grey.shade200,
-                        );
-                      }
-                      if (snapshot.hasError) {
-                        return Center(child: Text('Erreur de chargement'));
-                      }
 
-                      final locationData = snapshot.data as GeoPoint?;
-                      return !snapshot.hasData
-                          ? Container(
-                              width: double.infinity,
-                              height: 120,
-                              color: Colors.grey.shade200,
-                            )
-                          : Container(
-                              height: 120,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Stack(
-                                  children: [
-                                    GoogleMap(
-                                      zoomControlsEnabled: false,
-                                      scrollGesturesEnabled: true,
-                                      rotateGesturesEnabled: false,
-                                      tiltGesturesEnabled: false,
-                                      myLocationButtonEnabled: false,
-                                      initialCameraPosition: CameraPosition(
-                                        target: locationData != null
-                                            ? LatLng(locationData.latitude,
-                                                locationData.longitude)
-                                            : LatLng(0.0, 0.0),
-                                        zoom: 10.5,
-                                      ),
-                                      markers: locationData != null
-                                          ? Set.from([
-                                              Marker(
-                                                markerId:
-                                                    MarkerId('productMarker'),
-                                                position: LatLng(
-                                                    locationData.latitude,
-                                                    locationData.longitude),
-                                              ),
-                                            ])
-                                          : Set(),
-                                    ),
-                                    if (snapshot.hasData)
-                                      Positioned(
-                                        bottom: 10,
-                                        left: 10,
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                FutureBuilder<String>(
-                                                  future: address,
-                                                  builder: (context, snapshot) {
-                                                    if (snapshot
-                                                            .connectionState ==
-                                                        ConnectionState
-                                                            .waiting) {
-                                                      return SizedBox.shrink();
-                                                    }
-                                                    if (snapshot.hasError) {
-                                                      return SizedBox.shrink();
-                                                    }
-                                                    return Row(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        FaIcon(
-                                                            FontAwesomeIcons
-                                                                .mapPin,
-                                                            color: Colors.red,
-                                                            size: 14),
-                                                        SizedBox(width: 5),
-                                                        Text('${snapshot.data}',
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .black)),
-                                                      ],
-                                                    );
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            );
-                    },
+                SizedBox(height: 2),
+
+                // Description
+                Text("Emplacement",
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                SizedBox(height: 5),
+                ClipRRect(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  child: Stack(
+                    children: [
+                      Image.asset(
+                        'assets/maps2.jpg',
+                        width: double.infinity,
+                        height: 90,
+                        fit: BoxFit.cover,
+                      ),
+                      Container(
+                        width: double.infinity,
+                        height: 90,
+                        color: Colors.black
+                            .withOpacity(0.2), // Ajoute un fond sombre
+                      ),
+                      Container(
+                        width: double.infinity,
+                        height: 90,
+                        child: Center(
+                          child: Text(
+                            "Appuyer pour voir l'emplacement",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ), // Ajoute un fond sombre
+                      ),
+                    ],
                   ),
+                ),
+                SizedBox(height: 10),
+                Divider(
+                  color: Colors.grey.shade300,
+                ),
+
+                SizedBox(height: 2),
+
+                // Description
+                Text("Ventes similaires disponibles",
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                SizedBox(height: 5),
+                FutureBuilder<List<QueryDocumentSnapshot>>(
+                  future: _futureProducts,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                          child: Container(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.black,
+                              )));
+                    }
+                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(
+                          child: Text("Aucun produit similaire trouvé"));
+                    }
+
+                    var produitsSimilaires = snapshot.data!;
+
+                    return ListView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      padding: EdgeInsets.zero,
+                      itemCount: produitsSimilaires.length,
+                      itemBuilder: (context, index) {
+                        var product = produitsSimilaires[index];
+                        double montant = (product['prix'] is int)
+                            ? product['prix'].toDouble()
+                            : double.tryParse(product['prix'].toString()) ??
+                                0.0;
+                        String formatDevise =
+                            _exchangeFormat[product['currency']] ?? "en_US";
+                        String prix = NumberFormat.currency(
+                                locale: formatDevise, symbol: '')
+                            .format(montant);
+                        return InkWell(
+                          onTap: () {
+                            SlideNavigation.slideToPage(
+                              context,
+                              ProductDetailScreen(
+                                  categ: product['categorie'],
+                                  productId: product['uidVente'],
+                                  emplacement: product['location']['geopoint']),
+                            );
+                          },
+                          child: MarketplacePost(
+                            currency: product['currency'],
+                            sellerName: product['organizerName'],
+                            sellerProfileImage: product['organizerPhoto'],
+                            postTitle: product['title'],
+                            description: product['description'],
+                            categorie: product['categorie'],
+                            imageUrls: product['images'],
+                            prix: prix,
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
               ],
             ),
           );
