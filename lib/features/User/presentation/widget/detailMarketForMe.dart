@@ -9,17 +9,15 @@ import 'package:get/get.dart';
 import 'package:natify/core/utils/colors.dart';
 import 'package:intl/intl.dart';
 import 'package:natify/core/utils/slideNavigation.dart';
-import 'package:natify/features/Chat/presentation/pages/messageDetail.dart';
-import 'package:natify/features/User/presentation/pages/userProfilePage.dart';
+import 'package:natify/features/User/presentation/pages/editerannocemarket.dart';
 import 'package:natify/features/User/presentation/widget/list/visualisrMarketPlaceInMaps.dart';
-import 'package:natify/features/User/presentation/widget/postMarketplace.dart';
 
-class ProductDetailScreen extends StatefulWidget {
+class ProductDetailScreenMe extends StatefulWidget {
   final String productId;
   final GeoPoint emplacement;
   final String categ;
 
-  ProductDetailScreen(
+  ProductDetailScreenMe(
       {Key? key,
       required this.productId,
       required this.emplacement,
@@ -27,10 +25,10 @@ class ProductDetailScreen extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+  State<ProductDetailScreenMe> createState() => _ProductDetailScreenMeState();
 }
 
-class _ProductDetailScreenState extends State<ProductDetailScreen> {
+class _ProductDetailScreenMeState extends State<ProductDetailScreenMe> {
   final ValueNotifier<int> _currentIndex = ValueNotifier<int>(0);
   final ValueNotifier<String> _address = ValueNotifier<String>("");
   late Future<List<QueryDocumentSnapshot>> _futureProducts;
@@ -85,8 +83,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Marketplaces'.tr,
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title:
+            Text('Annonces'.tr, style: TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
@@ -250,10 +248,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   onPressed: () {
                     Navigator.of(context, rootNavigator: true).push(
                       MaterialPageRoute(
-                        builder: (context) => MessageDetail(
-                          urlPhoto: product['organizerPhoto'],
-                          uid: product['organizerUid'],
-                          name: product['organizerName'],
+                        builder: (context) => EditerAnnonceMarket(
+                          status: false,
+                          categorie: product['categorie'],
+                          currency: product['currency'],
+                          description: product['description'],
+                          title: product['title'],
+                          price: product['prix'].toString(),
+                          photoUrl: List<String>.from(product['images']),
+                          adresse: _address.value,
+                          emplacement: product['location']['geopoint'],
                         ),
                       ),
                     );
@@ -268,14 +272,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     children: [
                       Center(
                         child: Image.asset(
-                          'assets/discuter.png',
+                          'assets/editer-le-texte.png',
                           width: 20,
                           height: 20,
                           color: Colors.white,
                         ),
                       ),
                       SizedBox(width: 5),
-                      Text("Contacter maintenant",
+                      Text("Mettre à jour l'annonce",
                           style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold)),
@@ -321,17 +325,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                   title: Text(product['organizerName']),
                   // subtitle: Text("Membre depuis dsfsfsdfdsf"),
-                  trailing: IconButton(
-                    onPressed: () {
-                      Navigator.of(context, rootNavigator: true).push(
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              UserProfileScreen(uid: product['organizerUid']),
-                        ),
-                      );
-                    },
-                    icon: FaIcon(FontAwesomeIcons.chevronRight, size: 14),
-                  ),
                 ),
 
                 ValueListenableBuilder<String>(
@@ -465,81 +458,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               ),
                             );
                     }),
-                SizedBox(height: 10),
-                Divider(
-                  color: Colors.grey.shade300,
-                ),
-
                 SizedBox(height: 2),
-
-                // Description
-                Text("Ventes similaires disponibles",
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                SizedBox(height: 5),
-                FutureBuilder<List<QueryDocumentSnapshot>>(
-                  future: _futureProducts,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                          child: Container(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                color: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
-                              )));
-                    }
-                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(
-                          child: Text("Aucun produit similaire trouvé"));
-                    }
-
-                    var produitsSimilaires = snapshot.data!;
-
-                    return ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      padding: EdgeInsets.zero,
-                      itemCount: produitsSimilaires.length,
-                      itemBuilder: (context, index) {
-                        var product = produitsSimilaires[index];
-                        double montant = (product['prix'] is int)
-                            ? product['prix'].toDouble()
-                            : double.tryParse(product['prix'].toString()) ??
-                                0.0;
-                        String formatDevise =
-                            _exchangeFormat[product['currency']] ?? "en_US";
-                        String prix = NumberFormat.currency(
-                                locale: formatDevise, symbol: '')
-                            .format(montant);
-                        return InkWell(
-                          onTap: () {
-                            SlideNavigation.slideToPage(
-                              context,
-                              ProductDetailScreen(
-                                  categ: product['categorie'],
-                                  productId: product['uidVente'],
-                                  emplacement: product['location']['geopoint']),
-                            );
-                          },
-                          child: MarketplacePost(
-                            currency: product['currency'],
-                            sellerName: product['organizerName'],
-                            sellerProfileImage: product['organizerPhoto'],
-                            postTitle: product['title'],
-                            description: product['description'],
-                            categorie: product['categorie'],
-                            imageUrls: product['images'],
-                            prix: prix,
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
               ],
             ),
           );

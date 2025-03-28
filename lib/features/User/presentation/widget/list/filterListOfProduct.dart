@@ -454,8 +454,14 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                                         child: Text(
                                           _currentLocation,
                                           style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500),
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                            color: Theme.of(context)
+                                                        .brightness ==
+                                                    Brightness.dark
+                                                ? Colors.black.withOpacity(0.5)
+                                                : Colors.black,
+                                          ),
                                         ),
                                       ),
                                       if (!_isLoading)
@@ -486,8 +492,13 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                                             ? "Chargement..."
                                             : _currentLocation,
                                         style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.black.withOpacity(0.5)
+                                              : Colors.black,
+                                        ),
                                       ),
                                     ),
                                     if (!_isLoading)

@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:natify/core/utils/colors.dart';
 
@@ -67,9 +66,13 @@ class _ProductCardState extends State<ProductCard> {
                 imageUrl: widget.imageUrl,
                 width: double.infinity,
                 fit: BoxFit.cover,
-                placeholder: (context, url) =>
-                    Center(child: CircularProgressIndicator()),
-                errorWidget: (context, url, error) => Icon(Icons.error),
+                placeholder: (context, url) => Container(
+                  color: Colors.grey.shade100,
+                ),
+                errorWidget: (context, url, error) => Icon(
+                  Icons.error,
+                  color: Colors.red,
+                ),
               ),
             ),
           ),

@@ -44,7 +44,9 @@ class MarketplacePost extends StatelessWidget {
               width: 120, // Ajuste selon le besoin
               height: 120,
               fit: BoxFit.cover,
-              placeholder: (context, url) => CircularProgressIndicator(),
+              placeholder: (context, url) => Container(
+                color: Colors.grey.shade100,
+              ),
               errorWidget: (context, url, error) =>
                   Icon(Icons.error, color: Colors.red),
             ),
@@ -82,23 +84,8 @@ class MarketplacePost extends StatelessWidget {
               ),
             ),
           ),
-
-          // /// Bouton favoris à droite
-          // Padding(
-          //   padding: const EdgeInsets.all(10.0),
-          //   child: Icon(Icons.favorite_border, color: Colors.red),
-          // ),
         ],
       ),
-    );
-  }
-
-  Widget _actionButton(Widget icon, String label) {
-    return TextButton.icon(
-      onPressed: () {},
-      icon: icon,
-      label: Text(label,
-          style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold)),
     );
   }
 }

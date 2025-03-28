@@ -26,6 +26,7 @@ import 'package:natify/features/User/presentation/pages/signaler_profile.dart';
 import 'package:natify/features/User/presentation/provider/user_provider.dart';
 import 'package:natify/features/User/presentation/widget/OverlappingAvatars.dart';
 import 'package:natify/features/User/presentation/widget/list/listFollowingAndFollowers.dart';
+import 'package:natify/features/User/presentation/widget/list/listeMesVentes.dart';
 import 'package:natify/features/User/presentation/widget/list/shimmer/shimmerProfilePage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -233,21 +234,6 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                         widget.uid == uidUser
                             ? Row(
                                 children: [
-                                  // IconButton(
-                                  //   icon: FaIcon(FontAwesomeIcons.penToSquare,
-                                  //       size: 20, color: Colors.white),
-                                  //   onPressed: () {
-                                  //     Navigator.of(context, rootNavigator: true)
-                                  //         .push(
-                                  //       MaterialPageRoute(
-                                  //           builder: (context) => Editerprofile(
-                                  //                 uid: widget.uid,
-                                  //                 myOwnData:
-                                  //                     notifier.MydataPersiste!,
-                                  //               )),
-                                  //     );
-                                  //   },
-                                  // ),
                                   IconButton(
                                     icon: FaIcon(FontAwesomeIcons.bars,
                                         size: 20, color: Colors.white),
@@ -1960,6 +1946,51 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                       SizedBox(
                         height: 2.0,
                       ),
+                    if (userUid == uidUser)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 1, top: 1),
+                        child: ListTile(
+                          onTap: () async {
+                            Navigator.pop(context);
+                            SlideNavigation.slideToPage(
+                                context, MarketplacePageMe());
+                          },
+                          leading: Container(
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(30)),
+                                color: Colors.grey.shade300,
+                              ),
+                              child: Center(
+                                child: Image.asset(
+                                  'assets/photo.png',
+                                  width: 20,
+                                  height: 20,
+                                ),
+                              )),
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Gestion annonces'.tr,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                "Accédez à toutes vos publications sur le marketplace"
+                                    .tr,
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    SizedBox(
+                      height: 2.0,
+                    ),
                     if (userUid == uidUser)
                       Padding(
                         padding: const EdgeInsets.only(left: 1, top: 1),

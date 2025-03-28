@@ -412,7 +412,9 @@ class _MapsMarketPlaceState extends ConsumerState<MapsMarketPlace>
                     child: Container(
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.black
+                            : Colors.white,
                         borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
                       child: Column(

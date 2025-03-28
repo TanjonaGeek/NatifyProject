@@ -10,7 +10,6 @@ import 'package:natify/core/utils/slideNavigation.dart';
 import 'package:natify/features/User/presentation/provider/user_provider.dart';
 import 'package:natify/features/User/presentation/widget/detailMarket.dart';
 import 'package:natify/features/User/presentation/widget/list/ProductCard.dart';
-import 'package:natify/features/User/presentation/widget/postMarketplace.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
 
@@ -243,71 +242,3 @@ class MarketplacePage extends ConsumerWidget {
     ));
   }
 }
-
-// MarketplacePost(
-//                   sellerName: data['organizerName'],
-//                   sellerProfileImage: data['organizerPhoto'],
-//                   postTitle: data['title'],
-//                   description: data['description'],
-//                   categorie: data['categorie'],
-//                   imageUrls: data['images'],
-//                   prix: data['prix'],
-//                 ),
-
-// GridView.builder(
-//                 shrinkWrap: true,
-//                 physics: const NeverScrollableScrollPhysics(),
-//                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-//                   crossAxisCount: 2, // 2 images par ligne
-//                   crossAxisSpacing: 4,
-//                   mainAxisSpacing: 4,
-//                 ),
-//                 itemCount: imageUrls.length > maxImages
-//                     ? maxImages + 1
-//                     : imageUrls.length,
-//                 itemBuilder: (context, index) {
-//                   bool isLast = index == 3 && imageUrls.length > 4;
-//                   if (index == maxImages && imageUrls.length > maxImages) {
-//                     // Si plus d'images que maxImages, afficher "+X"
-//                     int remaining = imageUrls.length - maxImages;
-//                     return Stack(
-//                       fit: StackFit.expand,
-//                       children: [
-//                         ClipRRect(
-//                           borderRadius: BorderRadius.circular(8),
-//                           child: CachedNetworkImage(
-//                             imageUrl: imageUrls[maxImages],
-//                             fit: BoxFit.cover,
-//                             placeholder: (context, url) => const Center(
-//                                 child: CircularProgressIndicator()),
-//                             errorWidget: (context, url, error) =>
-//                                 const Icon(Icons.error),
-//                           ),
-//                         ),
-//                         Container(
-//                           color: Colors.black54,
-//                           alignment: Alignment.center,
-//                           child: Text(
-//                             "+$remaining",
-//                             style: TextStyle(
-//                                 color: Colors.white,
-//                                 fontSize: 24,
-//                                 fontWeight: FontWeight.bold),
-//                           ),
-//                         ),
-//                       ],
-//                     );
-//                   }
-//                   return ClipRRect(
-//                     borderRadius: BorderRadius.circular(8),
-//                     child: CachedNetworkImage(
-//                       imageUrl: imageUrls[index],
-//                       fit: BoxFit.cover,
-//                       placeholder: (context, url) =>
-//                           const Center(child: CircularProgressIndicator()),
-//                       errorWidget: (context, url, error) =>
-//                           const Icon(Icons.error),
-//                     ),
-//                   );
-//                 },
-//               ),
