@@ -249,7 +249,8 @@ class _ProductDetailScreenMeState extends State<ProductDetailScreenMe> {
                     Navigator.of(context, rootNavigator: true).push(
                       MaterialPageRoute(
                         builder: (context) => EditerAnnonceMarket(
-                          status: false,
+                          uidVente: product['uidVente'],
+                          status: product['status'],
                           categorie: product['categorie'],
                           currency: product['currency'],
                           description: product['description'],

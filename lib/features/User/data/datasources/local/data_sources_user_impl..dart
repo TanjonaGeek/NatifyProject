@@ -1477,6 +1477,7 @@ class DataSourceUserImpl implements DataSourceUser {
         "categorie": categorie ?? "",
         "currency": currency ?? "USD",
         "nameProduit": generateAllSubstrings(nameProduit),
+        "status": true
       });
 
       print("✅ Événement ajouté avec succès !");
@@ -1503,5 +1504,70 @@ class DataSourceUserImpl implements DataSourceUser {
       "parentId": parentId ?? "", // Vide si c'est un commentaire principal
       "createdAt": FieldValue.serverTimestamp(),
     });
+  }
+
+  @override
+  Future<void> editerVente(
+      UserModel users,
+      String title,
+      String description,
+      double latitude,
+      double longitude,
+      List<File> images,
+      List<String> imagesOld,
+      List<String> jaime,
+      List<String> commentaire,
+      int prix,
+      String categorie,
+      String currency,
+      String nameProduit,
+      String uidVente,
+      bool status) async {
+    try {
+      final userUid = FirebaseAuth.instance.currentUser;
+      var timeCreated = DateTime.now().millisecondsSinceEpoch;
+      if (userUid == null) {
+        return;
+      }
+      if (users.name!.isEmpty ||
+          users.profilePic!.isEmpty ||
+          users.uid!.isEmpty ||
+          title.isEmpty ||
+          description.isEmpty ||
+          prix < 1) {
+        return;
+      }
+
+      if (images.isNotEmpty || imagesOld.isNotEmpty) {
+        GeoFirePoint geoPoint =
+            geo.point(latitude: latitude, longitude: longitude);
+        List<String> collectionImagePath = imagesOld;
+        String ref = "/ProduitImage/$uidVente/";
+        String titles = "Importation image";
+
+        // Utilisation de Future.wait pour uploader toutes les images
+        await Future.wait(images.map((image) async {
+          // Appel de la fonction d'upload pour chaque image
+          String imageUrl =
+              await storeFileHighLigthToFirebase(ref, image, titles);
+          collectionImagePath.add(imageUrl);
+        }));
+        await firestore.collection('marketplace').doc(uidVente).update({
+          "title": title.trim(),
+          "description": description.trim(),
+          "location": geoPoint.data,
+          "images": collectionImagePath ?? [],
+          "organizerUid": users.uid,
+          "organizerName": users.name ?? "",
+          "organizerPhoto": users.profilePic ?? "",
+          "createdAt": timeCreated,
+          "prix": prix ?? "",
+          "categorie": categorie ?? "",
+          "currency": currency ?? "USD",
+          "nameProduit": generateAllSubstrings(nameProduit),
+          "status": status
+        });
+      }
+    } catch (e) {}
   }
 }

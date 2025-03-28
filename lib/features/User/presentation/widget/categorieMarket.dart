@@ -51,6 +51,7 @@ class CategoriesDialog extends StatelessWidget {
       "title": "Mode & Accessoires",
       "icon": Icons.shopping_bag,
       "subcategories": [
+        "Vêtements Hommes & Femmes",
         "Vêtements Hommes",
         "Vêtements Femmes",
         "Vêtements Enfants & Bébés",

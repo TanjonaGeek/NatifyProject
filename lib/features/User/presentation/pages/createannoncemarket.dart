@@ -14,6 +14,7 @@ import 'package:natify/features/User/presentation/provider/user_provider.dart';
 import 'package:natify/features/User/presentation/widget/categorieMarket.dart';
 import 'package:natify/features/User/presentation/widget/galleryannoncephoto.dart';
 import 'package:natify/features/User/presentation/widget/lieuvente.dart';
+import 'package:intl/intl.dart';
 
 class CreateAnnonceMarket extends ConsumerStatefulWidget {
   const CreateAnnonceMarket({super.key});
@@ -31,6 +32,11 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
   double latitude = 0.0;
   double longitude = 0.0;
   String _currentCurrency = "USD";
+  final Map<String, String> _exchangeFormat = {
+    'EUR': 'fr_FR',
+    'USD': 'en_US',
+    'MGA': 'mg_MG',
+  };
   final TextEditingController categorieProduit =
       TextEditingController(text: "Selectionnez Categorie");
   final TextEditingController titreProduit = TextEditingController();
@@ -117,7 +123,7 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
     final notifier = ref.read(infoUserStateNotifier);
     if (categorieProduit.text.isNotEmpty && selectedFiles.isNotEmpty) {
       if (mounted) {
-        ref.read(infoUserStateNotifier.notifier).publierVente(
+        ref.read(marketPlaceUserStateNotifier.notifier).publierVente(
             notifier.MydataPersiste!,
             titreProduit.text,
             descriptionProduit.text,
@@ -208,7 +214,9 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
                         hintText: "Partagez des détails sur ce produit...",
                         border: InputBorder.none,
                       ),
-                      maxLines: 3,
+                      maxLines:
+                          null, // Permet au champ de s'étendre verticalement
+                      keyboardType: TextInputType.multiline,
                     ),
                   ),
                   SizedBox(height: 10),
@@ -264,6 +272,31 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
                     validator: (value) {
                       if ((value == null || value.isEmpty)) {
                         return "rempli_champs".tr;
+                      }
+                      // Définir les valeurs min et max en fonction de la devise
+                      double minPrice = 1;
+                      double maxPrice = 10000;
+
+                      if (_currentCurrency == "MGA") {
+                        minPrice = 5000;
+                        maxPrice = 50000000;
+                      }
+
+                      double? price = double.tryParse(value);
+                      if (price == null) {
+                        return "Valeur invalide";
+                      }
+
+                      if (price < minPrice || price > maxPrice) {
+                        String formatDevise =
+                            _exchangeFormat[_currentCurrency] ?? "en_US";
+                        String prixMin = NumberFormat.currency(
+                                locale: formatDevise, symbol: '')
+                            .format(minPrice);
+                        String prixMax = NumberFormat.currency(
+                                locale: formatDevise, symbol: '')
+                            .format(maxPrice);
+                        return "Le prix doit être entre $prixMin et $prixMax $_currentCurrency";
                       }
                       return null;
                     },
@@ -389,8 +422,12 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
             children: [
               icon,
               SizedBox(width: 10),
-              Text(text,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Flexible(
+                child: Text(text,
+                    overflow: TextOverflow.ellipsis,
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              ),
             ],
           ),
         ),

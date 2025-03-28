@@ -81,7 +81,6 @@ class _TrouverParLieuxState extends ConsumerState<TrouverParLieux> {
   void dispose() {
     fieldRechercheController.dispose();
     client.close();
-    placesNotifier.dispose(); // Libère la mémoire du ValueNotifier
     super.dispose();
   }
 

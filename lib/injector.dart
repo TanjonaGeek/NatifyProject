@@ -37,6 +37,7 @@ import 'package:natify/features/User/domaine/usecases/useCaseAddReceiveNotificat
 import 'package:natify/features/User/domaine/usecases/useCaseCreateHighLight.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseDeleteAccount.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseDesabonner.dart';
+import 'package:natify/features/User/domaine/usecases/useCaseEditVente.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseEditerHiglight.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseGetInfoUser.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseIsFillUser.dart';
@@ -170,6 +171,8 @@ Future<void> initializationDepencies() async {
       UseCasePublierVente(userRepository: injector.get<UserRepository>()));
   injector.registerFactory<useCaseAddCommentVente>(() =>
       useCaseAddCommentVente(userRepository: injector.get<UserRepository>()));
+  injector.registerFactory<UseCaseEditerVente>(
+      () => UseCaseEditerVente(userRepository: injector.get<UserRepository>()));
 
   injector.registerFactory<UseCaseGetStorie>(() =>
       UseCaseGetStorie(storieRepository: injector.get<StorieRepository>()));

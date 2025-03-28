@@ -251,4 +251,39 @@ class UserRepositoryImpl implements UserRepository {
       String venteId, String userId, String text, String parentId) {
     return dataSourceUser.addCommentVente(venteId, userId, text, parentId);
   }
+
+  @override
+  Future<void> editerVente(
+      UserModel users,
+      String title,
+      String description,
+      double latitude,
+      double longitude,
+      List<File> images,
+      List<String> imagesOld,
+      List<String> jaime,
+      List<String> commentaire,
+      int prix,
+      String categorie,
+      String currency,
+      String nameProduit,
+      String uidVente,
+      bool status) {
+    return dataSourceUser.editerVente(
+        users,
+        title,
+        description,
+        latitude,
+        longitude,
+        images,
+        imagesOld,
+        jaime,
+        commentaire,
+        prix,
+        categorie,
+        currency,
+        nameProduit,
+        uidVente,
+        status);
+  }
 }

@@ -83,4 +83,20 @@ abstract class UserRepository {
       String nameProduit);
   Future<void> addCommentVente(
       String venteId, String userId, String text, String parentId);
+  Future<void> editerVente(
+      UserModel users,
+      String title,
+      String description,
+      double latitude,
+      double longitude,
+      List<File> images,
+      List<String> imagesOld,
+      List<String> jaime,
+      List<String> commentaire,
+      int prix,
+      String categorie,
+      String currency,
+      String nameProduit,
+      String uidVente,
+      bool status);
 }

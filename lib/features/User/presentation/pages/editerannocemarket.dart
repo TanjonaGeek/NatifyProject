@@ -14,6 +14,7 @@ import 'package:natify/features/User/presentation/widget/categorieMarket.dart';
 import 'package:natify/features/User/presentation/widget/galleryannoncephoto.dart';
 import 'package:natify/features/User/presentation/widget/lieuvente.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:intl/intl.dart';
 
 class EditerAnnonceMarket extends ConsumerStatefulWidget {
   final String description;
@@ -25,6 +26,7 @@ class EditerAnnonceMarket extends ConsumerStatefulWidget {
   final GeoPoint emplacement;
   final String currency;
   final bool status;
+  final String uidVente;
   EditerAnnonceMarket(
       {required this.description,
       required this.categorie,
@@ -35,6 +37,7 @@ class EditerAnnonceMarket extends ConsumerStatefulWidget {
       required this.emplacement,
       required this.currency,
       required this.status,
+      required this.uidVente,
       super.key});
 
   @override
@@ -47,6 +50,11 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
   List<File> selectedFiles = []; // Liste pour stocker les fichiers sélectionnés
   List<String> imageProduit =
       []; // Liste pour stocker les fichiers sélectionnés
+  final Map<String, String> _exchangeFormat = {
+    'EUR': 'fr_FR',
+    'USD': 'en_US',
+    'MGA': 'mg_MG',
+  };
   late String lieu = "Ajouter lieux";
   late bool _statusDisponible;
   late double latitude = 0.0;
@@ -142,32 +150,37 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
     );
 
     if (selectedLieux != null) {
-      print('le lieux est $selectedLieux');
+      var lat = double.parse(selectedLieux[0]['latitude'].toString());
+      var lon = double.parse(selectedLieux[0]['longitude'].toString());
       setState(() {
         lieu = selectedLieux[0]['lieu'];
-        latitude = selectedLieux[0]['latitude'];
-        longitude = selectedLieux[0]['longitude'];
+        latitude = lat;
+        longitude = lon;
       });
     }
   }
 
   Future<void> publierVente() async {
     final notifier = ref.read(infoUserStateNotifier);
-    if (categorieProduit.text.isNotEmpty && selectedFiles.isNotEmpty) {
+    if (categorieProduit.text.isNotEmpty &&
+        (selectedFiles.isNotEmpty || imageProduit.isNotEmpty)) {
       if (mounted) {
-        ref.read(infoUserStateNotifier.notifier).publierVente(
+        ref.read(marketPlaceUserStateNotifier.notifier).editerVente(
             notifier.MydataPersiste!,
             titreProduit.text,
             descriptionProduit.text,
             latitude,
             longitude,
             selectedFiles,
+            imageProduit,
             [],
             [],
             int.parse(prixProduit.text),
             categorieProduit.text,
             _currentCurrency,
-            titreProduit.text);
+            titreProduit.text,
+            widget.uidVente,
+            _statusDisponible);
       }
       Navigator.pop(context);
     } else {
@@ -247,7 +260,10 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
                         hintText: "Partagez des détails sur ce produit...",
                         border: InputBorder.none,
                       ),
-                      maxLines: 3,
+                      maxLines:
+                          null, // Permet au champ de s'étendre verticalement
+                      keyboardType: TextInputType
+                          .multiline, // Permet la saisie multi-ligne
                     ),
                   ),
                   SizedBox(height: 10),
@@ -305,6 +321,31 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
                     validator: (value) {
                       if ((value == null || value.isEmpty)) {
                         return "rempli_champs".tr;
+                      }
+                      // Définir les valeurs min et max en fonction de la devise
+                      double minPrice = 1;
+                      double maxPrice = 10000;
+
+                      if (_currentCurrency == "MGA") {
+                        minPrice = 5000;
+                        maxPrice = 50000000;
+                      }
+
+                      double? price = double.tryParse(value);
+                      if (price == null) {
+                        return "Valeur invalide";
+                      }
+
+                      if (price < minPrice || price > maxPrice) {
+                        String formatDevise =
+                            _exchangeFormat[_currentCurrency] ?? "en_US";
+                        String prixMin = NumberFormat.currency(
+                                locale: formatDevise, symbol: '')
+                            .format(minPrice);
+                        String prixMax = NumberFormat.currency(
+                                locale: formatDevise, symbol: '')
+                            .format(maxPrice);
+                        return "Le prix doit être entre $prixMin et $prixMax $_currentCurrency";
                       }
                       return null;
                     },
@@ -512,8 +553,12 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
             children: [
               icon,
               SizedBox(width: 10),
-              Text(text,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Flexible(
+                child: Text(text,
+                    overflow: TextOverflow.ellipsis,
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              ),
             ],
           ),
         ),
