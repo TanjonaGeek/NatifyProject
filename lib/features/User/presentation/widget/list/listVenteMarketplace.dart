@@ -19,6 +19,7 @@ class MarketplacePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     String a = "à".tr;
+    String? uidMe = FirebaseAuth.instance.currentUser!.uid ?? "";
     final notifier = ref.watch(marketPlaceUserStateNotifier);
     var requeteId = const Uuid().v1();
     final Map<String, String> _exchangeFormat = {
@@ -39,6 +40,8 @@ class MarketplacePage extends ConsumerWidget {
       query = query.where('categorie', isEqualTo: notifier.Categorie);
     }
     query = query
+        .where('status', isEqualTo: true)
+        .where('organizerUid', isNotEqualTo: uidMe)
         .orderBy('prix') // Ordre par âge
         .startAt([notifier.prixProduit.start.toInt()]).endAt(
             [notifier.prixProduit.end.toInt()]);

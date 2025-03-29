@@ -87,43 +87,8 @@ class InfoNotifierUser extends StateNotifier<InfoStateUser> {
       injector.get<UseCaseSupprimerPhotoProfiles>();
   final UseCaseModifierPhotoProfiles _editPhotoUserUseCase =
       injector.get<UseCaseModifierPhotoProfiles>();
-  final UseCasePublierVente _publierVenteUseCase =
-      injector.get<UseCasePublierVente>();
   InfoNotifierUser() : super(const InfoStateUser.initial());
   bool get isFetching => state.state != InfoUserConcreteState.loading;
-
-  Future<void> publierVente(
-    UserModel users,
-    String title,
-    String description,
-    double latitude,
-    double longitude,
-    List<File> images,
-    List<String> jaime,
-    List<String> commentaire,
-    int prix,
-    String categorie,
-    String currency,
-    String nameProduit,
-  ) async {
-    try {
-      final List<ConnectivityResult> connectivityResult =
-          await (Connectivity().checkConnectivity());
-      if (connectivityResult.contains(ConnectivityResult.none)) {
-        showCustomSnackBar("Pas de connexion internet");
-        return;
-      }
-      await _publierVenteUseCase
-          .call(users, title, description, latitude, longitude, images, jaime,
-              commentaire, prix, categorie, currency, nameProduit)
-          .then((onValue) {
-        showCustomSnackBar("Vente publier avec succes");
-      });
-    } catch (e) {
-      showCustomSnackBar(
-          "Une erreur s'est produite. Veuillez vérifier votre connexion et réessayer.");
-    }
-  }
 
   Future<void> updatePhotoProfileUser(
       String userId, List<File> profilePic) async {
