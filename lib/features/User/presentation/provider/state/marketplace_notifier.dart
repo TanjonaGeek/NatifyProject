@@ -147,6 +147,39 @@ class MarketplaceUserNotifier extends StateNotifier<MarketplaceUserState> {
     _saveState();
   }
 
+  Future<void> ClearFilterCategorie() async {
+    state = state.copyWith(Categorie: "");
+    _saveState();
+  }
+
+  Future<void> ClearFilterPrix() async {
+    if (state.currency == "MGA") {
+      state = state.copyWith(
+          prixProduit: RangeValues(5000, 50000000), currency: "MGA");
+      _saveState();
+    } else {
+      state =
+          state.copyWith(prixProduit: RangeValues(1, 10000), currency: "USD");
+      _saveState();
+    }
+  }
+
+  Future<void> ClearFilterAdresse() async {
+    state = state.copyWith(
+      adressMaps: "",
+      latitude: 0.0,
+      longitude: 0.0,
+      radius: 10000.0,
+      isFilterLocation: false,
+    );
+    _saveState();
+  }
+
+  Future<void> ClearFilterRayon() async {
+    state = state.copyWith(radius: 10000.0);
+    _saveState();
+  }
+
   Future<void> ResetFilter() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     state = state.copyWith(

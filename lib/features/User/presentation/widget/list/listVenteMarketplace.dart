@@ -91,6 +91,23 @@ class MarketplacePage extends ConsumerWidget {
                                         fontWeight: FontWeight.bold,
                                         color: kPrimaryColor),
                                   ),
+                                  if (notifier.Categorie.isNotEmpty)
+                                    SizedBox(
+                                      width: 7,
+                                    ),
+                                  // ref.watch(marketPlaceUserStateNotifier)
+                                  if (notifier.Categorie.isNotEmpty)
+                                    GestureDetector(
+                                      onTap: () {
+                                        ref
+                                            .read(marketPlaceUserStateNotifier
+                                                .notifier)
+                                            .ClearFilterCategorie();
+                                      },
+                                      child: FaIcon(FontAwesomeIcons.close,
+                                          color: Colors.black.withOpacity(0.6),
+                                          size: 16),
+                                    )
                                 ],
                               ),
                             )),
@@ -105,11 +122,41 @@ class MarketplacePage extends ConsumerWidget {
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 10, vertical: 10),
-                              child: Text(
-                                "${PrixDebutformatted} $a ${PrixFinformatted} ${notifier.currency}",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: kPrimaryColor),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "${PrixDebutformatted} $a ${PrixFinformatted} ${notifier.currency}",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: kPrimaryColor),
+                                  ),
+                                  (notifier.prixProduit ==
+                                              RangeValues(5000.0, 50000000.0) ||
+                                          notifier.prixProduit ==
+                                              RangeValues(1.0, 10000.0))
+                                      ? SizedBox.shrink()
+                                      : SizedBox(
+                                          width: 7,
+                                        ),
+                                  (notifier.prixProduit ==
+                                              RangeValues(5000.0, 50000000.0) ||
+                                          notifier.prixProduit ==
+                                              RangeValues(1.0, 10000.0))
+                                      ? SizedBox.shrink()
+                                      : GestureDetector(
+                                          onTap: () {
+                                            ref
+                                                .read(
+                                                    marketPlaceUserStateNotifier
+                                                        .notifier)
+                                                .ClearFilterPrix();
+                                          },
+                                          child: FaIcon(FontAwesomeIcons.close,
+                                              color:
+                                                  Colors.black.withOpacity(0.6),
+                                              size: 16),
+                                        )
+                                ],
                               ),
                             )),
                         SizedBox(
@@ -137,6 +184,23 @@ class MarketplacePage extends ConsumerWidget {
                                           fontWeight: FontWeight.bold,
                                           color: kPrimaryColor),
                                     ),
+                                    if (notifier.adressMaps.isNotEmpty)
+                                      SizedBox(
+                                        width: 7,
+                                      ),
+                                    if (notifier.adressMaps.isNotEmpty)
+                                      GestureDetector(
+                                        onTap: () {
+                                          ref
+                                              .read(marketPlaceUserStateNotifier
+                                                  .notifier)
+                                              .ClearFilterAdresse();
+                                        },
+                                        child: FaIcon(FontAwesomeIcons.close,
+                                            color:
+                                                Colors.black.withOpacity(0.6),
+                                            size: 16),
+                                      )
                                   ],
                                 ),
                               )),
@@ -152,11 +216,32 @@ class MarketplacePage extends ConsumerWidget {
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 10),
-                                child: Text(
-                                  'Rayon ${(notifier.radius / 1000).toInt()} Km',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: kPrimaryColor),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      'Rayon ${(notifier.radius / 1000).toInt()} Km',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: kPrimaryColor),
+                                    ),
+                                    if (notifier.radius > 10000.0)
+                                      SizedBox(
+                                        width: 7,
+                                      ),
+                                    if (notifier.radius > 10000.0)
+                                      GestureDetector(
+                                        onTap: () {
+                                          ref
+                                              .read(marketPlaceUserStateNotifier
+                                                  .notifier)
+                                              .ClearFilterRayon();
+                                        },
+                                        child: FaIcon(FontAwesomeIcons.close,
+                                            color:
+                                                Colors.black.withOpacity(0.6),
+                                            size: 16),
+                                      )
+                                  ],
                                 ),
                               )),
                       ],
