@@ -12,6 +12,8 @@ import 'package:natify/features/User/presentation/widget/detailMarket.dart';
 import 'package:natify/features/User/presentation/widget/list/ProductCard.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
+import 'dart:math';
+import 'package:geolocator/geolocator.dart';
 
 class MarketplacePage extends ConsumerWidget {
   MarketplacePage({super.key});
@@ -27,6 +29,17 @@ class MarketplacePage extends ConsumerWidget {
       'USD': 'en_US',
       'MGA': 'mg_MG',
     };
+
+    double calculateDistance(GeoPoint point1, GeoPoint point2) {
+      return Geolocator.distanceBetween(
+            point1.latitude,
+            point1.longitude,
+            point2.latitude,
+            point2.longitude,
+          ) /
+          1000; // Convertir en kilomètres
+    }
+
     Query query = FirebaseFirestore.instance.collection('marketplace');
     // Ajouter les filtres de recherche
     if (notifier.nameSearch.isNotEmpty) {
@@ -274,6 +287,9 @@ class MarketplacePage extends ConsumerWidget {
             if (data == null) {
               return Container();
             }
+            GeoPoint geoPointCible = data['location']['geopoint'];
+            GeoPoint geoPointfiltre =
+                GeoPoint(notifier.latitude, notifier.longitude);
             double montant = (data['prix'] is int)
                 ? data['prix'].toDouble()
                 : double.tryParse(data['prix'].toString()) ?? 0.0;
@@ -281,6 +297,19 @@ class MarketplacePage extends ConsumerWidget {
             String prix =
                 NumberFormat.currency(locale: formatDevise, symbol: '')
                     .format(montant);
+            if (notifier.isFilterLocation == true) {
+              // Calculer la distance entre l'utilisateur et le point récupéré
+              double distance = calculateDistance(
+                geoPointfiltre,
+                geoPointCible,
+              );
+              // Si la distance est supérieure au rayon, cacher cet élément
+              // Si la distance est supérieure au rayon (en mètres ou en kilomètres)
+              if (distance > notifier.radius / 1000) {
+                // Si rayon en mètres, diviser par 1000
+                return SizedBox.shrink();
+              }
+            }
             return InkWell(
                 onTap: () {
                   SlideNavigation.slideToPage(
