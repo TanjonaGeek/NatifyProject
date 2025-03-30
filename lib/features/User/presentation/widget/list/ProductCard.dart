@@ -59,20 +59,19 @@ class _ProductCardState extends State<ProductCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-              child: CachedNetworkImage(
-                imageUrl: widget.imageUrl,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
-                  color: Colors.grey.shade100,
-                ),
-                errorWidget: (context, url, error) => Icon(
-                  Icons.error,
-                  color: Colors.red,
-                ),
+          ClipRRect(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+            child: CachedNetworkImage(
+              imageUrl: widget.imageUrl,
+              width: double.infinity,
+              height: 230,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => Container(
+                color: Colors.grey.shade100,
+              ),
+              errorWidget: (context, url, error) => Icon(
+                Icons.error,
+                color: Colors.red,
               ),
             ),
           ),
@@ -81,14 +80,13 @@ class _ProductCardState extends State<ProductCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (_address.isNotEmpty)
-                  Text(
-                    _address.toString(),
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                if (_address.isNotEmpty) SizedBox(height: 4),
+                Text(
+                  _address.toString(),
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: 4),
                 Text(
                   widget.title,
                   style: TextStyle(fontWeight: FontWeight.bold),

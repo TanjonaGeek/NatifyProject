@@ -69,18 +69,111 @@ class MarketplacePage extends ConsumerWidget {
         body: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Flexible(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+        Container(
+          padding: EdgeInsets.all(8.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Flexible(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                          decoration: BoxDecoration(
+                              border: Border.all(color: kPrimaryColor),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20))),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 10),
+                            child: Row(
+                              children: [
+                                FaIcon(FontAwesomeIcons.boxOpen,
+                                    color: kPrimaryColor, size: 14),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Text(
+                                  notifier.Categorie.isNotEmpty
+                                      ? '${notifier.Categorie}'
+                                      : 'Toute Categories',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: kPrimaryColor),
+                                ),
+                                if (notifier.Categorie.isNotEmpty)
+                                  SizedBox(
+                                    width: 7,
+                                  ),
+                                // ref.watch(marketPlaceUserStateNotifier)
+                                if (notifier.Categorie.isNotEmpty)
+                                  GestureDetector(
+                                    onTap: () {
+                                      ref
+                                          .read(marketPlaceUserStateNotifier
+                                              .notifier)
+                                          .ClearFilterCategorie();
+                                    },
+                                    child: FaIcon(FontAwesomeIcons.close,
+                                        color: Colors.black.withOpacity(0.6),
+                                        size: 16),
+                                  )
+                              ],
+                            ),
+                          )),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Container(
+                          decoration: BoxDecoration(
+                              border: Border.all(color: kPrimaryColor),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20))),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 10),
+                            child: Row(
+                              children: [
+                                Text(
+                                  "${PrixDebutformatted} $a ${PrixFinformatted} ${notifier.currency}",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: kPrimaryColor),
+                                ),
+                                (notifier.prixProduit ==
+                                            RangeValues(5000.0, 50000000.0) ||
+                                        notifier.prixProduit ==
+                                            RangeValues(1.0, 10000.0))
+                                    ? SizedBox.shrink()
+                                    : SizedBox(
+                                        width: 7,
+                                      ),
+                                (notifier.prixProduit ==
+                                            RangeValues(5000.0, 50000000.0) ||
+                                        notifier.prixProduit ==
+                                            RangeValues(1.0, 10000.0))
+                                    ? SizedBox.shrink()
+                                    : GestureDetector(
+                                        onTap: () {
+                                          ref
+                                              .read(marketPlaceUserStateNotifier
+                                                  .notifier)
+                                              .ClearFilterPrix();
+                                        },
+                                        child: FaIcon(FontAwesomeIcons.close,
+                                            color:
+                                                Colors.black.withOpacity(0.6),
+                                            size: 16),
+                                      )
+                              ],
+                            ),
+                          )),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      if (notifier.isFilterLocation == true)
                         Container(
                             decoration: BoxDecoration(
                                 border: Border.all(color: kPrimaryColor),
@@ -91,31 +184,28 @@ class MarketplacePage extends ConsumerWidget {
                                   horizontal: 10, vertical: 10),
                               child: Row(
                                 children: [
-                                  FaIcon(FontAwesomeIcons.boxOpen,
+                                  FaIcon(FontAwesomeIcons.locationDot,
                                       color: kPrimaryColor, size: 14),
                                   SizedBox(
                                     width: 5,
                                   ),
                                   Text(
-                                    notifier.Categorie.isNotEmpty
-                                        ? '${notifier.Categorie}'
-                                        : 'Toute Categories',
+                                    "${notifier.adressMaps}",
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: kPrimaryColor),
                                   ),
-                                  if (notifier.Categorie.isNotEmpty)
+                                  if (notifier.adressMaps.isNotEmpty)
                                     SizedBox(
                                       width: 7,
                                     ),
-                                  // ref.watch(marketPlaceUserStateNotifier)
-                                  if (notifier.Categorie.isNotEmpty)
+                                  if (notifier.adressMaps.isNotEmpty)
                                     GestureDetector(
                                       onTap: () {
                                         ref
                                             .read(marketPlaceUserStateNotifier
                                                 .notifier)
-                                            .ClearFilterCategorie();
+                                            .ClearFilterAdresse();
                                       },
                                       child: FaIcon(FontAwesomeIcons.close,
                                           color: Colors.black.withOpacity(0.6),
@@ -124,9 +214,10 @@ class MarketplacePage extends ConsumerWidget {
                                 ],
                               ),
                             )),
-                        SizedBox(
-                          width: 5,
-                        ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      if (notifier.isFilterLocation == true)
                         Container(
                             decoration: BoxDecoration(
                                 border: Border.all(color: kPrimaryColor),
@@ -138,146 +229,47 @@ class MarketplacePage extends ConsumerWidget {
                               child: Row(
                                 children: [
                                   Text(
-                                    "${PrixDebutformatted} $a ${PrixFinformatted} ${notifier.currency}",
+                                    'Rayon ${(notifier.radius / 1000).toInt()} Km',
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: kPrimaryColor),
                                   ),
-                                  (notifier.prixProduit ==
-                                              RangeValues(5000.0, 50000000.0) ||
-                                          notifier.prixProduit ==
-                                              RangeValues(1.0, 10000.0))
-                                      ? SizedBox.shrink()
-                                      : SizedBox(
-                                          width: 7,
-                                        ),
-                                  (notifier.prixProduit ==
-                                              RangeValues(5000.0, 50000000.0) ||
-                                          notifier.prixProduit ==
-                                              RangeValues(1.0, 10000.0))
-                                      ? SizedBox.shrink()
-                                      : GestureDetector(
-                                          onTap: () {
-                                            ref
-                                                .read(
-                                                    marketPlaceUserStateNotifier
-                                                        .notifier)
-                                                .ClearFilterPrix();
-                                          },
-                                          child: FaIcon(FontAwesomeIcons.close,
-                                              color:
-                                                  Colors.black.withOpacity(0.6),
-                                              size: 16),
-                                        )
+                                  if (notifier.radius > 10000.0)
+                                    SizedBox(
+                                      width: 7,
+                                    ),
+                                  if (notifier.radius > 10000.0)
+                                    GestureDetector(
+                                      onTap: () {
+                                        ref
+                                            .read(marketPlaceUserStateNotifier
+                                                .notifier)
+                                            .ClearFilterRayon();
+                                      },
+                                      child: FaIcon(FontAwesomeIcons.close,
+                                          color: Colors.black.withOpacity(0.6),
+                                          size: 16),
+                                    )
                                 ],
                               ),
                             )),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        if (notifier.isFilterLocation == true)
-                          Container(
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: kPrimaryColor),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(20))),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 10),
-                                child: Row(
-                                  children: [
-                                    FaIcon(FontAwesomeIcons.locationDot,
-                                        color: kPrimaryColor, size: 14),
-                                    SizedBox(
-                                      width: 5,
-                                    ),
-                                    Text(
-                                      "${notifier.adressMaps}",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: kPrimaryColor),
-                                    ),
-                                    if (notifier.adressMaps.isNotEmpty)
-                                      SizedBox(
-                                        width: 7,
-                                      ),
-                                    if (notifier.adressMaps.isNotEmpty)
-                                      GestureDetector(
-                                        onTap: () {
-                                          ref
-                                              .read(marketPlaceUserStateNotifier
-                                                  .notifier)
-                                              .ClearFilterAdresse();
-                                        },
-                                        child: FaIcon(FontAwesomeIcons.close,
-                                            color:
-                                                Colors.black.withOpacity(0.6),
-                                            size: 16),
-                                      )
-                                  ],
-                                ),
-                              )),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        if (notifier.isFilterLocation == true)
-                          Container(
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: kPrimaryColor),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(20))),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 10),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      'Rayon ${(notifier.radius / 1000).toInt()} Km',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: kPrimaryColor),
-                                    ),
-                                    if (notifier.radius > 10000.0)
-                                      SizedBox(
-                                        width: 7,
-                                      ),
-                                    if (notifier.radius > 10000.0)
-                                      GestureDetector(
-                                        onTap: () {
-                                          ref
-                                              .read(marketPlaceUserStateNotifier
-                                                  .notifier)
-                                              .ClearFilterRayon();
-                                        },
-                                        child: FaIcon(FontAwesomeIcons.close,
-                                            color:
-                                                Colors.black.withOpacity(0.6),
-                                            size: 16),
-                                      )
-                                  ],
-                                ),
-                              )),
-                      ],
-                    ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
         FirestorePagination(
+          padding: EdgeInsets.zero,
           key: ValueKey(requeteId),
-          shrinkWrap: true,
+          wrapOptions: WrapOptions(
+              alignment: WrapAlignment.start,
+              crossAxisAlignment: WrapCrossAlignment.start),
           limit: 15, // Defaults to 10.
           isLive: false, // Defaults to false.s
-          viewType: ViewType.grid,
+          viewType: ViewType.wrap,
           physics: NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 0.7,
-          ),
           bottomLoader: SizedBox(),
           initialLoader: // Section de post
               SizedBox(),
@@ -310,22 +302,25 @@ class MarketplacePage extends ConsumerWidget {
                 return SizedBox.shrink();
               }
             }
-            return InkWell(
-                onTap: () {
-                  SlideNavigation.slideToPage(
-                    context,
-                    ProductDetailScreen(
-                        categ: data['categorie'],
-                        productId: data['uidVente'],
-                        emplacement: data['location']['geopoint']),
-                  );
-                },
-                child: ProductCard(
-                    imageUrl: data['images'][0],
-                    title: data['title'],
-                    price: prix,
-                    currency: data['currency'],
-                    emplacement: data['location']['geopoint']));
+            return Container(
+                padding: EdgeInsets.zero,
+                width: MediaQuery.of(context).size.width / 2 - 3,
+                child: InkWell(
+                    onTap: () {
+                      SlideNavigation.slideToPage(
+                        context,
+                        ProductDetailScreen(
+                            categ: data['categorie'],
+                            productId: data['uidVente'],
+                            emplacement: data['location']['geopoint']),
+                      );
+                    },
+                    child: ProductCard(
+                        imageUrl: data['images'][0],
+                        title: data['title'],
+                        price: prix,
+                        currency: data['currency'],
+                        emplacement: data['location']['geopoint'])));
           },
           onEmpty: Expanded(
             child: Column(

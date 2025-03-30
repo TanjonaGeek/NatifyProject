@@ -314,8 +314,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       height: 50,
                       imageUrl: product['organizerPhoto'],
                       fit: BoxFit.cover,
-                      placeholder: (context, url) =>
-                          CircularProgressIndicator(),
+                      placeholder: (context, url) => Container(
+                        color: Colors.grey.shade100,
+                      ),
                       errorWidget: (context, url, error) => Icon(Icons.error),
                     ),
                   ),
