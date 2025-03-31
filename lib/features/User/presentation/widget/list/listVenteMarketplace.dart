@@ -12,8 +12,6 @@ import 'package:natify/features/User/presentation/widget/detailMarket.dart';
 import 'package:natify/features/User/presentation/widget/list/ProductCard.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
-import 'dart:math';
-import 'package:geolocator/geolocator.dart';
 
 class MarketplacePage extends ConsumerStatefulWidget {
   MarketplacePage({super.key});
@@ -25,29 +23,16 @@ class MarketplacePage extends ConsumerStatefulWidget {
 class _MarketplacePageState extends ConsumerState<MarketplacePage> {
   String a = "à".tr;
   String? uidMe = FirebaseAuth.instance.currentUser!.uid ?? "";
-  final ValueNotifier<List<String>> _checkDataFilterLocation =
-      ValueNotifier<List<String>>([]);
   final Map<String, String> _exchangeFormat = {
     'EUR': 'fr_FR',
     'USD': 'en_US',
     'MGA': 'mg_MG',
   };
 
-  double calculateDistance(GeoPoint point1, GeoPoint point2) {
-    return Geolocator.distanceBetween(
-          point1.latitude,
-          point1.longitude,
-          point2.latitude,
-          point2.longitude,
-        ) /
-        1000; // Convertir en kilomètres
-  }
-
   @override
   Widget build(BuildContext context) {
     final notifier = ref.watch(marketPlaceUserStateNotifier);
     var requeteId = const Uuid().v1();
-    _checkDataFilterLocation.value.clear();
     Query query = FirebaseFirestore.instance.collection('marketplace');
     // Ajouter les filtres de recherche
     if (notifier.nameSearch.isNotEmpty) {
@@ -59,6 +44,13 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
     }
     if (notifier.Categorie.isNotEmpty) {
       query = query.where('categorie', isEqualTo: notifier.Categorie);
+    }
+    if (notifier.isFilterLocation == true) {
+      query = query
+          .where('latitude', isGreaterThanOrEqualTo: notifier.minlatitude)
+          .where('latitude', isLessThanOrEqualTo: notifier.maxlatitude)
+          .where('longitude', isGreaterThanOrEqualTo: notifier.minlongitude)
+          .where('longitude', isLessThanOrEqualTo: notifier.maxlongitude);
     }
     query = query
         .where('status', isEqualTo: true)
@@ -269,251 +261,84 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
             ],
           ),
         ),
-        ValueListenableBuilder<List<String>>(
-            valueListenable: _checkDataFilterLocation,
-            builder: (context, value, _) {
-              print('le value est ${value}');
-              if (value.contains('not-empty')) {
-                return FirestorePagination(
-                  padding: EdgeInsets.zero,
-                  key: ValueKey(requeteId),
-                  wrapOptions: WrapOptions(
-                      alignment: WrapAlignment.start,
-                      crossAxisAlignment: WrapCrossAlignment.start),
-                  limit: 15, // Defaults to 10.
-                  isLive: false, // Defaults to false.s
-                  viewType: ViewType.wrap,
-                  physics: NeverScrollableScrollPhysics(),
-                  bottomLoader: SizedBox(),
-                  initialLoader: // Section de post
-                      SizedBox(),
-                  query: query,
-                  itemBuilder: (context, documentSnapshot, index) {
-                    final data =
-                        documentSnapshot.data() as Map<String, dynamic>?;
-                    if (data == null) {
-                      return Container();
-                    }
-                    GeoPoint geoPointCible = data['location']['geopoint'];
-                    GeoPoint geoPointfiltre =
-                        GeoPoint(notifier.latitude, notifier.longitude);
-                    double montant = (data['prix'] is int)
-                        ? data['prix'].toDouble()
-                        : double.tryParse(data['prix'].toString()) ?? 0.0;
-                    String formatDevise =
-                        _exchangeFormat[data['currency']] ?? "en_US";
-                    String prix =
-                        NumberFormat.currency(locale: formatDevise, symbol: '')
-                            .format(montant);
-                    if (notifier.isFilterLocation == true) {
-                      // Calculer la distance entre l'utilisateur et le point récupéré
-                      double distance = calculateDistance(
-                        geoPointfiltre,
-                        geoPointCible,
-                      );
-                      // Si la distance est supérieure au rayon, cacher cet élément
-                      // Si la distance est supérieure au rayon (en mètres ou en kilomètres)
-                      if (distance > notifier.radius / 1000) {
-                        // Si rayon en mètres, diviser par 1000
-                        List<String> newList =
-                            List.from(_checkDataFilterLocation.value);
-                        newList.add('empty');
-                        _checkDataFilterLocation.value = newList;
-                        return SizedBox.shrink();
-                      } else {
-                        List<String> newLists =
-                            List.from(_checkDataFilterLocation.value);
-                        newLists.add('not-empty');
-                        _checkDataFilterLocation.value = newLists;
-                      }
-                    }
-                    return Container(
-                        padding: EdgeInsets.zero,
-                        width: MediaQuery.of(context).size.width / 2 - 3,
-                        child: InkWell(
-                            onTap: () {
-                              SlideNavigation.slideToPage(
-                                context,
-                                ProductDetailScreen(
-                                    categ: data['categorie'],
-                                    productId: data['uidVente'],
-                                    emplacement: data['location']['geopoint']),
-                              );
-                            },
-                            child: ProductCard(
-                                imageUrl: data['images'][0],
-                                title: data['title'],
-                                price: prix,
-                                currency: data['currency'],
-                                emplacement: data['location']['geopoint'])));
-                  },
-                  onEmpty: Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 130,
-                          height: 130,
-                          child: Image.asset(
-                            'assets/marketplace (1).png',
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          textAlign: TextAlign.center,
-                          "Aucun produit disponible".tr,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 20),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          textAlign: TextAlign.center,
-                          "Actuellement, aucun produit n'est en vente sur Marketplace"
-                              .tr,
-                          style: TextStyle(
-                              fontWeight: FontWeight.w400, fontSize: 17),
-                        ),
-                      ],
-                    ),
+        FirestorePagination(
+          padding: EdgeInsets.zero,
+          shrinkWrap: true,
+          key: ValueKey(requeteId),
+          wrapOptions: WrapOptions(
+              alignment: WrapAlignment.start,
+              crossAxisAlignment: WrapCrossAlignment.start),
+          limit: 15, // Defaults to 10.
+          isLive: false, // Defaults to false.s
+          viewType: ViewType.grid,
+          physics: NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 1,
+            mainAxisSpacing: 1,
+            childAspectRatio: 0.7,
+          ),
+          bottomLoader: SizedBox(),
+          initialLoader: // Section de post
+              SizedBox(),
+          query: query,
+          itemBuilder: (context, documentSnapshot, index) {
+            final data = documentSnapshot.data() as Map<String, dynamic>?;
+            if (data == null) {
+              return Container();
+            }
+            double montant = (data['prix'] is int)
+                ? data['prix'].toDouble()
+                : double.tryParse(data['prix'].toString()) ?? 0.0;
+            String formatDevise = _exchangeFormat[data['currency']] ?? "en_US";
+            String prix =
+                NumberFormat.currency(locale: formatDevise, symbol: '')
+                    .format(montant);
+            return InkWell(
+                onTap: () {
+                  SlideNavigation.slideToPage(
+                    context,
+                    ProductDetailScreen(
+                        categ: data['categorie'],
+                        productId: data['uidVente'],
+                        emplacement: data['location']['geopoint']),
+                  );
+                },
+                child: ProductCard(
+                    imageUrl: data['images'][0],
+                    title: data['title'],
+                    price: prix,
+                    currency: data['currency'],
+                    emplacement: data['location']['geopoint']));
+          },
+          onEmpty: Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 130,
+                  height: 130,
+                  child: Image.asset(
+                    'assets/marketplace (1).png',
                   ),
-                );
-              } else if (value.isEmpty) {
-                return FirestorePagination(
-                  padding: EdgeInsets.zero,
-                  key: ValueKey(requeteId),
-                  wrapOptions: WrapOptions(
-                      alignment: WrapAlignment.start,
-                      crossAxisAlignment: WrapCrossAlignment.start),
-                  limit: 15, // Defaults to 10.
-                  isLive: false, // Defaults to false.s
-                  viewType: ViewType.wrap,
-                  physics: NeverScrollableScrollPhysics(),
-                  bottomLoader: SizedBox(),
-                  initialLoader: // Section de post
-                      SizedBox(),
-                  query: query,
-                  itemBuilder: (context, documentSnapshot, index) {
-                    final data =
-                        documentSnapshot.data() as Map<String, dynamic>?;
-                    if (data == null) {
-                      return Container();
-                    }
-                    GeoPoint geoPointCible = data['location']['geopoint'];
-                    GeoPoint geoPointfiltre =
-                        GeoPoint(notifier.latitude, notifier.longitude);
-                    double montant = (data['prix'] is int)
-                        ? data['prix'].toDouble()
-                        : double.tryParse(data['prix'].toString()) ?? 0.0;
-                    String formatDevise =
-                        _exchangeFormat[data['currency']] ?? "en_US";
-                    String prix =
-                        NumberFormat.currency(locale: formatDevise, symbol: '')
-                            .format(montant);
-                    if (notifier.isFilterLocation == true) {
-                      // Calculer la distance entre l'utilisateur et le point récupéré
-                      double distance = calculateDistance(
-                        geoPointfiltre,
-                        geoPointCible,
-                      );
-                      // Si la distance est supérieure au rayon, cacher cet élément
-                      // Si la distance est supérieure au rayon (en mètres ou en kilomètres)
-                      if (distance > notifier.radius / 1000) {
-                        // Si rayon en mètres, diviser par 1000
-                        List<String> newList =
-                            List.from(_checkDataFilterLocation.value);
-                        newList.add('empty');
-                        _checkDataFilterLocation.value = newList;
-                        return SizedBox.shrink();
-                      } else {
-                        List<String> newLists =
-                            List.from(_checkDataFilterLocation.value);
-                        newLists.add('not-empty');
-                        _checkDataFilterLocation.value = newLists;
-                      }
-                    }
-                    return Container(
-                        padding: EdgeInsets.zero,
-                        width: MediaQuery.of(context).size.width / 2 - 3,
-                        child: InkWell(
-                            onTap: () {
-                              SlideNavigation.slideToPage(
-                                context,
-                                ProductDetailScreen(
-                                    categ: data['categorie'],
-                                    productId: data['uidVente'],
-                                    emplacement: data['location']['geopoint']),
-                              );
-                            },
-                            child: ProductCard(
-                                imageUrl: data['images'][0],
-                                title: data['title'],
-                                price: prix,
-                                currency: data['currency'],
-                                emplacement: data['location']['geopoint'])));
-                  },
-                  onEmpty: Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 130,
-                          height: 130,
-                          child: Image.asset(
-                            'assets/marketplace (1).png',
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          textAlign: TextAlign.center,
-                          "Aucun produit disponible".tr,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 20),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          textAlign: TextAlign.center,
-                          "Actuellement, aucun produit n'est en vente sur Marketplace"
-                              .tr,
-                          style: TextStyle(
-                              fontWeight: FontWeight.w400, fontSize: 17),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              } else {
-                print("le donner est dans l'etape 2");
-                return Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 130,
-                        height: 130,
-                        child: Image.asset(
-                          'assets/marketplace (1).png',
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        textAlign: TextAlign.center,
-                        "Aucun produit disponible".tr,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        textAlign: TextAlign.center,
-                        "Actuellement, aucun produit n'est en vente sur Marketplace"
-                            .tr,
-                        style: TextStyle(
-                            fontWeight: FontWeight.w400, fontSize: 17),
-                      ),
-                    ],
-                  ),
-                );
-              }
-            })
+                ),
+                SizedBox(height: 10),
+                Text(
+                  textAlign: TextAlign.center,
+                  "Aucun produit disponible".tr,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  textAlign: TextAlign.center,
+                  "Actuellement, aucun produit n'est en vente sur Marketplace"
+                      .tr,
+                  style: TextStyle(fontWeight: FontWeight.w400, fontSize: 17),
+                ),
+              ],
+            ),
+          ),
+        )
       ],
     ));
   }

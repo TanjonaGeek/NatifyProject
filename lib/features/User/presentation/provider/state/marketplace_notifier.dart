@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -142,9 +143,27 @@ class MarketplaceUserNotifier extends StateNotifier<MarketplaceUserState> {
         longitude: longitude,
         adressMaps: adresse,
         radius: radius);
-
+    calculateBounds(latitude, longitude);
     // Sauvegarde des données dans SharedPreferences
     _saveState();
+  }
+
+  Future<void> calculateBounds(double lat, double lon) async {
+    const double earthRadiusKm = 6371.0;
+    double radiusKm = state.radius / 1000.0;
+    // Convertir le rayon en degrés
+    double latOffset = (radiusKm / earthRadiusKm) * (180 / pi);
+    double lonOffset = latOffset / cos(lat * pi / 180);
+
+    double minLat = lat - latOffset;
+    double maxLat = lat + latOffset;
+    double minLon = lon - lonOffset;
+    double maxLon = lon + lonOffset;
+    state = state.copyWith(
+        minlongitude: minLon,
+        minlatitude: minLat,
+        maxlongitude: maxLon,
+        maxlatitude: maxLat);
   }
 
   Future<void> ClearFilterCategorie() async {
@@ -170,6 +189,10 @@ class MarketplaceUserNotifier extends StateNotifier<MarketplaceUserState> {
       latitude: 0.0,
       longitude: 0.0,
       radius: 10000.0,
+      minlongitude: 0.0,
+      minlatitude: 0.0,
+      maxlongitude: 0.0,
+      maxlatitude: 0.0,
       isFilterLocation: false,
     );
     _saveState();
@@ -191,6 +214,10 @@ class MarketplaceUserNotifier extends StateNotifier<MarketplaceUserState> {
         longitude: 0.0,
         nameSearch: '',
         radius: 10000.0,
+        minlongitude: 0.0,
+        minlatitude: 0.0,
+        maxlongitude: 0.0,
+        maxlatitude: 0.0,
         isFilterLocation: false,
         isFilter: false);
 

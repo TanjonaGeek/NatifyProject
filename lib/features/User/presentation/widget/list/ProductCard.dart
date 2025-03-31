@@ -59,19 +59,20 @@ class _ProductCardState extends State<ProductCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-            child: CachedNetworkImage(
-              imageUrl: widget.imageUrl,
-              width: double.infinity,
-              height: 230,
-              fit: BoxFit.cover,
-              placeholder: (context, url) => Container(
-                color: Colors.grey.shade100,
-              ),
-              errorWidget: (context, url, error) => Icon(
-                Icons.error,
-                color: Colors.red,
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+              child: CachedNetworkImage(
+                imageUrl: widget.imageUrl,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(
+                  color: Colors.grey.shade100,
+                ),
+                errorWidget: (context, url, error) => Icon(
+                  Icons.error,
+                  color: Colors.red,
+                ),
               ),
             ),
           ),

@@ -19,6 +19,10 @@ class MarketplaceUserState extends Equatable {
   final MarketplaceUserConcreteState state;
   final String currency;
   final double radius;
+  final double minlongitude;
+  final double minlatitude;
+  final double maxlongitude;
+  final double maxlatitude;
 
   const MarketplaceUserState({
     this.hasData = false,
@@ -36,6 +40,10 @@ class MarketplaceUserState extends Equatable {
     this.state = MarketplaceUserConcreteState.initial,
     this.currency = "USD",
     this.radius = 10000.0,
+    this.minlongitude = 0.0,
+    this.minlatitude = 0.0,
+    this.maxlongitude = 0.0,
+    this.maxlatitude = 0.0,
   });
 
   MarketplaceUserState copyWith({
@@ -55,6 +63,10 @@ class MarketplaceUserState extends Equatable {
     MarketplaceUserConcreteState? state,
     String? currency,
     double? radius,
+    double? minlongitude,
+    double? minlatitude,
+    double? maxlongitude,
+    double? maxlatitude,
   }) {
     return MarketplaceUserState(
       hasData: hasData ?? this.hasData,
@@ -72,6 +84,10 @@ class MarketplaceUserState extends Equatable {
       state: state ?? this.state,
       currency: currency ?? this.currency,
       radius: radius ?? this.radius,
+      minlongitude: minlongitude ?? this.minlongitude,
+      minlatitude: minlatitude ?? this.minlatitude,
+      maxlongitude: maxlongitude ?? this.maxlongitude,
+      maxlatitude: maxlatitude ?? this.maxlatitude,
     );
   }
 
@@ -93,6 +109,10 @@ class MarketplaceUserState extends Equatable {
       'state': state.index,
       'currency': currency,
       'radius': radius,
+      "minlongitude": minlongitude,
+      "minlatitude": minlatitude,
+      "maxlongitude": maxlongitude,
+      "maxlatitude": maxlatitude,
     };
   }
 
@@ -116,6 +136,10 @@ class MarketplaceUserState extends Equatable {
       state: MarketplaceUserConcreteState.values[json['state'] ?? 0],
       currency: json['currency'] ?? 'USD',
       radius: json['radius'] ?? 10000.0,
+      minlongitude: json['minlongitude'] ?? 0.0,
+      minlatitude: json['minlatitude'] ?? 0.0,
+      maxlongitude: json['maxlongitude'] ?? 0.0,
+      maxlatitude: json['maxlatitude'] ?? 0.0,
     );
   }
 
@@ -136,5 +160,9 @@ class MarketplaceUserState extends Equatable {
         state,
         currency,
         radius,
+        minlongitude,
+        minlatitude,
+        maxlongitude,
+        maxlatitude,
       ];
 }
