@@ -81,6 +81,53 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if (notifier.nameSearch.isNotEmpty)
+                        Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(color: kPrimaryColor),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20))),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 10),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "Mots-cle : ",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: kPrimaryColor),
+                                  ),
+                                  SizedBox(
+                                    width: 7,
+                                  ),
+                                  Text(
+                                    "${notifier.nameSearch}",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: kPrimaryColor),
+                                  ),
+                                  SizedBox(
+                                    width: 7,
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      ref
+                                          .read(marketPlaceUserStateNotifier
+                                              .notifier)
+                                          .ClearFilterTerm();
+                                    },
+                                    child: FaIcon(FontAwesomeIcons.close,
+                                        color: Colors.black.withOpacity(0.6),
+                                        size: 16),
+                                  )
+                                ],
+                              ),
+                            )),
+                      if (notifier.nameSearch.isNotEmpty)
+                        SizedBox(
+                          width: 5,
+                        ),
                       Container(
                           decoration: BoxDecoration(
                               border: Border.all(color: kPrimaryColor),
@@ -280,7 +327,23 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
           ),
           bottomLoader: SizedBox(),
           initialLoader: // Section de post
-              SizedBox(),
+              Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                  child: Container(
+                      width: 30,
+                      height: 30,
+                      child: CircularProgressIndicator(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black,
+                      )),
+                ),
+              ],
+            ),
+          ),
           query: query,
           itemBuilder: (context, documentSnapshot, index) {
             final data = documentSnapshot.data() as Map<String, dynamic>?;

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:geoflutterfire2/geoflutterfire2.dart';
 import 'package:natify/core/Services/NotificationService.dart';
+import 'package:natify/core/utils/helpers.dart';
 import 'package:natify/features/Storie/data/models/story_model.dart';
 import 'package:natify/features/User/data/datasources/local/data_source_user.dart';
 import 'package:natify/features/User/data/models/highlight_model.dart';
@@ -495,6 +496,34 @@ class DataSourceUserImpl implements DataSourceUser {
     }
 
     return downloadUrl;
+  }
+
+  List<String> generateKeywords(String title, String currentLanguage) {
+    // Vérifier si la langue est supportée
+    if (!Helpers.stopWordsByLanguage.containsKey(currentLanguage)) {
+      currentLanguage =
+          'en'; // Utiliser l'anglais par défaut si la langue n'est pas supportée
+    }
+
+    // Récupérer la liste de mots inutiles pour la langue spécifiée
+    List<String> stopWords = Helpers.stopWordsByLanguage[currentLanguage]!;
+    // Préparer les mots du titre, en convertissant en minuscules et en filtrant les stopwords
+    List<String> words = title
+        .toLowerCase()
+        .split(' ')
+        .where((word) => !stopWords.contains(word))
+        .toList();
+
+    Set<String> uniqueKeywords = {};
+
+    // Générer des combinaisons de mots
+    for (int i = 0; i < words.length; i++) {
+      for (int j = i; j < words.length; j++) {
+        uniqueKeywords.add(words.sublist(i, j + 1).join(' '));
+      }
+    }
+
+    return uniqueKeywords.toList();
   }
 
   List<String> generateAllSubstrings(String name) {
@@ -1452,7 +1481,7 @@ class DataSourceUserImpl implements DataSourceUser {
       List<String> collectionImagePath = [];
       String ref = "/ProduitImage/$venteUidGenerate/";
       String titles = "Importation image";
-
+      List<String> keywords = generateKeywords(title, 'en');
       // Utilisation de Future.wait pour uploader toutes les images
       await Future.wait(images.map((image) async {
         // Appel de la fonction d'upload pour chaque image
@@ -1478,15 +1507,39 @@ class DataSourceUserImpl implements DataSourceUser {
         "prix": prix ?? "",
         "categorie": categorie ?? "",
         "currency": currency ?? "USD",
-        "nameProduit": generateAllSubstrings(nameProduit),
+        "nameProduit": keywords,
         "status": true
       });
 
-      print("✅ Événement ajouté avec succès !");
+      // Ajouter les mots-clés dans la collection "suggestions"
+      for (String keyword in keywords) {
+        bool exists = await doesKeywordExist(
+            keyword); // Vérifie si le mot-clé existe déjà
+
+        if (!exists) {
+          await FirebaseFirestore.instance
+              .collection('suggestions')
+              .doc(keyword)
+              .set({
+            'term': keyword,
+            'category': categorie,
+          });
+          print('Mot-clé ajouté : $keyword');
+        }
+      }
     } catch (e) {
-      print("❌ Erreur lors de l'ajout de l'événement : $e");
       rethrow; // Permet de remonter l'erreur si nécessaire
     }
+  }
+
+  Future<bool> doesKeywordExist(String keyword) async {
+    DocumentSnapshot docSnapshot = await FirebaseFirestore.instance
+        .collection('suggestions')
+        .doc(keyword)
+        .get();
+
+    return docSnapshot
+        .exists; // Retourne true si le document existe, sinon false
   }
 
   @override
@@ -1546,7 +1599,7 @@ class DataSourceUserImpl implements DataSourceUser {
         List<String> collectionImagePath = imagesOld;
         String ref = "/ProduitImage/$uidVente/";
         String titles = "Importation image";
-
+        List<String> keywords = generateKeywords(title, 'en');
         // Utilisation de Future.wait pour uploader toutes les images
         await Future.wait(images.map((image) async {
           // Appel de la fonction d'upload pour chaque image
@@ -1568,9 +1621,25 @@ class DataSourceUserImpl implements DataSourceUser {
           "prix": prix ?? "",
           "categorie": categorie ?? "",
           "currency": currency ?? "USD",
-          "nameProduit": generateAllSubstrings(nameProduit),
+          "nameProduit": keywords,
           "status": status
         });
+        // Ajouter les mots-clés dans la collection "suggestions"
+        for (String keyword in keywords) {
+          bool exists = await doesKeywordExist(
+              keyword); // Vérifie si le mot-clé existe déjà
+
+          if (!exists) {
+            await FirebaseFirestore.instance
+                .collection('suggestions')
+                .doc(keyword)
+                .set({
+              'term': keyword,
+              'category': categorie,
+            });
+            print('Mot-clé ajouté : $keyword');
+          }
+        }
       }
     } catch (e) {}
   }

@@ -117,7 +117,16 @@ class _MarketplacePageMeState extends ConsumerState<MarketplacePageMe>
                   physics: NeverScrollableScrollPhysics(),
                   bottomLoader: SizedBox(),
                   initialLoader: // Section de post
-                      SizedBox(),
+                      Center(
+                    child: Container(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black,
+                        )),
+                  ),
                   query: query,
                   itemBuilder: (context, documentSnapshot, index) {
                     final data =

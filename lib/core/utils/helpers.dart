@@ -59,6 +59,41 @@ abstract class Helpers {
     }
   }
 
+  static Map<String, List<String>> stopWordsByLanguage = {
+    'fr': [
+      'le',
+      'la',
+      'de',
+      'et',
+      'du',
+      'un',
+      'une',
+      'des',
+      'pour',
+      'dans',
+      'avec'
+    ],
+    'en': ['the', 'and', 'for', 'a', 'to', 'in', 'with', 'is', 'at', 'of'],
+    'de': [
+      'der',
+      'die',
+      'das',
+      'und',
+      'für',
+      'ein',
+      'eine',
+      'mit',
+      'in',
+      'von'
+    ],
+    'es': ['el', 'la', 'y', 'de', 'un', 'una', 'para', 'con', 'en', 'por'],
+    'it': ['il', 'la', 'un', 'una', 'di', 'e', 'per', 'con', 'in', 'da'],
+    'pt': ['o', 'a', 'e', 'de', 'para', 'com', 'em', 'por', 'um', 'uma'],
+    'ar': ['ال', 'و', 'من', 'إلى', 'عن', 'في', 'مع', 'على'],
+    'pl': ['w', 'na', 'i', 'z', 'dla', 'do', 'od', 'o', 'jest'],
+    'tr': ['ve', 'bir', 'bu', 'da', 'ile', 'için', 'de'],
+  };
+
   static List locale = [
     {'name': 'English (US)', 'locale': Locale('en', 'US')},
     {'name': 'Français (FR)', 'locale': Locale('fr', 'FR')},

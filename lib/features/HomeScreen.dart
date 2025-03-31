@@ -21,6 +21,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:natify/features/User/presentation/widget/list/SearchProduct.dart';
 import 'package:natify/features/User/presentation/widget/list/filterListOfProduct.dart';
 import 'package:natify/features/User/presentation/widget/list/listVenteMarketplace.dart';
 import 'package:shimmer/shimmer.dart';
@@ -197,7 +198,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                             SlideNavigation.slideToPage(context, GalleryPage());
                           },
                           child: FaIcon(
-                            FontAwesomeIcons.solidSquarePlus,
+                            FontAwesomeIcons.squarePlus,
                             size: 24,
                           ))
                       : SizedBox();
@@ -207,15 +208,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 valueListenable: _selectedIndexNotifier,
                 builder: (context, selectedIndex, _) {
                   return selectedIndex == 3
-                      ? IconButton(
-                          onPressed: () {
-                            SlideNavigation.slideToPage(
-                                context, FilterProductPage());
-                          },
-                          icon: FaIcon(
-                            FontAwesomeIcons.sliders,
-                            size: 22,
-                          ),
+                      ? Row(
+                          children: [
+                            IconButton(
+                                onPressed: () {
+                                  SlideNavigation.slideToPage(
+                                      context, SearchProduct());
+                                },
+                                icon: Center(
+                                  child: Image.asset(
+                                    'assets/loupe1.png',
+                                    width: 28,
+                                    height: 28,
+                                    color: Colors.black,
+                                  ),
+                                )),
+                            IconButton(
+                              onPressed: () {
+                                SlideNavigation.slideToPage(
+                                    context, FilterProductPage());
+                              },
+                              icon: FaIcon(
+                                FontAwesomeIcons.sliders,
+                                size: 22,
+                              ),
+                            ),
+                          ],
                         )
                       : IconButton(
                           iconSize: 50,
@@ -227,7 +245,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                         context, AllNotification());
                                   },
                                   child: FaIcon(
-                                    FontAwesomeIcons.solidBell,
+                                    FontAwesomeIcons.bell,
                                     size: 24,
                                   )),
                               Positioned(
@@ -301,7 +319,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             ],
             leading: IconButton(
               icon: FaIcon(
-                FontAwesomeIcons.solidPenToSquare,
+                FontAwesomeIcons.penToSquare,
                 size: 24,
               ),
               onPressed: () {

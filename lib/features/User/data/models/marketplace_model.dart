@@ -20,6 +20,8 @@ class MarketplaceModel extends MarketPlaceEntity {
     super.categorie,
     super.currency,
     super.nameProduit,
+    super.latitude,
+    super.longitude,
   });
 
   factory MarketplaceModel.fromJson(Map<String, dynamic> map) {
@@ -41,6 +43,8 @@ class MarketplaceModel extends MarketPlaceEntity {
       categorie: map['categorie'] ?? '',
       currency: map['currency'] ?? 'USD',
       nameProduit: List<String>.from(map['nameProduit']) ?? [],
+      latitude: map['latitude'] ?? 0.0,
+      longitude: map['longitude'] ?? 0.0,
     );
   }
 
@@ -63,6 +67,8 @@ class MarketplaceModel extends MarketPlaceEntity {
       'categorie': categorie,
       'currency': currency,
       'nameProduit': nameProduit,
+      'latitude': latitude,
+      'longitude': longitude,
     };
   }
 
@@ -86,6 +92,8 @@ class MarketplaceModel extends MarketPlaceEntity {
       categorie: data['categorie'],
       currency: data['currency'],
       nameProduit: data['nameProduit'],
+      latitude: data['latitude'],
+      longitude: data['longitude'],
     );
   }
 
@@ -108,6 +116,8 @@ class MarketplaceModel extends MarketPlaceEntity {
       categorie: entity.categorie,
       currency: entity.currency,
       nameProduit: entity.nameProduit,
+      latitude: entity.latitude,
+      longitude: entity.longitude,
     );
   }
 
@@ -129,6 +139,8 @@ class MarketplaceModel extends MarketPlaceEntity {
         prix: prix,
         categorie: categorie,
         currency: currency,
-        nameProduit: nameProduit);
+        nameProduit: nameProduit,
+        latitude: latitude,
+        longitude: longitude);
   }
 }

@@ -203,6 +203,16 @@ class MarketplaceUserNotifier extends StateNotifier<MarketplaceUserState> {
     _saveState();
   }
 
+   Future<void> ClearFilterTerm() async {
+    state = state.copyWith(nameSearch: "");
+    _saveState();
+  }
+
+  Future<void> SetNameSearchTerm(String nameSearch) async {
+    state = state.copyWith(nameSearch: nameSearch);
+    _saveState();
+  }
+
   Future<void> ResetFilter() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     state = state.copyWith(
