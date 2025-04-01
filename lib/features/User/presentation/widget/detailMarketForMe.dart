@@ -112,8 +112,7 @@ class _ProductDetailScreenMeState extends State<ProductDetailScreenMe> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:
-            Text('Annonces'.tr, style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(''.tr, style: TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
@@ -263,10 +262,13 @@ class _ProductDetailScreenMeState extends State<ProductDetailScreenMe> {
                                       SizedBox(
                                         width: 10,
                                       ),
-                                      Text("${_address.value}",
-                                          style: TextStyle(
-                                              color: Colors.grey,
-                                              fontSize: 16)),
+                                      Flexible(
+                                        child: Text("${_address.value}",
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 16)),
+                                      ),
                                     ],
                                   );
                           }),
@@ -282,9 +284,12 @@ class _ProductDetailScreenMeState extends State<ProductDetailScreenMe> {
                           SizedBox(
                             width: 9,
                           ),
-                          Text(product['categorie'],
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 16)),
+                          Flexible(
+                            child: Text(product['categorie'],
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    color: Colors.grey, fontSize: 16)),
+                          ),
                         ],
                       ),
                       SizedBox(height: 10),
@@ -325,10 +330,13 @@ class _ProductDetailScreenMeState extends State<ProductDetailScreenMe> {
                               ),
                             ),
                             SizedBox(width: 5),
-                            Text("Mettre à jour l'annonce",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold)),
+                            Flexible(
+                              child: Text("Mettre_a_jour_annonce".tr,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold)),
+                            ),
                           ],
                         ),
                       ),
@@ -336,12 +344,18 @@ class _ProductDetailScreenMeState extends State<ProductDetailScreenMe> {
                       SizedBox(height: 10),
 
                       // Description
-                      Text("Description",
+                      Text("description".tr,
+                          maxLines: 1,
                           style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold)),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            overflow: TextOverflow.ellipsis,
+                          )),
                       SizedBox(height: 5),
                       Text(product['description'],
-                          style: TextStyle(fontSize: 16)),
+                          style: TextStyle(
+                            fontSize: 16,
+                          )),
 
                       SizedBox(height: 10),
                       Divider(
@@ -351,9 +365,12 @@ class _ProductDetailScreenMeState extends State<ProductDetailScreenMe> {
                       SizedBox(height: 2),
 
                       // Description
-                      Text("Vendeur",
+                      Text("Vendeur".tr,
+                          maxLines: 1,
                           style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold)),
+                              overflow: TextOverflow.ellipsis,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold)),
                       SizedBox(height: 5),
 
                       // Infos du vendeur
@@ -403,9 +420,11 @@ class _ProductDetailScreenMeState extends State<ProductDetailScreenMe> {
                           builder: (context, value, _) {
                             return value.isEmpty
                                 ? SizedBox.shrink()
-                                : Text("Emplacement",
+                                : Text("Emplacement".tr,
+                                    maxLines: 1,
                                     style: TextStyle(
                                         fontSize: 18,
+                                        overflow: TextOverflow.ellipsis,
                                         fontWeight: FontWeight.bold));
                           }),
 
@@ -513,12 +532,23 @@ class _ProductDetailScreenMeState extends State<ProductDetailScreenMe> {
                                                   width: double.infinity,
                                                   height: 90,
                                                   child: Center(
-                                                    child: Text(
-                                                      "Appuyer pour voir l'emplacement",
-                                                      style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontWeight:
-                                                              FontWeight.bold),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 8.0),
+                                                      child: Text(
+                                                        "Appuyer_voir_emplacement"
+                                                            .tr,
+                                                        maxLines: 1,
+                                                        style: TextStyle(
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            color: Colors.white,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
                                                     ),
                                                   ), // Ajoute un fond sombre
                                                 ),

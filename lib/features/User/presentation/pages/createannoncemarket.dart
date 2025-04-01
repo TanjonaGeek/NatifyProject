@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:flutter/services.dart';
 import 'package:natify/core/utils/colors.dart';
@@ -7,9 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:natify/core/utils/helpers.dart';
 import 'package:natify/core/utils/snack_bar_helpers.dart';
-import 'package:natify/core/utils/widget/nationaliteListPage.dart';
 import 'package:natify/features/User/presentation/provider/user_provider.dart';
 import 'package:natify/features/User/presentation/widget/categorieMarket.dart';
 import 'package:natify/features/User/presentation/widget/galleryannoncephoto.dart';
@@ -27,18 +24,22 @@ class CreateAnnonceMarket extends ConsumerStatefulWidget {
 class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
   final _formKey = GlobalKey<FormState>();
   List<File> selectedFiles = []; // Liste pour stocker les fichiers sélectionnés
-  String lieu = "Ajouter lieux";
+  String lieu = "Ajouter_lieux".tr;
   String flag = "";
   double latitude = 0.0;
   double longitude = 0.0;
   String _currentCurrency = "USD";
+  String prix_entre = "prix_entre".tr;
+  String et = "et".tr;
+  int _currentLength = 0; // Compteur pour la longueur du texte
+  final int _maxLength = 30; // Limite maximale de caractères
   final Map<String, String> _exchangeFormat = {
     'EUR': 'fr_FR',
     'USD': 'en_US',
     'MGA': 'mg_MG',
   };
   final TextEditingController categorieProduit =
-      TextEditingController(text: "Selectionnez Categorie");
+      TextEditingController(text: "Selectionnez_Categorie".tr);
   final TextEditingController titreProduit = TextEditingController();
   final TextEditingController prixProduit = TextEditingController();
   final TextEditingController descriptionProduit = TextEditingController();
@@ -67,8 +68,8 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Devises",
-              style: TextStyle(fontWeight: FontWeight.bold)),
+          title:
+              Text("Devises".tr, style: TextStyle(fontWeight: FontWeight.bold)),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           content: Column(
@@ -110,7 +111,6 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
     );
 
     if (selectedLieux != null) {
-      print('le lieux est $selectedLieux');
       setState(() {
         lieu = selectedLieux[0]['lieu'];
         latitude = selectedLieux[0]['latitude'];
@@ -140,9 +140,9 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
       Navigator.pop(context);
     } else {
       if (categorieProduit.text.isEmpty) {
-        showCustomSnackBar("Choissisez un categorie produit");
+        showCustomSnackBar("Choisissez_catégorie");
       } else if (selectedFiles.isEmpty) {
-        showCustomSnackBar("Inserer un image pour le produit");
+        showCustomSnackBar("Insérez_produit");
       }
     }
   }
@@ -153,7 +153,7 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
       child: Scaffold(
         resizeToAvoidBottomInset: true, // Permet d'éviter les débordements
         appBar: AppBar(
-          title: Text("Publier une annonce".tr,
+          title: Text("Publier_annonce".tr,
               style: TextStyle(fontWeight: FontWeight.bold)),
           elevation: 0,
           centerTitle: true,
@@ -211,7 +211,7 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
                         descriptionProduit.text = value.toString();
                       },
                       decoration: InputDecoration(
-                        hintText: "Partagez des détails sur ce produit...",
+                        hintText: "Partagez_détails".tr,
                         border: InputBorder.none,
                       ),
                       maxLines:
@@ -221,11 +221,15 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'Détails annonce',
+                    "Détails_annonce".tr,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 10),
                   TextFormField(
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(
+                          _maxLength), // Limite à 10 caractères
+                    ],
                     validator: (value) {
                       if ((value == null || value.isEmpty)) {
                         return "rempli_champs".tr;
@@ -234,9 +238,16 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
                     },
                     onChanged: (value) {
                       titreProduit.text = value.toString();
+                      setState(() {
+                        _currentLength = value.length;
+                      });
                     },
                     decoration: InputDecoration(
-                      labelText: "Que vendez vous".tr,
+                      suffix: Text(
+                        _currentLength == 0 ? "" : "$_currentLength",
+                        style: TextStyle(fontSize: 14),
+                      ),
+                      labelText: "Que_vendez_vous".tr,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -258,7 +269,7 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
                       categorieProduit.text = value.toString();
                     },
                     decoration: InputDecoration(
-                      labelText: "Categorie".tr,
+                      labelText: "Catégorie".tr,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -284,7 +295,7 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
 
                       double? price = double.tryParse(value);
                       if (price == null) {
-                        return "Valeur invalide";
+                        return "Valeur_invalide".tr;
                       }
 
                       if (price < minPrice || price > maxPrice) {
@@ -296,7 +307,7 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
                         String prixMax = NumberFormat.currency(
                                 locale: formatDevise, symbol: '')
                             .format(maxPrice);
-                        return "Le prix doit être entre $prixMin et $prixMax $_currentCurrency";
+                        return "${prix_entre} $prixMin ${et} $prixMax $_currentCurrency";
                       }
                       return null;
                     },
@@ -318,7 +329,7 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
                   TextButton(
                     onPressed: () => _showCurrencyDialog(context, ref),
                     child: Text(
-                      'Changer Devis'.tr,
+                      'Changer_Devis'.tr,
                       style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
@@ -326,14 +337,15 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
                     ),
                   ),
                   SizedBox(height: 10),
-                  Text('Localisation',
+                  Text('Emplacement'.tr,
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   SizedBox(height: 10),
                   GestureDetector(
                       onTap: () => _showLieuxDialog(context),
                       child: buildOption(Icon(Icons.location_on), lieu)),
                   SizedBox(height: 10),
-                  Text('Media', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('Visuels_produit'.tr,
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                   SizedBox(height: 10),
                   GestureDetector(
                       onTap: () async {
@@ -350,7 +362,8 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
                         }
                         // SlideNavigation.slideToPage(context, GalleryAnnoncePhoto());
                       },
-                      child: buildOption(Icon(Icons.add), "Ajouter Photos")),
+                      child: buildOption(
+                          Icon(Icons.photo_camera), "Ajouter_Photos".tr)),
                   SizedBox(height: 10),
                   GridView.builder(
                     shrinkWrap: true,

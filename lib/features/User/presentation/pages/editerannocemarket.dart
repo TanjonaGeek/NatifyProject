@@ -55,7 +55,11 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
     'USD': 'en_US',
     'MGA': 'mg_MG',
   };
-  late String lieu = "Ajouter lieux";
+  late String lieu = "Ajouter_lieux".tr;
+  String prix_entre = "prix_entre".tr;
+  String et = "et".tr;
+  int _currentLength = 0; // Compteur pour la longueur du texte
+  final int _maxLength = 30; // Limite maximale de caractères
   late bool _statusDisponible;
   late double latitude = 0.0;
   late double longitude = 0.0;
@@ -70,16 +74,17 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
     // TODO: implement initState
     super.initState();
     categorieProduit = TextEditingController(
-        text: widget.categorie ?? "Selectionnez Categorie");
+        text: widget.categorie ?? "Selectionnez_Categorie".tr);
     titreProduit = TextEditingController(text: widget.title ?? "");
     prixProduit = TextEditingController(text: widget.price ?? "");
     descriptionProduit = TextEditingController(text: widget.description ?? "");
-    lieu = widget.adresse.isNotEmpty ? widget.adresse : "Ajouter lieux";
+    lieu = widget.adresse.isNotEmpty ? widget.adresse : lieu;
     latitude = widget.emplacement.latitude;
     longitude = widget.emplacement.longitude;
     _currentCurrency = widget.currency;
     imageProduit = widget.photoUrl;
     _statusDisponible = widget.status;
+    _currentLength = widget.title.length;
   }
 
   void _showCategoriesDialog(BuildContext context) async {
@@ -107,8 +112,8 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Devises",
-              style: TextStyle(fontWeight: FontWeight.bold)),
+          title:
+              Text("Devises".tr, style: TextStyle(fontWeight: FontWeight.bold)),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           content: Column(
@@ -185,9 +190,9 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
       Navigator.pop(context);
     } else {
       if (categorieProduit.text.isEmpty) {
-        showCustomSnackBar("Choissisez un categorie produit");
+        showCustomSnackBar("Choisissez_catégorie");
       } else if (selectedFiles.isEmpty) {
-        showCustomSnackBar("Inserer un image pour le produit");
+        showCustomSnackBar("Insérez_produit");
       }
     }
   }
@@ -198,7 +203,7 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
       child: Scaffold(
         resizeToAvoidBottomInset: true, // Permet d'éviter les débordements
         appBar: AppBar(
-          title: Text("Publier une annonce".tr,
+          title: Text("Publier_annonce".tr,
               style: TextStyle(fontWeight: FontWeight.bold)),
           elevation: 0,
           centerTitle: true,
@@ -257,7 +262,7 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
                         descriptionProduit.text = value.toString();
                       },
                       decoration: InputDecoration(
-                        hintText: "Partagez des détails sur ce produit...",
+                        hintText: "Partagez_détails".tr,
                         border: InputBorder.none,
                       ),
                       maxLines:
@@ -268,11 +273,15 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'Détails annonce',
+                    'Détails_annonce'.tr,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 10),
                   TextFormField(
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(
+                          _maxLength), // Limite à 10 caractères
+                    ],
                     controller: titreProduit,
                     validator: (value) {
                       if ((value == null || value.isEmpty)) {
@@ -282,9 +291,16 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
                     },
                     onChanged: (value) {
                       titreProduit.text = value.toString();
+                      setState(() {
+                        _currentLength = value.length;
+                      });
                     },
                     decoration: InputDecoration(
-                      labelText: "Que vendez vous".tr,
+                      suffix: Text(
+                        _currentLength == 0 ? "" : "$_currentLength",
+                        style: TextStyle(fontSize: 14),
+                      ),
+                      labelText: "Que_vendez_vous".tr,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -306,7 +322,7 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
                       categorieProduit.text = value.toString();
                     },
                     decoration: InputDecoration(
-                      labelText: "Categorie".tr,
+                      labelText: "Catégorie".tr,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -333,7 +349,7 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
 
                       double? price = double.tryParse(value);
                       if (price == null) {
-                        return "Valeur invalide";
+                        return "Valeur_invalide";
                       }
 
                       if (price < minPrice || price > maxPrice) {
@@ -345,7 +361,7 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
                         String prixMax = NumberFormat.currency(
                                 locale: formatDevise, symbol: '')
                             .format(maxPrice);
-                        return "Le prix doit être entre $prixMin et $prixMax $_currentCurrency";
+                        return "${prix_entre} $prixMin ${et} $prixMax $_currentCurrency";
                       }
                       return null;
                     },
@@ -367,7 +383,7 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
                   TextButton(
                     onPressed: () => _showCurrencyDialog(context, ref),
                     child: Text(
-                      'Changer Devis'.tr,
+                      'Changer_Devis'.tr,
                       style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
@@ -375,7 +391,7 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
                     ),
                   ),
                   SizedBox(height: 10),
-                  Text('Localisation',
+                  Text('Emplacement'.tr,
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   SizedBox(height: 10),
                   GestureDetector(
@@ -401,7 +417,7 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
                           },
                         ),
                         Text(
-                          "Disponible à la vente",
+                          "Disponible_vente".tr,
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold),
                         ),
@@ -409,7 +425,8 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
                     ),
                   ),
                   SizedBox(height: 10),
-                  Text('Media', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('Visuels_produit'.tr,
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                   SizedBox(height: 10),
                   GestureDetector(
                       onTap: () async {
@@ -426,7 +443,7 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
                         }
                         // SlideNavigation.slideToPage(context, GalleryAnnoncePhoto());
                       },
-                      child: buildOption(Icon(Icons.add), "Ajouter Photos")),
+                      child: buildOption(Icon(Icons.add), "Ajouter_Photos".tr)),
                   SizedBox(height: 10),
                   Container(
                     height: 55,

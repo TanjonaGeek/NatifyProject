@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:natify/core/utils/colors.dart';
 
 class CategoriesDialog extends StatelessWidget {
@@ -99,7 +100,7 @@ class CategoriesDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text("Choisissez une catégorie",
+      title: Text("Choix_catégorie".tr,
           textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.bold)),
       content: SizedBox(
@@ -111,11 +112,11 @@ class CategoriesDialog extends StatelessWidget {
             final category = categoriesVente[index];
             return ExpansionTile(
               leading: Icon(category["icon"], color: kPrimaryColor),
-              title: Text(category["title"],
+              title: Text("${category["title"]}".tr,
                   style: TextStyle(fontWeight: FontWeight.bold)),
               children: (category["subcategories"] as List<String>)
                   .map((sub) => ListTile(
-                        title: Text(sub),
+                        title: Text("${sub}".tr),
                         onTap: () {
                           Navigator.pop(context,
                               sub); // Retourne la sous-catégorie sélectionnée

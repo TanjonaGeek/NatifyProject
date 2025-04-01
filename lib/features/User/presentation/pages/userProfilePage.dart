@@ -885,18 +885,6 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(fontWeight: FontWeight.bold),
                             )),
-                            Tab(
-                                icon: Text(
-                              'Evenement',
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            )),
-                            Tab(
-                                icon: Text(
-                              'Marketplace',
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            )),
                           ],
                         ),
                       ),
@@ -1974,14 +1962,13 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Gestion annonces'.tr,
+                                'Gestion_annonces'.tr,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               Text(
-                                "Accédez à toutes vos publications sur le marketplace"
-                                    .tr,
+                                "Accédez_toutes_marketplace".tr,
                                 style: TextStyle(fontSize: 15),
                               ),
                             ],
@@ -2019,14 +2006,13 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Publiez sur notre Marketplace'.tr,
+                                'Publiez_Marketplace'.tr,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               Text(
-                                "Partagez vos produits avec une large audience et concluez des ventes rapidement."
-                                    .tr,
+                                "Partagez_produits".tr,
                                 style: TextStyle(fontSize: 15),
                               ),
                             ],

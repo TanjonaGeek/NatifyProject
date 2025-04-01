@@ -9,59 +9,19 @@ import 'package:get/get.dart';
 import 'package:natify/core/utils/slideNavigation.dart';
 import 'package:natify/features/User/presentation/pages/createannoncemarket.dart';
 import 'package:natify/features/User/presentation/widget/detailMarketForMe.dart';
+import 'package:natify/features/User/presentation/widget/list/listVenteForMe.dart';
 import 'package:natify/features/User/presentation/widget/postMarketplace.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
 
-class MarketplacePageMe extends ConsumerStatefulWidget {
+class MarketplacePageMe extends StatelessWidget {
   MarketplacePageMe({super.key});
-
-  @override
-  ConsumerState<MarketplacePageMe> createState() => _MarketplacePageMeState();
-}
-
-class _MarketplacePageMeState extends ConsumerState<MarketplacePageMe>
-    with SingleTickerProviderStateMixin {
-  String requeteId = Uuid().v1();
-  String a = "à".tr;
-  Query query = FirebaseFirestore.instance
-      .collection('marketplace')
-      .where('organizerUid', isEqualTo: FirebaseAuth.instance.currentUser!.uid);
-  final Map<String, String> _exchangeFormat = {
-    'EUR': 'fr_FR',
-    'USD': 'en_US',
-    'MGA': 'mg_MG',
-  };
-  void _deleteSale(String venteId) async {
-    try {
-      if (venteId.isEmpty) {
-        return;
-      }
-      await FirebaseFirestore.instance
-          .collection('marketplace')
-          .doc(venteId)
-          .delete()
-          .then((onValue) {
-        setState(() {
-          requeteId = Uuid().v1();
-        });
-      });
-    } catch (e) {
-      print("Erreur lors de la suppression : $e");
-    }
-  }
-
-  Future<void> _refresh() async {
-    setState(() {
-      requeteId = Uuid().v1();
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Gestion annonces'.tr,
+          title: Text('Gestion_annonces'.tr,
               style: TextStyle(fontWeight: FontWeight.bold)),
           elevation: 0,
           centerTitle: true,
@@ -92,14 +52,11 @@ class _MarketplacePageMeState extends ConsumerState<MarketplacePageMe>
           ],
         ),
         body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: RefreshIndicator(
-            onRefresh: _refresh,
-            child: ListView(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
               children: [
                 Text(
-                  "Consultez et gérez vos annonces : modifiez, mettez à jour ou supprimez-les."
-                      .tr,
+                  "Consultez_gérez_annonces".tr,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 15.0,
@@ -108,128 +65,9 @@ class _MarketplacePageMeState extends ConsumerState<MarketplacePageMe>
                 SizedBox(
                   height: 8,
                 ),
-                FirestorePagination(
-                  key: ValueKey(requeteId),
-                  shrinkWrap: true,
-                  limit: 15, // Defaults to 10.
-                  isLive: false, // Defaults to false
-                  viewType: ViewType.list,
-                  physics: NeverScrollableScrollPhysics(),
-                  bottomLoader: SizedBox(),
-                  initialLoader: // Section de post
-                      Center(
-                    child: Container(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white
-                              : Colors.black,
-                        )),
-                  ),
-                  query: query,
-                  itemBuilder: (context, documentSnapshot, index) {
-                    final data =
-                        documentSnapshot.data() as Map<String, dynamic>?;
-                    if (data == null) {
-                      return Container();
-                    }
-                    double montant = (data['prix'] is int)
-                        ? data['prix'].toDouble()
-                        : double.tryParse(data['prix'].toString()) ?? 0.0;
-                    String formatDevise =
-                        _exchangeFormat[data['currency']] ?? "en_US";
-                    String prix =
-                        NumberFormat.currency(locale: formatDevise, symbol: '')
-                            .format(montant);
-                    return InkWell(
-                      onTap: () {
-                        SlideNavigation.slideToPage(
-                          context,
-                          ProductDetailScreenMe(
-                              categ: data['categorie'],
-                              productId: data['uidVente'],
-                              emplacement: data['location']['geopoint']),
-                        );
-                      },
-                      child: Slidable(
-                        key: ValueKey(data['uidVente']),
-                        endActionPane: ActionPane(
-                          extentRatio: 0.3,
-                          motion:
-                              StretchMotion(), // Utilisation de DrawerMotion pour un effet de glissement différent
-                          children: [
-                            SlidableAction(
-                              onPressed: (_) => showCustomDialog(
-                                context: context,
-                                icon: Icons.warning,
-                                iconColor: Colors.red,
-                                title: "Supprimer cette element ?",
-                                message:
-                                    "Êtes-vous sûr de vouloir supprimer cette element ? Cette action est irréversible.",
-                                confirmText: "Oui, Supprimer",
-                                cancelText: "Cancel",
-                                isConfirmation: true,
-                                onConfirm: () {
-                                  _deleteSale(data['uidVente'].toString());
-                                },
-                              ),
-                              backgroundColor: Colors.red,
-                              foregroundColor: Colors.white,
-                              icon: Icons.delete,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
-                              label: 'supprimer'.tr,
-                            ),
-                          ],
-                        ),
-                        child: MarketplacePost(
-                          currency: data['currency'],
-                          sellerName: data['organizerName'],
-                          sellerProfileImage: data['organizerPhoto'],
-                          postTitle: data['title'],
-                          description: data['description'],
-                          categorie: data['categorie'],
-                          imageUrls: data['images'],
-                          prix: prix,
-                        ),
-                      ),
-                    );
-                  },
-                  onEmpty: Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 130,
-                          height: 130,
-                          child: Image.asset(
-                            'assets/marketplace (1).png',
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          textAlign: TextAlign.center,
-                          "Aucun produit disponible".tr,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 20),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          textAlign: TextAlign.center,
-                          "Actuellement, aucun produit n'est en vente sur Marketplace"
-                              .tr,
-                          style: TextStyle(
-                              fontWeight: FontWeight.w400, fontSize: 17),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                Expanded(child: listVenteForme()),
               ],
-            ),
-          ),
-        ));
+            )));
   }
 }
 

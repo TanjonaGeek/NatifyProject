@@ -308,97 +308,95 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
             ],
           ),
         ),
-        FirestorePagination(
-          padding: EdgeInsets.zero,
-          shrinkWrap: true,
-          key: ValueKey(requeteId),
-          wrapOptions: WrapOptions(
-              alignment: WrapAlignment.start,
-              crossAxisAlignment: WrapCrossAlignment.start),
-          limit: 15, // Defaults to 10.
-          isLive: false, // Defaults to false.s
-          viewType: ViewType.grid,
-          physics: NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 1,
-            mainAxisSpacing: 1,
-            childAspectRatio: 0.7,
-          ),
-          bottomLoader: SizedBox(),
-          initialLoader: // Section de post
-              Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Center(
-                  child: Container(
-                      width: 30,
-                      height: 30,
-                      child: CircularProgressIndicator(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : Colors.black,
-                      )),
-                ),
-              ],
+        Expanded(
+          child: FirestorePagination(
+            padding: EdgeInsets.zero,
+            key: ValueKey(requeteId),
+            limit: 15, // Defaults to 10.
+            isLive: false, // Defaults to false.s
+            viewType: ViewType.grid,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 1,
+              mainAxisSpacing: 1,
+              childAspectRatio: 0.7,
             ),
-          ),
-          query: query,
-          itemBuilder: (context, documentSnapshot, index) {
-            final data = documentSnapshot.data() as Map<String, dynamic>?;
-            if (data == null) {
-              return Container();
-            }
-            double montant = (data['prix'] is int)
-                ? data['prix'].toDouble()
-                : double.tryParse(data['prix'].toString()) ?? 0.0;
-            String formatDevise = _exchangeFormat[data['currency']] ?? "en_US";
-            String prix =
-                NumberFormat.currency(locale: formatDevise, symbol: '')
-                    .format(montant);
-            return InkWell(
-                onTap: () {
-                  SlideNavigation.slideToPage(
-                    context,
-                    ProductDetailScreen(
-                        categ: data['categorie'],
-                        productId: data['uidVente'],
-                        emplacement: data['location']['geopoint']),
-                  );
-                },
-                child: ProductCard(
-                    imageUrl: data['images'][0],
-                    title: data['title'],
-                    price: prix,
-                    currency: data['currency'],
-                    emplacement: data['location']['geopoint']));
-          },
-          onEmpty: Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 130,
-                  height: 130,
-                  child: Image.asset(
-                    'assets/marketplace (1).png',
+            bottomLoader: SizedBox(),
+            initialLoader: // Section de post
+                Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(
+                    child: Container(
+                        width: 30,
+                        height: 30,
+                        child: CircularProgressIndicator(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black,
+                        )),
                   ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  textAlign: TextAlign.center,
-                  "Aucun produit disponible".tr,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  textAlign: TextAlign.center,
-                  "Actuellement, aucun produit n'est en vente sur Marketplace"
-                      .tr,
-                  style: TextStyle(fontWeight: FontWeight.w400, fontSize: 17),
-                ),
-              ],
+                ],
+              ),
+            ),
+            query: query,
+            itemBuilder: (context, documentSnapshot, index) {
+              final data = documentSnapshot.data() as Map<String, dynamic>?;
+              if (data == null) {
+                return Container();
+              }
+              double montant = (data['prix'] is int)
+                  ? data['prix'].toDouble()
+                  : double.tryParse(data['prix'].toString()) ?? 0.0;
+              String formatDevise =
+                  _exchangeFormat[data['currency']] ?? "en_US";
+              String prix =
+                  NumberFormat.currency(locale: formatDevise, symbol: '')
+                      .format(montant);
+              return InkWell(
+                  onTap: () {
+                    SlideNavigation.slideToPage(
+                      context,
+                      ProductDetailScreen(
+                          categ: data['categorie'],
+                          productId: data['uidVente'],
+                          emplacement: data['location']['geopoint']),
+                    );
+                  },
+                  child: ProductCard(
+                      imageUrl: data['images'][0],
+                      title: data['title'],
+                      price: prix,
+                      currency: data['currency'],
+                      emplacement: data['location']['geopoint']));
+            },
+            onEmpty: Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 130,
+                    height: 130,
+                    child: Image.asset(
+                      'assets/marketplace (1).png',
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    textAlign: TextAlign.center,
+                    "Aucun produit disponible".tr,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    textAlign: TextAlign.center,
+                    "Actuellement, aucun produit n'est en vente sur Marketplace"
+                        .tr,
+                    style: TextStyle(fontWeight: FontWeight.w400, fontSize: 17),
+                  ),
+                ],
+              ),
             ),
           ),
         )
