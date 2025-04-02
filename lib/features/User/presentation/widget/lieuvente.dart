@@ -4,7 +4,6 @@ import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:flutter/services.dart';
 import 'package:natify/core/utils/colors.dart';
 import 'package:natify/core/utils/snack_bar_helpers.dart';
-import 'package:natify/core/utils/widget/loading.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,6 +31,7 @@ class _TrouverParLieuxState extends ConsumerState<TrouverParLieux> {
 
   // ValueNotifier pour gérer l'état des lieux
   ValueNotifier<List<dynamic>> placesNotifier = ValueNotifier([]);
+  ValueNotifier<bool> loadNotifier = ValueNotifier(false);
 
   // Future pour récupérer les lieux
   Future<List<dynamic>> fetchPlaceSuggestions(String placeInput) async {
@@ -48,6 +48,7 @@ class _TrouverParLieuxState extends ConsumerState<TrouverParLieux> {
           '$baseUrl/search?q=$placeInput&format=json&polygon_geojson=1&addressdetails=1');
       // Attendre 500ms pour éviter le blocage par surcharge
       await Future.delayed(Duration(milliseconds: 500));
+      loadNotifier.value = true;
       final response = await client.get(url, headers: headers);
 
       if (response.statusCode == 200) {
@@ -68,6 +69,7 @@ class _TrouverParLieuxState extends ConsumerState<TrouverParLieux> {
     _debounce = Timer(const Duration(milliseconds: 500), () async {
       final places = await fetchPlaceSuggestions(fieldRechercheController.text);
       placesNotifier.value = places; // Met à jour la valeur du notifier
+      loadNotifier.value = false;
     });
   }
 
@@ -88,6 +90,7 @@ class _TrouverParLieuxState extends ConsumerState<TrouverParLieux> {
   Widget build(BuildContext context) {
     return ThemeSwitchingArea(
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: Text('tapez_un_lieu'.tr,
               style: TextStyle(fontWeight: FontWeight.bold)),
@@ -118,6 +121,25 @@ class _TrouverParLieuxState extends ConsumerState<TrouverParLieux> {
                 controller: fieldRechercheController,
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.w200),
                 decoration: InputDecoration(
+                  suffix: ValueListenableBuilder<bool>(
+                      valueListenable:
+                          loadNotifier, // Surveille le ValueNotifier
+                      builder: (context, loadingLocation, child) {
+                        if (loadingLocation == true) {
+                          return Container(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                          );
+                        } else {
+                          return SizedBox.shrink();
+                        }
+                      }),
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(
                         color: Theme.of(context).brightness == Brightness.dark
@@ -154,29 +176,27 @@ class _TrouverParLieuxState extends ConsumerState<TrouverParLieux> {
                 valueListenable: placesNotifier, // Surveille le ValueNotifier
                 builder: (context, listLocation, child) {
                   if (listLocation.isEmpty) {
-                    return SingleChildScrollView(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Image.asset('assets/localisation-de-lutilisateur.png',
-                              width: 120, height: 120),
-                          SizedBox(height: 10),
-                          Text("Aucun résultat".tr,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 20)),
-                          SizedBox(height: 2),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 30),
-                            child: Text(
-                              "pas_pu_localiser".tr,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w400, fontSize: 17),
-                            ),
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.asset('assets/localisation-de-lutilisateur.png',
+                            width: 120, height: 120),
+                        SizedBox(height: 10),
+                        Text("Aucun résultat".tr,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 20)),
+                        SizedBox(height: 2),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 30),
+                          child: Text(
+                            "Impossible_localiser".tr,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400, fontSize: 17),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     );
                   }
 

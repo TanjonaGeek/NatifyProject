@@ -38,8 +38,7 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
     'USD': 'en_US',
     'MGA': 'mg_MG',
   };
-  final TextEditingController categorieProduit =
-      TextEditingController(text: "Selectionnez_Categorie".tr);
+  final TextEditingController categorieProduit = TextEditingController();
   final TextEditingController titreProduit = TextEditingController();
   final TextEditingController prixProduit = TextEditingController();
   final TextEditingController descriptionProduit = TextEditingController();
@@ -142,7 +141,7 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
       if (categorieProduit.text.isEmpty) {
         showCustomSnackBar("Choisissez_catégorie");
       } else if (selectedFiles.isEmpty) {
-        showCustomSnackBar("Insérez_produit");
+        showCustomSnackBar("Insérez_produit.");
       }
     }
   }
@@ -269,7 +268,7 @@ class _CreateAnnonceMarketState extends ConsumerState<CreateAnnonceMarket> {
                       categorieProduit.text = value.toString();
                     },
                     decoration: InputDecoration(
-                      labelText: "Catégorie".tr,
+                      labelText: "Selectionnez_Categorie".tr,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),

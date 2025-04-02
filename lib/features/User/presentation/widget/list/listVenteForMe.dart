@@ -126,8 +126,8 @@ class _listVenteFormeState extends State<listVenteForme> {
                       context: context,
                       icon: Icons.warning,
                       iconColor: Colors.red,
-                      title: "Supprimer_cet_élément".tr,
-                      message: "action_irréversible".tr,
+                      title: "Supprimer_cet_élément",
+                      message: "action_irréversible.",
                       confirmText: "Oui_Supprimer".tr,
                       cancelText: "annuler".tr,
                       isConfirmation: true,
@@ -235,7 +235,7 @@ void showCustomDialog({
 
               // Titre
               Text(
-                title,
+                "${title}".tr,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -245,7 +245,7 @@ void showCustomDialog({
 
               // Sous-titre
               Text(
-                message,
+                "${message}".tr,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey.shade600),
               ),

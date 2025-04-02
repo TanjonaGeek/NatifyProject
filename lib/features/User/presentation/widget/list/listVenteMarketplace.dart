@@ -22,12 +22,14 @@ class MarketplacePage extends ConsumerStatefulWidget {
 
 class _MarketplacePageState extends ConsumerState<MarketplacePage> {
   String a = "à".tr;
+  String toutCat = "ToutCat".tr;
   String? uidMe = FirebaseAuth.instance.currentUser!.uid ?? "";
   final Map<String, String> _exchangeFormat = {
     'EUR': 'fr_FR',
     'USD': 'en_US',
     'MGA': 'mg_MG',
   };
+  String rayon = "rayon";
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +67,6 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
     String PrixFinformatted =
         NumberFormat.currency(locale: formatDevise, symbol: '')
             .format(notifier.prixProduit.end);
-    print('le rebuild');
     return Scaffold(
         body: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,7 +94,7 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
                               child: Row(
                                 children: [
                                   Text(
-                                    "Mots-cle : ",
+                                    "Mots-cle".tr,
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: kPrimaryColor),
@@ -145,8 +146,8 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
                                 ),
                                 Text(
                                   notifier.Categorie.isNotEmpty
-                                      ? '${notifier.Categorie}'
-                                      : 'Toute Categories',
+                                      ? '${notifier.Categorie}'.tr
+                                      : 'ToutCat'.tr,
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: kPrimaryColor),
@@ -277,7 +278,7 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
                               child: Row(
                                 children: [
                                   Text(
-                                    'Rayon ${(notifier.radius / 1000).toInt()} Km',
+                                    '${rayon} ${(notifier.radius / 1000).toInt()} Km',
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: kPrimaryColor),
@@ -372,30 +373,34 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
                       emplacement: data['location']['geopoint']));
             },
             onEmpty: Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 130,
-                    height: 130,
-                    child: Image.asset(
-                      'assets/marketplace (1).png',
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 130,
+                      height: 130,
+                      child: Image.asset(
+                        'assets/marketplace (1).png',
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    textAlign: TextAlign.center,
-                    "Aucun produit disponible".tr,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    textAlign: TextAlign.center,
-                    "Actuellement, aucun produit n'est en vente sur Marketplace"
-                        .tr,
-                    style: TextStyle(fontWeight: FontWeight.w400, fontSize: 17),
-                  ),
-                ],
+                    SizedBox(height: 10),
+                    Text(
+                      textAlign: TextAlign.center,
+                      "Aucun_produit_disponible".tr,
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      textAlign: TextAlign.center,
+                      "Actuellement_aucun_produit".tr,
+                      style:
+                          TextStyle(fontWeight: FontWeight.w400, fontSize: 17),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

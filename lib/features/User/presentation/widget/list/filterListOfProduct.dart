@@ -34,7 +34,7 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
   Future<void> _getCurrentLocation() async {
     setState(() {
       _isLoading = true; // Afficher "Chargement..."
-      _currentLocation = "Chargement...";
+      _currentLocation = "chargement";
     });
     try {
       Position position = await Geolocator.getCurrentPosition(
@@ -230,7 +230,7 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Categorie Produit'.tr,
+                        'Catégorie'.tr,
                         style: TextStyle(
                             fontSize: 17, fontWeight: FontWeight.bold),
                       ),
@@ -251,7 +251,7 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                               horizontal: 10, vertical: 10),
                           child: Text(
                             categorie.isEmpty
-                                ? "Choisissez categories produits"
+                                ? "Selectionnez_Categorie".tr
                                 : categorie,
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
@@ -265,7 +265,7 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                     thickness: 0.2,
                   ),
                   Text(
-                    'Monetaire'.tr,
+                    'Devises'.tr,
                     style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                   ),
                   Divider(
@@ -315,7 +315,7 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Devis Appliquer :".tr,
+                        "Devis_Appliquer".tr,
                         style: TextStyle(
                             fontSize: 17, fontWeight: FontWeight.w500),
                       ),
@@ -335,7 +335,7 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                   TextButton(
                     onPressed: () => _showCurrencyDialog(context, ref),
                     child: Text(
-                      'Changer Devis'.tr,
+                      'Changer_Devis'.tr,
                       style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
@@ -376,7 +376,7 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                           },
                         ),
                         Text(
-                          "Filtrer par localisation",
+                          "Filtrer_localisation".tr,
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold),
                         ),
@@ -520,7 +520,7 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Avec rayon :".tr,
+                          "${rayon} :".tr,
                           style: TextStyle(
                               fontSize: 17, fontWeight: FontWeight.w500),
                         ),
@@ -582,8 +582,8 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Devises",
-              style: TextStyle(fontWeight: FontWeight.bold)),
+          title:
+              Text("Devises".tr, style: TextStyle(fontWeight: FontWeight.bold)),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           content: Column(

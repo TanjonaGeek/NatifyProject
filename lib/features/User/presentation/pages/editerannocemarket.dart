@@ -73,8 +73,7 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    categorieProduit = TextEditingController(
-        text: widget.categorie ?? "Selectionnez_Categorie".tr);
+    categorieProduit = TextEditingController(text: widget.categorie ?? "");
     titreProduit = TextEditingController(text: widget.title ?? "");
     prixProduit = TextEditingController(text: widget.price ?? "");
     descriptionProduit = TextEditingController(text: widget.description ?? "");
@@ -192,7 +191,7 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
       if (categorieProduit.text.isEmpty) {
         showCustomSnackBar("Choisissez_catégorie");
       } else if (selectedFiles.isEmpty) {
-        showCustomSnackBar("Insérez_produit");
+        showCustomSnackBar("Insérez_produit.");
       }
     }
   }
@@ -322,7 +321,7 @@ class _EditerAnnonceMarketState extends ConsumerState<EditerAnnonceMarket> {
                       categorieProduit.text = value.toString();
                     },
                     decoration: InputDecoration(
-                      labelText: "Catégorie".tr,
+                      labelText: "Selectionnez_Categorie".tr,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
