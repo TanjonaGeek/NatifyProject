@@ -29,7 +29,7 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
     'USD': 'en_US',
     'MGA': 'mg_MG',
   };
-  String rayon = "rayon";
+  String rayon = "rayon".tr;
 
   @override
   Widget build(BuildContext context) {
@@ -388,7 +388,7 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
                     SizedBox(height: 10),
                     Text(
                       textAlign: TextAlign.center,
-                      "Aucun_produit_disponible".tr,
+                      "Aucun_produit_disponible.".tr,
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                     ),

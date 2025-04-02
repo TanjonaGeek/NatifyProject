@@ -15,31 +15,46 @@ class SearchProduct extends ConsumerStatefulWidget {
 class _SearchProductState extends ConsumerState<SearchProduct> {
   TextEditingController _searchController = TextEditingController();
   List<Map<String, dynamic>> _suggestions = [];
+  bool loadingLocation = false;
   // Fonction pour récupérer les suggestions basées sur ce que l'utilisateur tape
   void _getSuggestions(String query) async {
-    if (query.isNotEmpty) {
-      // Requête Firestore pour rechercher dans la collection `suggestions`
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('suggestions')
-          .where('term', isGreaterThanOrEqualTo: query)
-          .where('term',
-              isLessThanOrEqualTo: query + '\uf8ff') // Recherche par préfixe
-          .limit(5) // Limiter les suggestions à 5
-          .get();
+    Future.delayed(Duration(milliseconds: 500), () {});
+    setState(() {
+      loadingLocation = true;
+      _suggestions = [];
+    });
+    Future.delayed(Duration(seconds: 1), () {});
+    try {
+      if (query.isNotEmpty) {
+        // Requête Firestore pour rechercher dans la collection `suggestions`
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+            .collection('suggestions')
+            .where('term', isGreaterThanOrEqualTo: query)
+            .where('term',
+                isLessThanOrEqualTo: query + '\uf8ff') // Recherche par préfixe
+            .limit(15) // Limiter les suggestions à 5
+            .get();
 
-      List<Map<String, dynamic>> suggestions = querySnapshot.docs.map((doc) {
-        return {
-          'term': doc['term'],
-          'category': doc['category'], // Inclure aussi la catégorie
-        };
-      }).toList();
+        List<Map<String, dynamic>> suggestions = querySnapshot.docs.map((doc) {
+          return {
+            'term': doc['term'],
+            'category': doc['category'], // Inclure aussi la catégorie
+          };
+        }).toList();
 
+        setState(() {
+          _suggestions = suggestions;
+          loadingLocation = false;
+        });
+      } else {
+        setState(() {
+          _suggestions = [];
+          loadingLocation = false;
+        });
+      }
+    } catch (e) {
       setState(() {
-        _suggestions = suggestions;
-      });
-    } else {
-      setState(() {
-        _suggestions = [];
+        loadingLocation = false;
       });
     }
   }
@@ -82,6 +97,17 @@ class _SearchProductState extends ConsumerState<SearchProduct> {
             padding: const EdgeInsets.all(8.0),
             child: TextFormField(
               decoration: InputDecoration(
+                suffix: loadingLocation == true
+                    ? Container(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black,
+                        ),
+                      )
+                    : SizedBox.shrink(),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(),
                   borderRadius: BorderRadius.all(Radius.circular(30.0)),
@@ -97,7 +123,8 @@ class _SearchProductState extends ConsumerState<SearchProduct> {
                     width: 2.0,
                   ),
                 ),
-                contentPadding: EdgeInsets.only(left: 25, top: 15, bottom: 15),
+                contentPadding:
+                    EdgeInsets.only(left: 20, right: 20, top: 3, bottom: 3),
                 hintText: 'Rechercher'.tr,
                 hintStyle: TextStyle(
                     fontSize: 16,
@@ -133,7 +160,7 @@ class _SearchProductState extends ConsumerState<SearchProduct> {
                                 height: 1,
                               ),
                               Text(
-                                suggestion['category'],
+                                "${suggestion['category']}".tr,
                                 style: TextStyle(
                                     fontSize: 14, color: Colors.grey.shade500),
                               ),
@@ -164,15 +191,14 @@ class _SearchProductState extends ConsumerState<SearchProduct> {
                       SizedBox(height: 10),
                       Text(
                         textAlign: TextAlign.center,
-                        "Aucun produit disponible".tr,
+                        "Aucun_produit_disponible.".tr,
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 20),
                       ),
                       SizedBox(height: 4),
                       Text(
                         textAlign: TextAlign.center,
-                        "Actuellement, aucun produit n'est en vente sur Marketplace"
-                            .tr,
+                        "Actuellement_aucun_produit".tr,
                         style: TextStyle(
                             fontWeight: FontWeight.w400, fontSize: 17),
                       ),

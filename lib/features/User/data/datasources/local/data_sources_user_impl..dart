@@ -19,6 +19,8 @@ import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'package:characters/characters.dart';
 
 class DataSourceUserImpl implements DataSourceUser {
   NotificationService notificationService = NotificationService();
@@ -499,31 +501,79 @@ class DataSourceUserImpl implements DataSourceUser {
   }
 
   List<String> generateKeywords(String title, String currentLanguage) {
-    // Vérifier si la langue est supportée
+    // Vérifier si la langue est supportée, sinon utiliser l'anglais par défaut
     if (!Helpers.stopWordsByLanguage.containsKey(currentLanguage)) {
-      currentLanguage =
-          'en'; // Utiliser l'anglais par défaut si la langue n'est pas supportée
+      currentLanguage = 'en';
     }
 
-    // Récupérer la liste de mots inutiles pour la langue spécifiée
-    List<String> stopWords = Helpers.stopWordsByLanguage[currentLanguage]!;
-    // Préparer les mots du titre, en convertissant en minuscules et en filtrant les stopwords
-    List<String> words = title
-        .toLowerCase()
-        .split(' ')
-        .where((word) => !stopWords.contains(word))
+    // Récupérer les stopwords sous forme de Set pour accélérer les recherches
+    Set<String> stopWords =
+        Helpers.stopWordsByLanguage[currentLanguage]!.toSet();
+
+    // Nettoyer et normaliser le titre
+    String normalizedTitle = removeDiacritics(title.toLowerCase());
+
+    List<String> words = normalizedTitle
+        .replaceAll(RegExp(r'[^\w\s]'), '') // Supprime la ponctuation
+        .split(RegExp(r'\s+')) // Divise en mots par espace ou tabulation
+        .where((word) =>
+            word.isNotEmpty &&
+            !stopWords.contains(word)) // Filtre les stopwords
         .toList();
 
     Set<String> uniqueKeywords = {};
 
-    // Générer des combinaisons de mots
+    // Générer des combinaisons de mots-clés
     for (int i = 0; i < words.length; i++) {
+      String phrase = '';
       for (int j = i; j < words.length; j++) {
-        uniqueKeywords.add(words.sublist(i, j + 1).join(' '));
+        phrase = phrase.isEmpty ? words[j] : '$phrase ${words[j]}';
+        uniqueKeywords.add(phrase);
       }
     }
 
-    return uniqueKeywords.toList();
+    return uniqueKeywords.toList(growable: false);
+  }
+
+  // Fonction pour supprimer les accents
+  String removeDiacritics(String input) {
+    const Map<String, String> diacriticsMap = {
+      'à': 'a',
+      'â': 'a',
+      'ä': 'a',
+      'á': 'a',
+      'ã': 'a',
+      'å': 'a',
+      'ā': 'a',
+      'è': 'e',
+      'é': 'e',
+      'ê': 'e',
+      'ë': 'e',
+      'ē': 'e',
+      'ì': 'i',
+      'í': 'i',
+      'î': 'i',
+      'ï': 'i',
+      'ī': 'i',
+      'ò': 'o',
+      'ó': 'o',
+      'ô': 'o',
+      'ö': 'o',
+      'õ': 'o',
+      'ø': 'o',
+      'ō': 'o',
+      'ù': 'u',
+      'ú': 'u',
+      'û': 'u',
+      'ü': 'u',
+      'ū': 'u',
+      'ç': 'c',
+      'ñ': 'n',
+      'ý': 'y',
+      'ÿ': 'y'
+    };
+
+    return input.split('').map((char) => diacriticsMap[char] ?? char).join();
   }
 
   List<String> generateAllSubstrings(String name) {

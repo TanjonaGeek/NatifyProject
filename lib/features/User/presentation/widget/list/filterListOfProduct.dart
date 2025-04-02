@@ -30,11 +30,12 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
   bool _isLoading = false; // Indicateur de chargement
   RangeValues prix = RangeValues(1, 10000);
   double rayon = 10000.0;
+  String Rayon = "rayon".tr;
 
   Future<void> _getCurrentLocation() async {
     setState(() {
       _isLoading = true; // Afficher "Chargement..."
-      _currentLocation = "chargement";
+      _currentLocation = "chargement".tr;
     });
     try {
       Position position = await Geolocator.getCurrentPosition(
@@ -58,7 +59,7 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
       });
     } catch (e) {
       setState(() {
-        _currentLocation = "Impossible d'obtenir la localisation";
+        _currentLocation = "Impossible d'obtenir la localisation".tr;
         _isLoading = false;
       });
     }
@@ -252,7 +253,7 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                           child: Text(
                             categorie.isEmpty
                                 ? "Selectionnez_Categorie".tr
-                                : categorie,
+                                : "${categorie}".tr,
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         )),
@@ -394,48 +395,56 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                                 currentPosition != null)
                             ? GestureDetector(
                                 onTap: () async {
-                                  final selectedLieux = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => MapsMarketPlace(
-                                          lieuAdress: _currentLocation,
-                                          currentPosition: currentPosition!,
-                                          rayon: rayon),
-                                    ),
-                                  );
-
-                                  if (selectedLieux != null) {
-                                    var lat = double.parse(selectedLieux[0]
-                                            ['latitude']
-                                        .toString());
-                                    var lon = double.parse(selectedLieux[0]
-                                            ['longitude']
-                                        .toString());
-                                    var rad = double.parse(
-                                        selectedLieux[0]['radius'].toString());
-                                    Position positionNews = Position(
-                                      latitude: lat,
-                                      longitude: lon,
-                                      accuracy:
-                                          0.0, // Précision, vous pouvez ajuster cette valeur
-                                      altitude: 0.0, // Altitude par défaut
-                                      heading: 0.0, // Direction par défaut
-                                      speed: 0.0, // Vitesse par défaut
-                                      speedAccuracy:
-                                          0.0, // Précision de la vitesse
-                                      timestamp: DateTime.now(),
-                                      altitudeAccuracy:
-                                          0.0, // Ajoutez l'altitudeAccuracy par défaut
-                                      headingAccuracy: 0.0,
+                                  String posss = "chargement".tr;
+                                  String impo =
+                                      "Impossible d'obtenir la localisation".tr;
+                                  if (_currentLocation == posss ||
+                                      _currentLocation == impo) {
+                                  } else {
+                                    final selectedLieux = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => MapsMarketPlace(
+                                            lieuAdress: _currentLocation,
+                                            currentPosition: currentPosition!,
+                                            rayon: rayon),
+                                      ),
                                     );
-                                    setState(() {
-                                      currentPosition = positionNews;
-                                      latitude = lat;
-                                      longitude = lon;
-                                      _currentLocation =
-                                          selectedLieux[0]['lieu'];
-                                      rayon = rad;
-                                    });
+
+                                    if (selectedLieux != null) {
+                                      var lat = double.parse(selectedLieux[0]
+                                              ['latitude']
+                                          .toString());
+                                      var lon = double.parse(selectedLieux[0]
+                                              ['longitude']
+                                          .toString());
+                                      var rad = double.parse(selectedLieux[0]
+                                              ['radius']
+                                          .toString());
+                                      Position positionNews = Position(
+                                        latitude: lat,
+                                        longitude: lon,
+                                        accuracy:
+                                            0.0, // Précision, vous pouvez ajuster cette valeur
+                                        altitude: 0.0, // Altitude par défaut
+                                        heading: 0.0, // Direction par défaut
+                                        speed: 0.0, // Vitesse par défaut
+                                        speedAccuracy:
+                                            0.0, // Précision de la vitesse
+                                        timestamp: DateTime.now(),
+                                        altitudeAccuracy:
+                                            0.0, // Ajoutez l'altitudeAccuracy par défaut
+                                        headingAccuracy: 0.0,
+                                      );
+                                      setState(() {
+                                        currentPosition = positionNews;
+                                        latitude = lat;
+                                        longitude = lon;
+                                        _currentLocation =
+                                            selectedLieux[0]['lieu'];
+                                        rayon = rad;
+                                      });
+                                    }
                                   }
                                 },
                                 child: Container(
@@ -489,7 +498,7 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                                     Expanded(
                                       child: Text(
                                         _isLoading
-                                            ? "Chargement..."
+                                            ? "chargement".tr
                                             : _currentLocation,
                                         style: TextStyle(
                                           fontSize: 16,
@@ -520,7 +529,7 @@ class _FilterProductPageState extends ConsumerState<FilterProductPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "${rayon} :".tr,
+                          "${Rayon} :".tr,
                           style: TextStyle(
                               fontSize: 17, fontWeight: FontWeight.w500),
                         ),
