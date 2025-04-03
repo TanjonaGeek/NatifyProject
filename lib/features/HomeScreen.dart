@@ -10,6 +10,7 @@ import 'package:natify/features/Chat/presentation/pages/AllMessagePage.dart';
 import 'package:natify/features/Storie/presentation/pages/AllStoriePage.dart';
 import 'package:natify/features/Storie/presentation/pages/creeateStoriePage.dart';
 import 'package:natify/features/User/presentation/pages/UserProfilePage.dart';
+import 'package:natify/features/User/presentation/pages/createannoncemarket.dart';
 import 'package:natify/features/User/presentation/pages/editerprofile.dart';
 import 'package:natify/features/User/presentation/pages/map/maps.dart';
 import 'package:natify/features/User/presentation/pages/notification/listNotification.dart';
@@ -181,10 +182,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               child: ValueListenableBuilder<int>(
                 valueListenable: _selectedIndexNotifier,
                 builder: (context, selectedIndex, _) {
-                  return Text(
-                    appBarTitles[selectedIndex].tr,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  );
+                  return selectedIndex == 3
+                      ? SizedBox(
+                          width: 90,
+                          height: 90,
+                          child: Image.asset(
+                            'assets/gomarket.png',
+                          ))
+                      : Text(
+                          appBarTitles[selectedIndex].tr,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        );
                 },
               ),
             ),
@@ -210,19 +218,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   return selectedIndex == 3
                       ? Row(
                           children: [
-                            IconButton(
-                                onPressed: () {
-                                  SlideNavigation.slideToPage(
-                                      context, SearchProduct());
-                                },
-                                icon: Center(
-                                  child: Image.asset(
-                                    'assets/loupe1.png',
-                                    width: 28,
-                                    height: 28,
-                                    color: Colors.black,
-                                  ),
-                                )),
+                            InkWell(
+                              onTap: () {
+                                SlideNavigation.slideToPage(
+                                    context, CreateAnnonceMarket());
+                              },
+                              child: FaIcon(
+                                FontAwesomeIcons.plus,
+                                size: 22,
+                              ),
+                            ),
                             IconButton(
                               onPressed: () {
                                 SlideNavigation.slideToPage(

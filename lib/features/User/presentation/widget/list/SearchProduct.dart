@@ -195,13 +195,13 @@ class _SearchProductState extends ConsumerState<SearchProduct> {
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 20),
                       ),
-                      SizedBox(height: 4),
-                      Text(
-                        textAlign: TextAlign.center,
-                        "Actuellement_aucun_produit".tr,
-                        style: TextStyle(
-                            fontWeight: FontWeight.w400, fontSize: 17),
-                      ),
+                      // SizedBox(height: 4),
+                      // Text(
+                      //   textAlign: TextAlign.center,
+                      //   "Actuellement_aucun_produit".tr,
+                      //   style: TextStyle(
+                      //       fontWeight: FontWeight.w400, fontSize: 17),
+                      // ),
                     ],
                   ),
                 ),
