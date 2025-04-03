@@ -4,6 +4,7 @@ import 'package:firebase_pagination/firebase_pagination.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:natify/core/utils/colors.dart';
 import 'package:natify/core/utils/slideNavigation.dart';
@@ -11,6 +12,7 @@ import 'package:natify/features/User/presentation/provider/user_provider.dart';
 import 'package:natify/features/User/presentation/widget/detailMarket.dart';
 import 'package:natify/features/User/presentation/widget/list/ProductCard.dart';
 import 'package:natify/features/User/presentation/widget/list/SearchProduct.dart';
+import 'package:natify/features/User/presentation/widget/list/mapsMarketPlace.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
 
@@ -79,244 +81,6 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
         body: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Container(
-        //   padding: EdgeInsets.all(8.0),
-        //   child: Row(
-        //     crossAxisAlignment: CrossAxisAlignment.start,
-        //     children: [
-        //       Flexible(
-        //         child: SingleChildScrollView(
-        //           scrollDirection: Axis.horizontal,
-        //           child: Row(
-        //             crossAxisAlignment: CrossAxisAlignment.start,
-        //             children: [
-        //               if (notifier.nameSearch.isNotEmpty)
-        //                 Container(
-        //                     decoration: BoxDecoration(
-        //                         border: Border.all(color: kPrimaryColor),
-        //                         borderRadius:
-        //                             BorderRadius.all(Radius.circular(20))),
-        //                     child: Padding(
-        //                       padding: const EdgeInsets.symmetric(
-        //                           horizontal: 10, vertical: 10),
-        //                       child: Row(
-        //                         children: [
-        //                           Text(
-        //                             "Mots-cle".tr,
-        //                             style: TextStyle(
-        //                                 fontWeight: FontWeight.bold,
-        //                                 color: kPrimaryColor),
-        //                           ),
-        //                           SizedBox(
-        //                             width: 7,
-        //                           ),
-        //                           Text(
-        //                             "${notifier.nameSearch}",
-        //                             style: TextStyle(
-        //                                 fontWeight: FontWeight.bold,
-        //                                 color: kPrimaryColor),
-        //                           ),
-        //                           SizedBox(
-        //                             width: 7,
-        //                           ),
-        //                           GestureDetector(
-        //                             onTap: () {
-        //                               ref
-        //                                   .read(marketPlaceUserStateNotifier
-        //                                       .notifier)
-        //                                   .ClearFilterTerm();
-        //                             },
-        //                             child: FaIcon(FontAwesomeIcons.close,
-        //                                 color: Colors.black.withOpacity(0.6),
-        //                                 size: 16),
-        //                           )
-        //                         ],
-        //                       ),
-        //                     )),
-        //               if (notifier.nameSearch.isNotEmpty)
-        //                 SizedBox(
-        //                   width: 5,
-        //                 ),
-        //               Container(
-        //                   decoration: BoxDecoration(
-        //                       border: Border.all(color: kPrimaryColor),
-        //                       borderRadius:
-        //                           BorderRadius.all(Radius.circular(20))),
-        //                   child: Padding(
-        //                     padding: const EdgeInsets.symmetric(
-        //                         horizontal: 10, vertical: 10),
-        //                     child: Row(
-        //                       children: [
-        //                         FaIcon(FontAwesomeIcons.boxOpen,
-        //                             color: kPrimaryColor, size: 14),
-        //                         SizedBox(
-        //                           width: 5,
-        //                         ),
-        //                         Text(
-        //                           notifier.Categorie.isNotEmpty
-        //                               ? '${notifier.Categorie}'.tr
-        //                               : 'ToutCat'.tr,
-        //                           style: TextStyle(
-        //                               fontWeight: FontWeight.bold,
-        //                               color: kPrimaryColor),
-        //                         ),
-        //                         if (notifier.Categorie.isNotEmpty)
-        //                           SizedBox(
-        //                             width: 7,
-        //                           ),
-        //                         // ref.watch(marketPlaceUserStateNotifier)
-        //                         if (notifier.Categorie.isNotEmpty)
-        //                           GestureDetector(
-        //                             onTap: () {
-        //                               ref
-        //                                   .read(marketPlaceUserStateNotifier
-        //                                       .notifier)
-        //                                   .ClearFilterCategorie();
-        //                             },
-        //                             child: FaIcon(FontAwesomeIcons.close,
-        //                                 color: Colors.black.withOpacity(0.6),
-        //                                 size: 16),
-        //                           )
-        //                       ],
-        //                     ),
-        //                   )),
-        //               SizedBox(
-        //                 width: 5,
-        //               ),
-        //               Container(
-        //                   decoration: BoxDecoration(
-        //                       border: Border.all(color: kPrimaryColor),
-        //                       borderRadius:
-        //                           BorderRadius.all(Radius.circular(20))),
-        //                   child: Padding(
-        //                     padding: const EdgeInsets.symmetric(
-        //                         horizontal: 10, vertical: 10),
-        //                     child: Row(
-        //                       children: [
-        //                         Text(
-        //                           "${PrixDebutformatted} $a ${PrixFinformatted} ${notifier.currency}",
-        //                           style: TextStyle(
-        //                               fontWeight: FontWeight.bold,
-        //                               color: kPrimaryColor),
-        //                         ),
-        //                         (notifier.prixProduit ==
-        //                                     RangeValues(5000.0, 50000000.0) ||
-        //                                 notifier.prixProduit ==
-        //                                     RangeValues(1.0, 10000.0))
-        //                             ? SizedBox.shrink()
-        //                             : SizedBox(
-        //                                 width: 7,
-        //                               ),
-        //                         (notifier.prixProduit ==
-        //                                     RangeValues(5000.0, 50000000.0) ||
-        //                                 notifier.prixProduit ==
-        //                                     RangeValues(1.0, 10000.0))
-        //                             ? SizedBox.shrink()
-        //                             : GestureDetector(
-        //                                 onTap: () {
-        //                                   ref
-        //                                       .read(marketPlaceUserStateNotifier
-        //                                           .notifier)
-        //                                       .ClearFilterPrix();
-        //                                 },
-        //                                 child: FaIcon(FontAwesomeIcons.close,
-        //                                     color:
-        //                                         Colors.black.withOpacity(0.6),
-        //                                     size: 16),
-        //                               )
-        //                       ],
-        //                     ),
-        //                   )),
-        //               SizedBox(
-        //                 width: 5,
-        //               ),
-        //               if (notifier.isFilterLocation == true)
-        //                 Container(
-        //                     decoration: BoxDecoration(
-        //                         border: Border.all(color: kPrimaryColor),
-        //                         borderRadius:
-        //                             BorderRadius.all(Radius.circular(20))),
-        //                     child: Padding(
-        //                       padding: const EdgeInsets.symmetric(
-        //                           horizontal: 10, vertical: 10),
-        //                       child: Row(
-        //                         children: [
-        //                           FaIcon(FontAwesomeIcons.locationDot,
-        //                               color: kPrimaryColor, size: 14),
-        //                           SizedBox(
-        //                             width: 5,
-        //                           ),
-        //                           Text(
-        //                             "${notifier.adressMaps}",
-        //                             style: TextStyle(
-        //                                 fontWeight: FontWeight.bold,
-        //                                 color: kPrimaryColor),
-        //                           ),
-        //                           if (notifier.adressMaps.isNotEmpty)
-        //                             SizedBox(
-        //                               width: 7,
-        //                             ),
-        //                           if (notifier.adressMaps.isNotEmpty)
-        //                             GestureDetector(
-        //                               onTap: () {
-        //                                 ref
-        //                                     .read(marketPlaceUserStateNotifier
-        //                                         .notifier)
-        //                                     .ClearFilterAdresse();
-        //                               },
-        //                               child: FaIcon(FontAwesomeIcons.close,
-        //                                   color: Colors.black.withOpacity(0.6),
-        //                                   size: 16),
-        //                             )
-        //                         ],
-        //                       ),
-        //                     )),
-        //               SizedBox(
-        //                 width: 5,
-        //               ),
-        //               if (notifier.isFilterLocation == true)
-        //                 Container(
-        //                     decoration: BoxDecoration(
-        //                         border: Border.all(color: kPrimaryColor),
-        //                         borderRadius:
-        //                             BorderRadius.all(Radius.circular(20))),
-        //                     child: Padding(
-        //                       padding: const EdgeInsets.symmetric(
-        //                           horizontal: 10, vertical: 10),
-        //                       child: Row(
-        //                         children: [
-        //                           Text(
-        //                             '${rayon} ${(notifier.radius / 1000).toInt()} Km',
-        //                             style: TextStyle(
-        //                                 fontWeight: FontWeight.bold,
-        //                                 color: kPrimaryColor),
-        //                           ),
-        //                           if (notifier.radius > 10000.0)
-        //                             SizedBox(
-        //                               width: 7,
-        //                             ),
-        //                           if (notifier.radius > 10000.0)
-        //                             GestureDetector(
-        //                               onTap: () {
-        //                                 ref
-        //                                     .read(marketPlaceUserStateNotifier
-        //                                         .notifier)
-        //                                     .ClearFilterRayon();
-        //                               },
-        //                               child: FaIcon(FontAwesomeIcons.close,
-        //                                   color: Colors.black.withOpacity(0.6),
-        //                                   size: 16),
-        //                             )
-        //                         ],
-        //                       ),
-        //                     )),
-        //             ],
-        //           ),
-        //         ),
-        //       ),
-        //     ],
-        //   ),
-        // ),
         Padding(
           padding: const EdgeInsets.all(12.0),
           child: TextField(
@@ -325,23 +89,81 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
               SlideNavigation.slideToPage(context, SearchProduct());
             },
             decoration: InputDecoration(
-              hintText: notifier.adressMaps.isNotEmpty
-                  ? notifier.adressMaps
-                  : "Rechercher".tr,
+              hintText: notifier.nameSearch.isNotEmpty
+                  ? "${notifier.nameSearch}"
+                  : notifier.adressMaps.isNotEmpty
+                      ? "${notifier.adressMaps}"
+                      : "Rechercher".tr,
               hintStyle: TextStyle(color: Colors.grey),
-              suffixIcon: Padding(
-                padding: EdgeInsets.only(right: 1),
-                child: Container(
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
-                      borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(30),
-                          bottomRight: Radius.circular(30)),
+              suffixIcon: notifier.nameSearch.isNotEmpty
+                  ? Padding(
+                      padding: EdgeInsets.only(right: 1),
+                      child: InkWell(
+                        onTap: () {
+                          ref
+                              .read(marketPlaceUserStateNotifier.notifier)
+                              .ClearFilterTerm();
+                        },
+                        child: Icon(
+                          Icons.close,
+                          color: kPrimaryColor,
+                          size: 20,
+                        ),
+                      ),
+                    )
+                  : Padding(
+                      padding: EdgeInsets.only(right: 1),
+                      child: InkWell(
+                        onTap: () async {
+                          Position positionNews = Position(
+                            latitude: notifier.latitude,
+                            longitude: notifier.longitude,
+                            accuracy:
+                                0.0, // Précision, vous pouvez ajuster cette valeur
+                            altitude: 0.0, // Altitude par défaut
+                            heading: 0.0, // Direction par défaut
+                            speed: 0.0, // Vitesse par défaut
+                            speedAccuracy: 0.0, // Précision de la vitesse
+                            timestamp: DateTime.now(),
+                            altitudeAccuracy:
+                                0.0, // Ajoutez l'altitudeAccuracy par défaut
+                            headingAccuracy: 0.0,
+                          );
+                          final selectedLieux = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MapsMarketPlace(
+                                  lieuAdress: notifier.adressMaps,
+                                  currentPosition: positionNews!,
+                                  rayon: notifier.radius),
+                            ),
+                          );
+                          if (selectedLieux != null) {
+                            var lat = double.parse(
+                                selectedLieux[0]['latitude'].toString());
+                            var lon = double.parse(
+                                selectedLieux[0]['longitude'].toString());
+                            var rad = double.parse(
+                                selectedLieux[0]['radius'].toString());
+                            String adress = selectedLieux[0]['lieu'];
+                            if (mounted) {
+                              if (lat == 0.0 && lon == 0.0) {
+                                print('le etape 1');
+                                ref
+                                    .read(marketPlaceUserStateNotifier.notifier)
+                                    .SetLocation("", 0.0, 0.0, 10000.0, false);
+                              } else {
+                                print('le etape 2');
+                                ref
+                                    .read(marketPlaceUserStateNotifier.notifier)
+                                    .SetLocation(adress, lon, lat, rad, true);
+                              }
+                            }
+                          }
+                        },
+                        child: Icon(Icons.place, color: kPrimaryColor),
+                      ),
                     ),
-                    child: Icon(Icons.place, color: kPrimaryColor)),
-              ),
               filled: true,
               fillColor: Colors.white,
               border: OutlineInputBorder(

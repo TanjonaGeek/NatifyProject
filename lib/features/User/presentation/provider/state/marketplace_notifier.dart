@@ -203,13 +203,25 @@ class MarketplaceUserNotifier extends StateNotifier<MarketplaceUserState> {
     _saveState();
   }
 
-   Future<void> ClearFilterTerm() async {
+  Future<void> ClearFilterTerm() async {
     state = state.copyWith(nameSearch: "");
     _saveState();
   }
 
   Future<void> SetNameSearchTerm(String nameSearch) async {
     state = state.copyWith(nameSearch: nameSearch);
+    _saveState();
+  }
+
+  Future<void> SetLocation(String adrss, double long, double lat, double rad,
+      bool isFilterLoc) async {
+    state = state.copyWith(
+        adressMaps: adrss,
+        longitude: long,
+        latitude: lat,
+        radius: rad,
+        isFilterLocation: isFilterLoc);
+    calculateBounds(lat, long);
     _saveState();
   }
 
