@@ -40,13 +40,11 @@ class _MarketplaceResultFiltrePageState
   };
   String rayon = "rayon".tr;
   String term = "";
-  String categorieSelect = "";
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     term = widget.nameTerm;
-    categorieSelect = widget.categorieSelectionner;
   }
 
   @override
@@ -61,8 +59,8 @@ class _MarketplaceResultFiltrePageState
     if (notifier.currency.isNotEmpty) {
       query = query.where('currency', isEqualTo: notifier.currency);
     }
-    if (categorieSelect.isNotEmpty) {
-      query = query.where('categorie', isEqualTo: categorieSelect);
+    if (notifier.Categorie.isNotEmpty) {
+      query = query.where('categorie', isEqualTo: notifier.Categorie);
     }
     if (notifier.isFilterLocation == true) {
       query = query
@@ -246,24 +244,25 @@ class _MarketplaceResultFiltrePageState
                                       width: 5,
                                     ),
                                     Text(
-                                      categorieSelect.isNotEmpty
-                                          ? '${categorieSelect}'.tr
+                                      notifier.Categorie.isNotEmpty
+                                          ? '${notifier.Categorie}'.tr
                                           : 'ToutCat'.tr,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: kPrimaryColor),
                                     ),
-                                    if (categorieSelect.isNotEmpty)
+                                    if (notifier.Categorie.isNotEmpty)
                                       SizedBox(
                                         width: 7,
                                       ),
                                     // ref.watch(marketPlaceUserStateNotifier)
-                                    if (categorieSelect.isNotEmpty)
+                                    if (notifier.Categorie.isNotEmpty)
                                       GestureDetector(
                                         onTap: () {
-                                          setState(() {
-                                            categorieSelect = "";
-                                          });
+                                          ref
+                                              .read(marketPlaceUserStateNotifier
+                                                  .notifier)
+                                              .SetCategorie("");
                                         },
                                         child: FaIcon(FontAwesomeIcons.close,
                                             color:

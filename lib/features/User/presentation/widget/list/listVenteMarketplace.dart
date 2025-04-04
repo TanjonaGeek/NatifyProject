@@ -29,7 +29,6 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
   String a = "à".tr;
   String toutCat = "ToutCat".tr;
   final ValueNotifier<List<String>> selectedSubcategories = ValueNotifier([]);
-  final ValueNotifier<String> selectedcategories = ValueNotifier("");
   String? uidMe = FirebaseAuth.instance.currentUser!.uid ?? "";
   List<Map<String, dynamic>> categoriesVente = Helpers.categoriesVente;
   final Map<String, String> _exchangeFormat = {
@@ -39,17 +38,10 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
   };
   String rayon = "rayon".tr;
 
-  void updateSubcategories(List<String> subcategories, String titleCategorie) {
-    selectedSubcategories.value =
-        subcategories; // Met à jour les sous-catégories
-    selectedcategories.value = titleCategorie;
-  }
-
   @override
   void dispose() {
     // TODO: implement dispose
     selectedSubcategories.dispose();
-    selectedcategories.dispose();
     super.dispose();
   }
 
@@ -140,12 +132,10 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
                         String adress = selectedLieux[0]['lieu'];
                         if (mounted) {
                           if (lat == 0.0 && lon == 0.0) {
-                            print('le etape 1');
                             ref
                                 .read(marketPlaceUserStateNotifier.notifier)
                                 .SetLocation("", 0.0, 0.0, 10000.0, false);
                           } else {
-                            print('le etape 2');
                             ref
                                 .read(marketPlaceUserStateNotifier.notifier)
                                 .SetLocation(adress, lon, lat, rad, true);
@@ -179,17 +169,26 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
                 padding: const EdgeInsets.only(right: 6),
                 child: InkWell(
                   onTap: () {
-                    updateSubcategories(subCategorie, titleCategorie);
                     // if (mounted) {
                     //   ref
                     //       .read(marketPlaceUserStateNotifier.notifier)
-                    //       .SetCategorie(category['title']);
+                    //       .SetTitleCategorie(titleCategorie);
                     // }
-                    // SlideNavigation.slideToPage(
-                    //     context,
-                    //     MarketplaceResultFiltrePage(
-                    //       nameTerm: "",
-                    //     ));
+                    int index = categoriesVente.indexWhere(
+                      (element) => element["title"] == titleCategorie,
+                    );
+
+                    // Vérification pour éviter les erreurs
+                    final Map<String, dynamic>? category =
+                        (index != -1) ? categoriesVente[index] : null;
+
+                    // 🔥 Assurez-vous que `subcategories` est bien une liste de `String`
+                    final List<String> subCategorie =
+                        List<String>.from(category?['subcategories'] ?? []);
+
+                    // Afficher le Modal avec les sous-catégories
+                    showCustomModal(context, subCategorie, titleCategorie,
+                        notifier.Categorie, ref);
                   },
                   child: CategoryCard(
                     category: category,
@@ -199,69 +198,16 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
             },
           ),
         ),
-        SizedBox(
-          height: 5,
-        ),
-
-        /// Affichage des sous-catégories avec `Wrap`
-        ValueListenableBuilder<List<String>>(
-          valueListenable: selectedSubcategories,
-          builder: (context, subcategories, _) {
-            return subcategories.isEmpty
-                ? SizedBox()
-                : Theme(
-                    data: ThemeData().copyWith(
-                      dividerColor:
-                          Colors.transparent, // Supprime la ligne de séparation
-                    ),
-                    child: ExpansionTile(
-                      initiallyExpanded: true,
-                      title: Text("${selectedcategories.value}".tr,
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Wrap(
-                              alignment:
-                                  WrapAlignment.start, // Aligner à gauche
-                              crossAxisAlignment: WrapCrossAlignment
-                                  .start, // Alignement vertical en haut
-                              runAlignment: WrapAlignment
-                                  .start, // Aligner les lignes à gauche
-                              spacing: 5,
-                              runSpacing: 7,
-                              children: subcategories.map((sub) {
-                                return InkWell(
-                                  onTap: () {
-                                    SlideNavigation.slideToPage(
-                                        context,
-                                        MarketplaceResultFiltrePage(
-                                          nameTerm: "",
-                                          categorieSelectionner: sub,
-                                        ));
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10)),
-                                        border: Border.all()),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text('${sub}'.tr),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-          },
-        ),
+        if (notifier.titreCategorie.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Text(
+              "${notifier.titreCategorie}".tr,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         SizedBox(
           height: 5,
         ),
@@ -276,7 +222,7 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
               crossAxisCount: 2,
               crossAxisSpacing: 1,
               mainAxisSpacing: 1,
-              childAspectRatio: 0.7,
+              childAspectRatio: 0.8,
             ),
             bottomLoader: SizedBox(),
             initialLoader: // Section de post
@@ -364,6 +310,115 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
       ],
     ));
   }
+}
+
+void showCustomModal(BuildContext context, List<String> subCategorie,
+    String titre, String cat, WidgetRef ref) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true, // Pour ajuster selon le contenu
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) {
+      return Container(
+        width: double.infinity, // Pleine largeur
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 50,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            SizedBox(height: 10),
+            Text(
+              "${titre}".tr,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 20),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 1),
+                child: Wrap(
+                  alignment: WrapAlignment.start, // Aligner à gauche
+                  crossAxisAlignment:
+                      WrapCrossAlignment.start, // Alignement vertical en haut
+                  runAlignment:
+                      WrapAlignment.start, // Aligner les lignes à gauche
+                  spacing: 5,
+                  runSpacing: 7,
+                  children: subCategorie.map<Widget>((sub) {
+                    // ✅ Ajout du type <Widget>
+                    return InkWell(
+                      onTap: () {
+                        ref
+                            .read(marketPlaceUserStateNotifier.notifier)
+                            .SetTitleCategorieAndCategorie(titre, sub);
+                        Navigator.pop(context);
+                      },
+                      child: Stack(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Colors.blue.shade50,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10)),
+                                border: Border.all(
+                                  color: Colors.blue.shade50,
+                                )),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 15),
+                              child: Text(sub.tr),
+                            ),
+                          ),
+                          if (cat == sub)
+                            Positioned(
+                                top: 0,
+                                right: 0,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    ref
+                                        .read(marketPlaceUserStateNotifier
+                                            .notifier)
+                                        .SetTitleCategorieAndCategorie("", "");
+                                    Navigator.pop(context);
+                                  },
+                                  child: Container(
+                                    width: 17,
+                                    height: 17,
+                                    decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(30))),
+                                    child: Center(
+                                      child: FaIcon(FontAwesomeIcons.close,
+                                          color: Colors.white, size: 13),
+                                    ),
+                                  ),
+                                ))
+                        ],
+                      ),
+                    );
+                  }).toList(), // ✅ Convertir en List<Widget>
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }
 
 class CategoryCard extends StatelessWidget {

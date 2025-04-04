@@ -214,7 +214,21 @@ class MarketplaceUserNotifier extends StateNotifier<MarketplaceUserState> {
   }
 
   Future<void> SetCategorie(String categorie) async {
-    state = state.copyWith(Categorie: categorie);
+    state = state.copyWith(
+      Categorie: categorie,
+    );
+    _saveState();
+  }
+
+  Future<void> SetTitleCategorie(String titrecategorie) async {
+    state = state.copyWith(titreCategorie: titrecategorie);
+    _saveState();
+  }
+
+  Future<void> SetTitleCategorieAndCategorie(
+      String titrecategorie, String Categorie) async {
+    state =
+        state.copyWith(titreCategorie: titrecategorie, Categorie: Categorie);
     _saveState();
   }
 
@@ -246,6 +260,7 @@ class MarketplaceUserNotifier extends StateNotifier<MarketplaceUserState> {
         maxlongitude: 0.0,
         maxlatitude: 0.0,
         isFilterLocation: false,
+        titreCategorie: "",
         isFilter: false);
 
     // Sauvegarder les valeurs réinitialisées dans SharedPreferences

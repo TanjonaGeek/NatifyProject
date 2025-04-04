@@ -23,6 +23,7 @@ class MarketplaceUserState extends Equatable {
   final double minlatitude;
   final double maxlongitude;
   final double maxlatitude;
+  final String titreCategorie;
 
   const MarketplaceUserState({
     this.hasData = false,
@@ -44,6 +45,7 @@ class MarketplaceUserState extends Equatable {
     this.minlatitude = 0.0,
     this.maxlongitude = 0.0,
     this.maxlatitude = 0.0,
+    this.titreCategorie = "",
   });
 
   MarketplaceUserState copyWith({
@@ -67,6 +69,7 @@ class MarketplaceUserState extends Equatable {
     double? minlatitude,
     double? maxlongitude,
     double? maxlatitude,
+    String? titreCategorie,
   }) {
     return MarketplaceUserState(
       hasData: hasData ?? this.hasData,
@@ -88,6 +91,7 @@ class MarketplaceUserState extends Equatable {
       minlatitude: minlatitude ?? this.minlatitude,
       maxlongitude: maxlongitude ?? this.maxlongitude,
       maxlatitude: maxlatitude ?? this.maxlatitude,
+      titreCategorie: titreCategorie ?? this.titreCategorie,
     );
   }
 
@@ -113,6 +117,7 @@ class MarketplaceUserState extends Equatable {
       "minlatitude": minlatitude,
       "maxlongitude": maxlongitude,
       "maxlatitude": maxlatitude,
+      "titreCategorie": titreCategorie,
     };
   }
 
@@ -140,6 +145,7 @@ class MarketplaceUserState extends Equatable {
       minlatitude: json['minlatitude'] ?? 0.0,
       maxlongitude: json['maxlongitude'] ?? 0.0,
       maxlatitude: json['maxlatitude'] ?? 0.0,
+      titreCategorie: json['titreCategorie'] ?? "",
     );
   }
 
@@ -164,5 +170,6 @@ class MarketplaceUserState extends Equatable {
         minlatitude,
         maxlongitude,
         maxlatitude,
+        titreCategorie
       ];
 }
