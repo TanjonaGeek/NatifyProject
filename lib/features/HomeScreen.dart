@@ -224,7 +224,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                     context, CreateAnnonceMarket());
                               },
                               child: FaIcon(
-                                FontAwesomeIcons.plus,
+                                FontAwesomeIcons.squarePlus,
+                                size: 22,
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            InkWell(
+                              onTap: () {
+                                SlideNavigation.slideToPage(
+                                    context, CreateAnnonceMarket());
+                              },
+                              child: FaIcon(
+                                FontAwesomeIcons.heart,
                                 size: 22,
                               ),
                             ),

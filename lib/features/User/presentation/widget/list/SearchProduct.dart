@@ -63,11 +63,13 @@ class _SearchProductState extends ConsumerState<SearchProduct> {
   }
 
   Future<void> findTerm(String term) async {
-    if (mounted) {
-      ref.read(marketPlaceUserStateNotifier.notifier).SetNameSearchTerm(term);
-    }
     Future.delayed(Duration(seconds: 1), () {});
-    SlideNavigation.slideToPage(context, MarketplaceResultFiltrePage());
+    SlideNavigation.slideToPage(
+        context,
+        MarketplaceResultFiltrePage(
+          nameTerm: term,
+          categorieSelectionner: "",
+        ));
   }
 
   @override
@@ -75,7 +77,7 @@ class _SearchProductState extends ConsumerState<SearchProduct> {
     return Scaffold(
       appBar: AppBar(
         title: SizedBox(
-          height: 40,
+          height: 45,
           child: TextFormField(
             decoration: InputDecoration(
               suffix: loadingLocation == true

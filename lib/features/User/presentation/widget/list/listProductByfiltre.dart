@@ -18,7 +18,10 @@ import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
 
 class MarketplaceResultFiltrePage extends ConsumerStatefulWidget {
-  MarketplaceResultFiltrePage({super.key});
+  final String nameTerm;
+  final String categorieSelectionner;
+  MarketplaceResultFiltrePage(
+      {required this.nameTerm, required this.categorieSelectionner, super.key});
 
   @override
   ConsumerState<MarketplaceResultFiltrePage> createState() =>
@@ -36,6 +39,15 @@ class _MarketplaceResultFiltrePageState
     'MGA': 'mg_MG',
   };
   String rayon = "rayon".tr;
+  String term = "";
+  String categorieSelect = "";
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    term = widget.nameTerm;
+    categorieSelect = widget.categorieSelectionner;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,15 +55,14 @@ class _MarketplaceResultFiltrePageState
     var requeteId = const Uuid().v1();
     Query query = FirebaseFirestore.instance.collection('marketplace');
     // Ajouter les filtres de recherche
-    if (notifier.nameSearch.isNotEmpty) {
-      query = query.where('nameProduit',
-          arrayContains: notifier.nameSearch.toLowerCase());
+    if (term.isNotEmpty) {
+      query = query.where('nameProduit', arrayContains: term.toLowerCase());
     }
     if (notifier.currency.isNotEmpty) {
       query = query.where('currency', isEqualTo: notifier.currency);
     }
-    if (notifier.Categorie.isNotEmpty) {
-      query = query.where('categorie', isEqualTo: notifier.Categorie);
+    if (categorieSelect.isNotEmpty) {
+      query = query.where('categorie', isEqualTo: categorieSelect);
     }
     if (notifier.isFilterLocation == true) {
       query = query
@@ -79,13 +90,16 @@ class _MarketplaceResultFiltrePageState
             height: 45,
             child: TextFormField(
               readOnly: true,
+              onTap: () {
+                SlideNavigation.slideToPage(context, SearchProduct());
+              },
               decoration: InputDecoration(
-                suffixIcon: notifier.nameSearch.isNotEmpty
+                suffixIcon: term.isNotEmpty
                     ? InkWell(
                         onTap: () {
-                          ref
-                              .read(marketPlaceUserStateNotifier.notifier)
-                              .ClearFilterTerm();
+                          setState(() {
+                            term = "";
+                          });
                         },
                         child: Icon(
                           Icons.close,
@@ -157,8 +171,8 @@ class _MarketplaceResultFiltrePageState
                 ),
                 contentPadding:
                     EdgeInsets.only(left: 20, right: 20, top: 3, bottom: 3),
-                hintText: notifier.nameSearch.isNotEmpty
-                    ? "${notifier.nameSearch}"
+                hintText: term.isNotEmpty
+                    ? "${term}"
                     : notifier.adressMaps.isNotEmpty
                         ? "${notifier.adressMaps}"
                         : "Rechercher".tr,
@@ -232,25 +246,24 @@ class _MarketplaceResultFiltrePageState
                                       width: 5,
                                     ),
                                     Text(
-                                      notifier.Categorie.isNotEmpty
-                                          ? '${notifier.Categorie}'.tr
+                                      categorieSelect.isNotEmpty
+                                          ? '${categorieSelect}'.tr
                                           : 'ToutCat'.tr,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: kPrimaryColor),
                                     ),
-                                    if (notifier.Categorie.isNotEmpty)
+                                    if (categorieSelect.isNotEmpty)
                                       SizedBox(
                                         width: 7,
                                       ),
                                     // ref.watch(marketPlaceUserStateNotifier)
-                                    if (notifier.Categorie.isNotEmpty)
+                                    if (categorieSelect.isNotEmpty)
                                       GestureDetector(
                                         onTap: () {
-                                          ref
-                                              .read(marketPlaceUserStateNotifier
-                                                  .notifier)
-                                              .ClearFilterCategorie();
+                                          setState(() {
+                                            categorieSelect = "";
+                                          });
                                         },
                                         child: FaIcon(FontAwesomeIcons.close,
                                             color:

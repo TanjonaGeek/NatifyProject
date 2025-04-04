@@ -7,11 +7,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:natify/core/utils/colors.dart';
+import 'package:natify/core/utils/helpers.dart';
 import 'package:natify/core/utils/slideNavigation.dart';
 import 'package:natify/features/User/presentation/provider/user_provider.dart';
 import 'package:natify/features/User/presentation/widget/detailMarket.dart';
 import 'package:natify/features/User/presentation/widget/list/ProductCard.dart';
 import 'package:natify/features/User/presentation/widget/list/SearchProduct.dart';
+import 'package:natify/features/User/presentation/widget/list/listProductByfiltre.dart';
 import 'package:natify/features/User/presentation/widget/list/mapsMarketPlace.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
@@ -26,31 +28,36 @@ class MarketplacePage extends ConsumerStatefulWidget {
 class _MarketplacePageState extends ConsumerState<MarketplacePage> {
   String a = "à".tr;
   String toutCat = "ToutCat".tr;
+  final ValueNotifier<List<String>> selectedSubcategories = ValueNotifier([]);
+  final ValueNotifier<String> selectedcategories = ValueNotifier("");
   String? uidMe = FirebaseAuth.instance.currentUser!.uid ?? "";
+  List<Map<String, dynamic>> categoriesVente = Helpers.categoriesVente;
   final Map<String, String> _exchangeFormat = {
     'EUR': 'fr_FR',
     'USD': 'en_US',
     'MGA': 'mg_MG',
   };
-  final List<Category> categories = [
-    Category(icon: Icons.home, label: 'Immobilier & Hébergement'),
-    Category(icon: Icons.directions_car, label: 'Véhicules & Mobilité'),
-    Category(icon: Icons.computer, label: 'Informatique, High-Tech & Jeux'),
-    Category(icon: Icons.weekend, label: 'Maison, Meubles & Décoration'),
-    Category(icon: Icons.category, label: 'Autres catégories'),
-  ];
   String rayon = "rayon".tr;
+
+  void updateSubcategories(List<String> subcategories, String titleCategorie) {
+    selectedSubcategories.value =
+        subcategories; // Met à jour les sous-catégories
+    selectedcategories.value = titleCategorie;
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    selectedSubcategories.dispose();
+    selectedcategories.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final notifier = ref.watch(marketPlaceUserStateNotifier);
     var requeteId = const Uuid().v1();
     Query query = FirebaseFirestore.instance.collection('marketplace');
-    // Ajouter les filtres de recherche
-    if (notifier.nameSearch.isNotEmpty) {
-      query = query.where('nameProduit',
-          arrayContains: notifier.nameSearch.toLowerCase());
-    }
     if (notifier.currency.isNotEmpty) {
       query = query.where('currency', isEqualTo: notifier.currency);
     }
@@ -82,92 +89,78 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: TextField(
-            readOnly: true,
-            onTap: () {
-              SlideNavigation.slideToPage(context, SearchProduct());
-            },
-            decoration: InputDecoration(
-              hintText: notifier.nameSearch.isNotEmpty
-                  ? "${notifier.nameSearch}"
-                  : notifier.adressMaps.isNotEmpty
-                      ? "${notifier.adressMaps}"
-                      : "Rechercher".tr,
-              hintStyle: TextStyle(color: Colors.grey),
-              suffixIcon: notifier.nameSearch.isNotEmpty
-                  ? Padding(
-                      padding: EdgeInsets.only(right: 1),
-                      child: InkWell(
-                        onTap: () {
-                          ref
-                              .read(marketPlaceUserStateNotifier.notifier)
-                              .ClearFilterTerm();
-                        },
-                        child: Icon(
-                          Icons.close,
-                          color: kPrimaryColor,
-                          size: 20,
+          padding:
+              const EdgeInsets.only(left: 12, right: 12, top: 8, bottom: 8),
+          child: SizedBox(
+            height: 45,
+            child: TextField(
+              readOnly: true,
+              onTap: () {
+                SlideNavigation.slideToPage(context, SearchProduct());
+              },
+              decoration: InputDecoration(
+                hintText: notifier.adressMaps.isNotEmpty
+                    ? "${notifier.adressMaps}"
+                    : "Rechercher".tr,
+                hintStyle: TextStyle(color: Colors.grey),
+                suffixIcon: Padding(
+                  padding: EdgeInsets.only(right: 1),
+                  child: InkWell(
+                    onTap: () async {
+                      Position positionNews = Position(
+                        latitude: notifier.latitude,
+                        longitude: notifier.longitude,
+                        accuracy:
+                            0.0, // Précision, vous pouvez ajuster cette valeur
+                        altitude: 0.0, // Altitude par défaut
+                        heading: 0.0, // Direction par défaut
+                        speed: 0.0, // Vitesse par défaut
+                        speedAccuracy: 0.0, // Précision de la vitesse
+                        timestamp: DateTime.now(),
+                        altitudeAccuracy:
+                            0.0, // Ajoutez l'altitudeAccuracy par défaut
+                        headingAccuracy: 0.0,
+                      );
+                      final selectedLieux = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MapsMarketPlace(
+                              lieuAdress: notifier.adressMaps,
+                              currentPosition: positionNews!,
+                              rayon: notifier.radius),
                         ),
-                      ),
-                    )
-                  : Padding(
-                      padding: EdgeInsets.only(right: 1),
-                      child: InkWell(
-                        onTap: () async {
-                          Position positionNews = Position(
-                            latitude: notifier.latitude,
-                            longitude: notifier.longitude,
-                            accuracy:
-                                0.0, // Précision, vous pouvez ajuster cette valeur
-                            altitude: 0.0, // Altitude par défaut
-                            heading: 0.0, // Direction par défaut
-                            speed: 0.0, // Vitesse par défaut
-                            speedAccuracy: 0.0, // Précision de la vitesse
-                            timestamp: DateTime.now(),
-                            altitudeAccuracy:
-                                0.0, // Ajoutez l'altitudeAccuracy par défaut
-                            headingAccuracy: 0.0,
-                          );
-                          final selectedLieux = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MapsMarketPlace(
-                                  lieuAdress: notifier.adressMaps,
-                                  currentPosition: positionNews!,
-                                  rayon: notifier.radius),
-                            ),
-                          );
-                          if (selectedLieux != null) {
-                            var lat = double.parse(
-                                selectedLieux[0]['latitude'].toString());
-                            var lon = double.parse(
-                                selectedLieux[0]['longitude'].toString());
-                            var rad = double.parse(
-                                selectedLieux[0]['radius'].toString());
-                            String adress = selectedLieux[0]['lieu'];
-                            if (mounted) {
-                              if (lat == 0.0 && lon == 0.0) {
-                                print('le etape 1');
-                                ref
-                                    .read(marketPlaceUserStateNotifier.notifier)
-                                    .SetLocation("", 0.0, 0.0, 10000.0, false);
-                              } else {
-                                print('le etape 2');
-                                ref
-                                    .read(marketPlaceUserStateNotifier.notifier)
-                                    .SetLocation(adress, lon, lat, rad, true);
-                              }
-                            }
+                      );
+                      if (selectedLieux != null) {
+                        var lat = double.parse(
+                            selectedLieux[0]['latitude'].toString());
+                        var lon = double.parse(
+                            selectedLieux[0]['longitude'].toString());
+                        var rad =
+                            double.parse(selectedLieux[0]['radius'].toString());
+                        String adress = selectedLieux[0]['lieu'];
+                        if (mounted) {
+                          if (lat == 0.0 && lon == 0.0) {
+                            print('le etape 1');
+                            ref
+                                .read(marketPlaceUserStateNotifier.notifier)
+                                .SetLocation("", 0.0, 0.0, 10000.0, false);
+                          } else {
+                            print('le etape 2');
+                            ref
+                                .read(marketPlaceUserStateNotifier.notifier)
+                                .SetLocation(adress, lon, lat, rad, true);
                           }
-                        },
-                        child: Icon(Icons.place, color: kPrimaryColor),
-                      ),
-                    ),
-              filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
+                        }
+                      }
+                    },
+                    child: Icon(Icons.place, color: kPrimaryColor),
+                  ),
+                ),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
               ),
             ),
           ),
@@ -176,18 +169,101 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
           height: 80, // Hauteur ajustée pour correspondre au design compact
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.only(left: 30, right: 30),
-            itemCount: categories.length,
+            padding: EdgeInsets.only(left: 10, right: 10),
+            itemCount: categoriesVente.length,
             itemBuilder: (context, index) {
+              final category = categoriesVente[index];
+              final subCategorie = category['subcategories'];
+              final titleCategorie = category['title'];
               return Padding(
                 padding: const EdgeInsets.only(right: 6),
-                child: CategoryCard(category: categories[index]),
+                child: InkWell(
+                  onTap: () {
+                    updateSubcategories(subCategorie, titleCategorie);
+                    // if (mounted) {
+                    //   ref
+                    //       .read(marketPlaceUserStateNotifier.notifier)
+                    //       .SetCategorie(category['title']);
+                    // }
+                    // SlideNavigation.slideToPage(
+                    //     context,
+                    //     MarketplaceResultFiltrePage(
+                    //       nameTerm: "",
+                    //     ));
+                  },
+                  child: CategoryCard(
+                    category: category,
+                  ),
+                ),
               );
             },
           ),
         ),
         SizedBox(
-          height: 10,
+          height: 5,
+        ),
+
+        /// Affichage des sous-catégories avec `Wrap`
+        ValueListenableBuilder<List<String>>(
+          valueListenable: selectedSubcategories,
+          builder: (context, subcategories, _) {
+            return subcategories.isEmpty
+                ? SizedBox()
+                : Theme(
+                    data: ThemeData().copyWith(
+                      dividerColor:
+                          Colors.transparent, // Supprime la ligne de séparation
+                    ),
+                    child: ExpansionTile(
+                      initiallyExpanded: true,
+                      title: Text("${selectedcategories.value}".tr,
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Wrap(
+                              alignment:
+                                  WrapAlignment.start, // Aligner à gauche
+                              crossAxisAlignment: WrapCrossAlignment
+                                  .start, // Alignement vertical en haut
+                              runAlignment: WrapAlignment
+                                  .start, // Aligner les lignes à gauche
+                              spacing: 5,
+                              runSpacing: 7,
+                              children: subcategories.map((sub) {
+                                return InkWell(
+                                  onTap: () {
+                                    SlideNavigation.slideToPage(
+                                        context,
+                                        MarketplaceResultFiltrePage(
+                                          nameTerm: "",
+                                          categorieSelectionner: sub,
+                                        ));
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10)),
+                                        border: Border.all()),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text('${sub}'.tr),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+          },
+        ),
+        SizedBox(
+          height: 5,
         ),
         Expanded(
           child: FirestorePagination(
@@ -291,7 +367,7 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
 }
 
 class CategoryCard extends StatelessWidget {
-  final Category category;
+  final Map<String, dynamic> category;
   const CategoryCard({required this.category});
 
   @override
@@ -305,12 +381,13 @@ class CategoryCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(category.icon, size: 20, color: kPrimaryColor), // Taille réduite
+          Icon(category["icon"],
+              size: 20, color: kPrimaryColor), // Taille réduite
           SizedBox(height: 3),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 3),
             child: Text(
-              "${category.label}".tr,
+              "${category["title"]}".tr,
               maxLines: 2,
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
@@ -323,10 +400,4 @@ class CategoryCard extends StatelessWidget {
       ),
     );
   }
-}
-
-class Category {
-  final IconData icon;
-  final String label;
-  Category({required this.icon, required this.label});
 }

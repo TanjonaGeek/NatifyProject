@@ -213,6 +213,11 @@ class MarketplaceUserNotifier extends StateNotifier<MarketplaceUserState> {
     _saveState();
   }
 
+  Future<void> SetCategorie(String categorie) async {
+    state = state.copyWith(Categorie: categorie);
+    _saveState();
+  }
+
   Future<void> SetLocation(String adrss, double long, double lat, double rad,
       bool isFilterLoc) async {
     state = state.copyWith(
