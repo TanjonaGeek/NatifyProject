@@ -22,6 +22,8 @@ class MarketplaceModel extends MarketPlaceEntity {
     super.nameProduit,
     super.latitude,
     super.longitude,
+    super.favorie,
+    super.vue,
   });
 
   factory MarketplaceModel.fromJson(Map<String, dynamic> map) {
@@ -45,6 +47,8 @@ class MarketplaceModel extends MarketPlaceEntity {
       nameProduit: List<String>.from(map['nameProduit']) ?? [],
       latitude: map['latitude'] ?? 0.0,
       longitude: map['longitude'] ?? 0.0,
+      favorie: List<String>.from(map['favorie']),
+      vue: List<String>.from(map['vue']),
     );
   }
 
@@ -69,6 +73,8 @@ class MarketplaceModel extends MarketPlaceEntity {
       'nameProduit': nameProduit,
       'latitude': latitude,
       'longitude': longitude,
+      'favorie': favorie,
+      'vue': vue,
     };
   }
 
@@ -94,6 +100,8 @@ class MarketplaceModel extends MarketPlaceEntity {
       nameProduit: data['nameProduit'],
       latitude: data['latitude'],
       longitude: data['longitude'],
+      favorie: data['favorie'],
+      vue: data['vue'],
     );
   }
 
@@ -118,6 +126,8 @@ class MarketplaceModel extends MarketPlaceEntity {
       nameProduit: entity.nameProduit,
       latitude: entity.latitude,
       longitude: entity.longitude,
+      favorie: entity.favorie,
+      vue: entity.vue,
     );
   }
 
@@ -141,6 +151,8 @@ class MarketplaceModel extends MarketPlaceEntity {
         currency: currency,
         nameProduit: nameProduit,
         latitude: latitude,
-        longitude: longitude);
+        longitude: longitude,
+        favorie: favorie,
+        vue: vue);
   }
 }

@@ -1542,6 +1542,8 @@ class DataSourceUserImpl implements DataSourceUser {
 
       await docRef.set({
         "title": title.trim(),
+        "favorie": [],
+        "vue": [],
         "description": description.trim(),
         "location": geoPoint.data,
         "latitude": latitude,
@@ -1692,5 +1694,162 @@ class DataSourceUserImpl implements DataSourceUser {
         }
       }
     } catch (e) {}
+  }
+
+  @override
+  Future<void> Defavorier(
+      String uidMe, String uidNotification, String uidVente) async {
+    try {
+      if (uidMe.isEmpty) {
+        throw Exception('User not authenticated');
+      }
+      final userSnapshot = await firestore
+          .collection('marketplace')
+          .where('uidVente', isEqualTo: uidVente)
+          .limit(1) // Limitation à un seul document
+          .get();
+
+      // final userSnapshot2 = await firestore
+      //     .collection('users')
+      //     .where('uid', isEqualTo: uidMe)
+      //     .limit(1) // Limitation à un seul document
+      //     .get();
+
+      if (userSnapshot.docs.isEmpty) {
+        print('No stories found for user $uidMe');
+        return;
+      }
+
+      // Get the first document
+      final userDoc = userSnapshot.docs.first;
+      // final userDoc2 = userSnapshot2.docs.first;
+      final userData = userDoc.data();
+      // final userData2 = userDoc2.data();
+      final List<dynamic> favorie = List.from(userData['favorie'] ?? []);
+
+      final userFavorieData = favorie.firstWhere(
+        (element) => element == uidMe,
+        orElse: () => null,
+      );
+
+      if (userFavorieData != null) {
+        // If no reaction data exists, create it
+        favorie.remove(uidMe);
+        await firestore
+            .collection('marketplace')
+            .doc(uidVente)
+            .update({'favorie': favorie});
+      }
+    } catch (e) {
+      // Log the error properly
+      print('Failed to desabonner: $e');
+      // Optionally, handle specific error types (e.g., network issues)
+    }
+  }
+
+  @override
+  Future<void> Favoriser(
+      String uidMe, String uidNotification, String uidVente) async {
+    try {
+      if (uidMe.isEmpty) {
+        throw Exception('User not authenticated');
+      }
+      final userSnapshot = await firestore
+          .collection('marketplace')
+          .where('uidVente', isEqualTo: uidVente)
+          .limit(1) // Limitation à un seul document
+          .get();
+
+      // final userSnapshot2 = await firestore
+      //     .collection('users')
+      //     .where('uid', isEqualTo: uidMe)
+      //     .limit(1) // Limitation à un seul document
+      //     .get();
+
+      if (userSnapshot.docs.isEmpty) {
+        print('No stories found for user $uidMe');
+        return;
+      }
+
+      // Get the first document
+      final userDoc = userSnapshot.docs.first;
+      // final userDoc2 = userSnapshot2.docs.first;
+      final userData = userDoc.data();
+      // final userData2 = userDoc2.data();
+      final List<dynamic> favorie = List.from(userData['favorie'] ?? []);
+
+      final userAbonneeData = favorie.firstWhere(
+        (element) => element == uidMe,
+        orElse: () => null,
+      );
+
+      if (userAbonneeData == null) {
+        // If no reaction data exists, create it
+        favorie.add(uidMe);
+        await firestore
+            .collection('marketplace')
+            .doc(uidVente)
+            .update({'favorie': favorie});
+      }
+      // Update the story document
+      // sendNotification(userData, userData2);
+    } catch (e) {
+      // Log the error properly
+      print('Failed to abonner: $e');
+      // Optionally, handle specific error types (e.g., network issues)
+    }
+  }
+
+  @override
+  Future<void> VueVente(
+      String uidMe, String uidNotification, String uidVente) async {
+    try {
+      if (uidMe.isEmpty) {
+        throw Exception('User not authenticated');
+      }
+      final userSnapshot = await firestore
+          .collection('marketplace')
+          .where('uidVente', isEqualTo: uidVente)
+          .limit(1) // Limitation à un seul document
+          .get();
+
+      // final userSnapshot2 = await firestore
+      //     .collection('users')
+      //     .where('uid', isEqualTo: uidMe)
+      //     .limit(1) // Limitation à un seul document
+      //     .get();
+
+      if (userSnapshot.docs.isEmpty) {
+        print('No stories found for user $uidMe');
+        return;
+      }
+
+      // Get the first document
+      final userDoc = userSnapshot.docs.first;
+      // final userDoc2 = userSnapshot2.docs.first;
+      final userData = userDoc.data();
+      // final userData2 = userDoc2.data();
+      final List<dynamic> favorie = List.from(userData['vue'] ?? []);
+
+      final userAbonneeData = favorie.firstWhere(
+        (element) => element == uidMe,
+        orElse: () => null,
+      );
+
+      if (userAbonneeData == null) {
+        // If no reaction data exists, create it
+        favorie.add(uidMe);
+        await firestore
+            .collection('marketplace')
+            .doc(uidVente)
+            .update({'vue': favorie});
+      }
+      // Update the story document
+      // sendNotification(userData, userData2);
+    } catch (e) {
+      // Log the error properly
+      print('Failed to abonner: $e');
+      // Optionally, handle specific error types (e.g., network issues)
+    }
   }
 }

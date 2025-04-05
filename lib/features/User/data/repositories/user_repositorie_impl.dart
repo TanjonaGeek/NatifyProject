@@ -286,4 +286,22 @@ class UserRepositoryImpl implements UserRepository {
         uidVente,
         status);
   }
+
+  @override
+  Future<void> Defavorier(
+      String uidUser, String uidNotification, String uidVente) {
+    return dataSourceUser.Defavorier(uidUser, uidNotification, uidVente);
+  }
+
+  @override
+  Future<void> Favoriser(
+      String uidUser, String uidNotification, String uidVente) {
+    return dataSourceUser.Favoriser(uidUser, uidNotification, uidVente);
+  }
+
+  @override
+  Future<void> VueVente(
+      String uidUser, String uidNotification, String uidVente) {
+    return dataSourceUser.VueVente(uidUser, uidNotification, uidVente);
+  }
 }

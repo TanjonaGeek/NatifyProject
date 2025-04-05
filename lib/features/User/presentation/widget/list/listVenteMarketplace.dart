@@ -37,6 +37,13 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
   };
   String rayon = "rayon".tr;
 
+  bool isUserSubscribed(String uid, List<dynamic> userFavoriedUids) {
+    // Convertir la List<dynamic> en Set<String> pour améliorer les performances
+    Set<String> userFavoriedUidsSet =
+        Set<String>.from(userFavoriedUids.whereType<String>());
+    return userFavoriedUidsSet.contains(uid);
+  }
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -234,6 +241,8 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
               if (data == null) {
                 return Container();
               }
+              bool isFav = isUserSubscribed(uidMe!, data['favorie'] ?? []);
+              int nbrFav = data['favorie'].length;
               double montant = (data['prix'] is int)
                   ? data['prix'].toDouble()
                   : double.tryParse(data['prix'].toString()) ?? 0.0;
@@ -247,12 +256,16 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
                     SlideNavigation.slideToPage(
                       context,
                       ProductDetailScreen(
-                          categ: data['categorie'],
-                          productId: data['uidVente'],
-                          emplacement: data['location']['geopoint']),
+                        categ: data['categorie'],
+                        productId: data['uidVente'],
+                        emplacement: data['location']['geopoint'],
+                        favorieList: data['favorie'],
+                      ),
                     );
                   },
                   child: ProductCard(
+                      isFav: isFav,
+                      nbrFav: nbrFav,
                       imageUrl: data['images'][0],
                       title: data['title'],
                       price: prix,

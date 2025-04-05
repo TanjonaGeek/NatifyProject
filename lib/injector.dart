@@ -35,6 +35,7 @@ import 'package:natify/features/User/domaine/usecases/useCasUpdateStatusAutorisa
 import 'package:natify/features/User/domaine/usecases/useCaseAbonner.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseAddReceiveNotificatonByUser.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseCreateHighLight.dart';
+import 'package:natify/features/User/domaine/usecases/useCaseDefavoriser.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseDeleteAccount.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseDesabonner.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseEditVente.dart';
@@ -58,8 +59,10 @@ import 'package:natify/features/User/domaine/usecases/useCaseUpdateDistancePosit
 import 'package:natify/features/User/domaine/usecases/useCaseUpdateInfoInAccount.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseUpdateStatusUser.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseVoirHighLight.dart';
+import 'package:natify/features/User/domaine/usecases/useCaseVueVente.dart';
 import 'package:natify/features/User/domaine/usecases/useCasegetUserTokenNotification.dart';
 import 'package:natify/features/User/domaine/usecases/useCasesAddComment.dart';
+import 'package:natify/features/User/domaine/usecases/useCasesFavoriser.dart';
 import 'package:natify/features/User/domaine/usecases/useCasesGetPhotoPrrofile.dart';
 import 'package:natify/features/User/domaine/usecases/useCasesGetAllPhotoProfile.dart';
 import 'package:natify/features/User/domaine/usecases/useCasesGetPartPhotoProfile.dart';
@@ -173,6 +176,12 @@ Future<void> initializationDepencies() async {
       useCaseAddCommentVente(userRepository: injector.get<UserRepository>()));
   injector.registerFactory<UseCaseEditerVente>(
       () => UseCaseEditerVente(userRepository: injector.get<UserRepository>()));
+  injector.registerFactory<UseCaseFavoriser>(
+      () => UseCaseFavoriser(userRepository: injector.get<UserRepository>()));
+  injector.registerFactory<UseCaseDeFavoriser>(
+      () => UseCaseDeFavoriser(userRepository: injector.get<UserRepository>()));
+  injector.registerFactory<UseCaseVueVente>(
+      () => UseCaseVueVente(userRepository: injector.get<UserRepository>()));
 
   injector.registerFactory<UseCaseGetStorie>(() =>
       UseCaseGetStorie(storieRepository: injector.get<StorieRepository>()));

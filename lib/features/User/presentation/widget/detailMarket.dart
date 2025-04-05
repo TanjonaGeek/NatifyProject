@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_pagination/firebase_pagination.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -11,34 +13,41 @@ import 'package:intl/intl.dart';
 import 'package:natify/core/utils/slideNavigation.dart';
 import 'package:natify/features/Chat/presentation/pages/messageDetail.dart';
 import 'package:natify/features/User/presentation/pages/userProfilePage.dart';
+import 'package:natify/features/User/presentation/provider/user_provider.dart';
 import 'package:natify/features/User/presentation/widget/list/visualisrMarketPlaceInMaps.dart';
 import 'package:natify/features/User/presentation/widget/postMarketplace.dart';
 
-class ProductDetailScreen extends StatefulWidget {
+class ProductDetailScreen extends ConsumerStatefulWidget {
   final String productId;
   final GeoPoint emplacement;
   final String categ;
+  final List<dynamic> favorieList;
 
-  ProductDetailScreen(
-      {Key? key,
-      required this.productId,
-      required this.emplacement,
-      required this.categ})
-      : super(key: key);
+  ProductDetailScreen({
+    Key? key,
+    required this.productId,
+    required this.emplacement,
+    required this.categ,
+    required this.favorieList,
+  }) : super(key: key);
 
   @override
-  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+  ConsumerState<ProductDetailScreen> createState() =>
+      _ProductDetailScreenState();
 }
 
-class _ProductDetailScreenState extends State<ProductDetailScreen> {
+class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   final ValueNotifier<int> _currentIndex = ValueNotifier<int>(0);
   final ValueNotifier<String> _address = ValueNotifier<String>("");
   late Future<List<QueryDocumentSnapshot>> _futureProducts;
+  final ValueNotifier<bool> isFavorieNotifier = ValueNotifier<bool>(false);
+  String uidUser = FirebaseAuth.instance.currentUser!.uid;
   final Map<String, String> _exchangeFormat = {
     'EUR': 'fr_FR',
     'USD': 'en_US',
     'MGA': 'mg_MG',
   };
+
   Future<void> _getAddressFromCoordinates() async {
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(
@@ -56,6 +65,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
   }
 
+  Future<void> _vueVente() async {
+    try {
+      ref
+          .read(marketPlaceUserStateNotifier.notifier)
+          .vueVente(uidUser, '', widget.productId);
+    } catch (e) {}
+  }
+
   Future<List<QueryDocumentSnapshot>> fetchProductsSimilar() async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('marketplace')
@@ -67,9 +84,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     return querySnapshot.docs;
   }
 
+  bool isUserSubscribed(String uid, List<dynamic> userFavoriedUids) {
+    // Convertir la List<dynamic> en Set<String> pour améliorer les performances
+    Set<String> userFavoriedUidsSet =
+        Set<String>.from(userFavoriedUids.whereType<String>());
+    return userFavoriedUidsSet.contains(uid);
+  }
+
+  String formatDateFromMilliseconds(int milliseconds) {
+    final date = DateTime.fromMillisecondsSinceEpoch(milliseconds);
+    final formatter = DateFormat('dd.MM.yyyy');
+    return formatter.format(date);
+  }
+
   @override
   void initState() {
     super.initState();
+    _vueVente();
     _getAddressFromCoordinates();
     _futureProducts = fetchProductsSimilar();
   }
@@ -78,6 +109,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   void dispose() {
     _currentIndex.dispose();
     _address.dispose();
+    isFavorieNotifier.dispose();
     super.dispose();
   }
 
@@ -104,6 +136,34 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             Navigator.pop(context);
           },
         ),
+        actions: [
+          ValueListenableBuilder<bool>(
+              valueListenable: isFavorieNotifier,
+              builder: (context, isFavo, child) {
+                return IconButton(
+                  onPressed: () async {
+                    isFavorieNotifier.value = !isFavorieNotifier.value;
+                    if (mounted) {
+                      if (isFavorieNotifier.value) {
+                        // Appel de la fonction abonner
+                        await ref
+                            .read(marketPlaceUserStateNotifier.notifier)
+                            .favoriser(uidUser, '', widget.productId);
+                      } else {
+                        // Appel de la fonction desabonner
+                        await ref
+                            .read(marketPlaceUserStateNotifier.notifier)
+                            .defavoriser(uidUser, '', widget.productId);
+                      }
+                    }
+                  },
+                  icon: isFavo
+                      ? FaIcon(FontAwesomeIcons.solidHeart,
+                          color: Colors.red, size: 20)
+                      : FaIcon(FontAwesomeIcons.heart, size: 20),
+                );
+              })
+        ],
       ),
       body: FirestorePagination(
         physics: AlwaysScrollableScrollPhysics(),
@@ -129,13 +189,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           if (product == null) {
             return Container();
           }
+          bool isFav = isUserSubscribed(uidUser, product['favorie'] ?? []);
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            isFavorieNotifier.value = isFav;
+          });
+
           double montant = (product['prix'] is int)
               ? product['prix'].toDouble()
               : double.tryParse(product['prix'].toString()) ?? 0.0;
 
           String Prixformatted =
               NumberFormat.currency(locale: 'mg_MG').format(montant);
-
+          final createdAt =
+              product['createdAt']; // supposé être un int (timestamp en ms)
+          final dateAffichee = formatDateFromMilliseconds(createdAt);
+          int nbrVue = product['vue'].length;
           return SingleChildScrollView(
             padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
             child: Column(
@@ -242,6 +310,40 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
                     Text(product['categorie'],
                         style: TextStyle(color: Colors.grey, fontSize: 16)),
+                  ],
+                ),
+                SizedBox(height: 10),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 2,
+                    ),
+                    FaIcon(FontAwesomeIcons.solidCalendar,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black,
+                        size: 15),
+                    SizedBox(
+                      width: 12,
+                    ),
+                    Text("${dateAffichee}",
+                        style: TextStyle(color: Colors.grey, fontSize: 16)),
+                    SizedBox(
+                      width: 12,
+                    ),
+                    if (nbrVue > 0)
+                      FaIcon(FontAwesomeIcons.solidEye,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black,
+                          size: 15),
+                    if (nbrVue > 0)
+                      SizedBox(
+                        width: 5,
+                      ),
+                    if (nbrVue > 0)
+                      Text("${nbrVue}",
+                          style: TextStyle(color: Colors.grey, fontSize: 16)),
                   ],
                 ),
                 SizedBox(height: 10),
@@ -521,6 +623,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             SlideNavigation.slideToPage(
                               context,
                               ProductDetailScreen(
+                                  favorieList: product['favorie'],
                                   categ: product['categorie'],
                                   productId: product['uidVente'],
                                   emplacement: product['location']['geopoint']),

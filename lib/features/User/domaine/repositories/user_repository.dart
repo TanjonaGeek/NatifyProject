@@ -99,4 +99,10 @@ abstract class UserRepository {
       String nameProduit,
       String uidVente,
       bool status);
+  Future<void> Defavorier(
+      String uidUser, String uidNotification, String uidVente);
+  Future<void> Favoriser(
+      String uidUser, String uidNotification, String uidVente);
+  Future<void> VueVente(
+      String uidUser, String uidNotification, String uidVente);
 }

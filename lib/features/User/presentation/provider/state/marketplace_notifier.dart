@@ -7,8 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:natify/core/utils/snack_bar_helpers.dart';
 import 'package:natify/features/User/data/models/user_model.dart';
+import 'package:natify/features/User/domaine/usecases/useCaseDefavoriser.dart';
 import 'package:natify/features/User/domaine/usecases/useCaseEditVente.dart';
 import 'package:natify/features/User/domaine/usecases/useCasePublierVente.dart';
+import 'package:natify/features/User/domaine/usecases/useCaseVueVente.dart';
+import 'package:natify/features/User/domaine/usecases/useCasesFavoriser.dart';
 import 'package:natify/features/User/presentation/provider/state/marketplace_state.dart';
 import 'package:natify/injector.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,10 +22,70 @@ class MarketplaceUserNotifier extends StateNotifier<MarketplaceUserState> {
       injector.get<UseCasePublierVente>();
   final UseCaseEditerVente _editerVenteUseCase =
       injector.get<UseCaseEditerVente>();
+  final UseCaseFavoriser _favoriserUseCase = injector.get<UseCaseFavoriser>();
+  final UseCaseDeFavoriser _defavoriserUseCase =
+      injector.get<UseCaseDeFavoriser>();
+  final UseCaseVueVente _vueVenteUseCase = injector.get<UseCaseVueVente>();
   MarketplaceUserNotifier(this.ref) : super(MarketplaceUserState()) {
     _loadState(); // Charger l'état sauvegardé au démarrage
   }
   bool get isFetching => state.state != MarketplaceUserConcreteState.loading;
+
+  Future<void> vueVente(
+      String uidMe, String uidNotification, String uidVente) async {
+    try {
+      final List<ConnectivityResult> connectivityResult =
+          await (Connectivity().checkConnectivity());
+      if (connectivityResult.contains(ConnectivityResult.none)) {
+        showCustomSnackBar("Pas de connexion internet");
+        return;
+      }
+      await _vueVenteUseCase.call(uidMe, uidNotification, uidVente);
+    } catch (e) {
+      showCustomSnackBar(
+          "Une erreur s'est produite. Veuillez vérifier votre connexion et réessayer.");
+    }
+  }
+
+  Future<void> defavoriser(
+      String uidMe, String uidNotification, String uidVente) async {
+    try {
+      final List<ConnectivityResult> connectivityResult =
+          await (Connectivity().checkConnectivity());
+      if (connectivityResult.contains(ConnectivityResult.none)) {
+        showCustomSnackBar("Pas de connexion internet");
+        return;
+      }
+      await _defavoriserUseCase
+          .call(uidMe, uidNotification, uidVente)
+          .then((onValue) {
+        state = state.copyWith(isLoading: false);
+      });
+    } catch (e) {
+      showCustomSnackBar(
+          "Une erreur s'est produite. Veuillez vérifier votre connexion et réessayer.");
+    }
+  }
+
+  Future<void> favoriser(
+      String uidMe, String uidNotification, String uidVente) async {
+    try {
+      final List<ConnectivityResult> connectivityResult =
+          await (Connectivity().checkConnectivity());
+      if (connectivityResult.contains(ConnectivityResult.none)) {
+        showCustomSnackBar("Pas de connexion internet");
+        return;
+      }
+      await _favoriserUseCase
+          .call(uidMe, uidNotification, uidVente)
+          .then((onValue) {
+        state = state.copyWith(isLoading: false);
+      });
+    } catch (e) {
+      showCustomSnackBar(
+          "Une erreur s'est produite. Veuillez vérifier votre connexion et réessayer.");
+    }
+  }
 
   Future<void> publierVente(
     UserModel users,

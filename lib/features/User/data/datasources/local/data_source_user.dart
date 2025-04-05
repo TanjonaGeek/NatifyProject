@@ -105,4 +105,10 @@ abstract class DataSourceUser {
       bool status);
   Future<void> addCommentVente(
       String venteId, String userId, String text, String parentId);
+  Future<void> Defavorier(
+      String uidUser, String uidNotification, String uidVente);
+  Future<void> Favoriser(
+      String uidUser, String uidNotification, String uidVente);
+  Future<void> VueVente(
+      String uidUser, String uidNotification, String uidVente);
 }

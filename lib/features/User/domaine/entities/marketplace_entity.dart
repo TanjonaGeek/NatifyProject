@@ -21,6 +21,8 @@ class MarketPlaceEntity extends Equatable {
   final List<String>? nameProduit;
   final double? latitude;
   final double? longitude;
+  final List<String>? favorie;
+  final List<String>? vue;
 
   const MarketPlaceEntity({
     required this.title,
@@ -42,6 +44,8 @@ class MarketPlaceEntity extends Equatable {
     required this.nameProduit,
     required this.latitude,
     required this.longitude,
+    required this.favorie,
+    required this.vue,
   });
 
   @override
@@ -65,7 +69,9 @@ class MarketPlaceEntity extends Equatable {
       currency,
       nameProduit,
       latitude,
-      longitude
+      longitude,
+      favorie,
+      vue
     ];
   }
 }

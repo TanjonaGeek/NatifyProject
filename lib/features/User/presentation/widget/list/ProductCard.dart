@@ -11,6 +11,8 @@ class ProductCard extends StatefulWidget {
   final String price;
   final String currency;
   final GeoPoint emplacement;
+  final bool isFav;
+  final int nbrFav;
 
   ProductCard({
     required this.imageUrl,
@@ -18,6 +20,8 @@ class ProductCard extends StatefulWidget {
     required this.price,
     required this.currency,
     required this.emplacement,
+    required this.isFav,
+    required this.nbrFav,
   });
 
   @override
@@ -90,15 +94,20 @@ class _ProductCardState extends State<ProductCard> {
                             horizontal: 5, vertical: 4),
                         child: Row(
                           children: [
-                            Text(
-                              '1333',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            FaIcon(FontAwesomeIcons.heart,
-                                color: Colors.white, size: 18),
+                            if (widget.nbrFav > 0)
+                              Text(
+                                '${widget.nbrFav}',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            if (widget.nbrFav > 0)
+                              SizedBox(
+                                width: 5,
+                              ),
+                            widget.isFav
+                                ? FaIcon(FontAwesomeIcons.solidHeart,
+                                    color: Colors.red, size: 15)
+                                : FaIcon(FontAwesomeIcons.heart,
+                                    color: Colors.white, size: 15),
                           ],
                         ),
                       ),
