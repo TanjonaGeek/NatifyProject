@@ -28,7 +28,6 @@ class MarketplacePage extends ConsumerStatefulWidget {
 class _MarketplacePageState extends ConsumerState<MarketplacePage> {
   String a = "à".tr;
   String toutCat = "ToutCat".tr;
-  final ValueNotifier<List<String>> selectedSubcategories = ValueNotifier([]);
   String? uidMe = FirebaseAuth.instance.currentUser!.uid ?? "";
   List<Map<String, dynamic>> categoriesVente = Helpers.categoriesVente;
   final Map<String, String> _exchangeFormat = {
@@ -41,7 +40,6 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
   @override
   void dispose() {
     // TODO: implement dispose
-    selectedSubcategories.dispose();
     super.dispose();
   }
 
@@ -50,12 +48,6 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
     final notifier = ref.watch(marketPlaceUserStateNotifier);
     var requeteId = const Uuid().v1();
     Query query = FirebaseFirestore.instance.collection('marketplace');
-    if (notifier.currency.isNotEmpty) {
-      query = query.where('currency', isEqualTo: notifier.currency);
-    }
-    if (notifier.Categorie.isNotEmpty) {
-      query = query.where('categorie', isEqualTo: notifier.Categorie);
-    }
     if (notifier.isFilterLocation == true) {
       query = query
           .where('latitude', isGreaterThanOrEqualTo: notifier.minlatitude)
@@ -148,8 +140,17 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
                 ),
                 filled: true,
                 fillColor: Colors.white,
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey.shade700),
+                  borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey.shade700),
+                  borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                ),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide(color: Colors.grey.shade700),
+                  borderRadius: BorderRadius.all(Radius.circular(30.0)),
                 ),
               ),
             ),
@@ -169,11 +170,6 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
                 padding: const EdgeInsets.only(right: 6),
                 child: InkWell(
                   onTap: () {
-                    // if (mounted) {
-                    //   ref
-                    //       .read(marketPlaceUserStateNotifier.notifier)
-                    //       .SetTitleCategorie(titleCategorie);
-                    // }
                     int index = categoriesVente.indexWhere(
                       (element) => element["title"] == titleCategorie,
                     );
@@ -187,8 +183,7 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
                         List<String>.from(category?['subcategories'] ?? []);
 
                     // Afficher le Modal avec les sous-catégories
-                    showCustomModal(context, subCategorie, titleCategorie,
-                        notifier.Categorie, ref);
+                    showCustomModal(context, subCategorie, titleCategorie, ref);
                   },
                   child: CategoryCard(
                     category: category,
@@ -198,16 +193,6 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
             },
           ),
         ),
-        if (notifier.titreCategorie.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Text(
-              "${notifier.titreCategorie}".tr,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
         SizedBox(
           height: 5,
         ),
@@ -294,13 +279,6 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                     ),
-                    // SizedBox(height: 4),
-                    // Text(
-                    //   textAlign: TextAlign.center,
-                    //   "Actuellement_aucun_produit".tr,
-                    //   style:
-                    //       TextStyle(fontWeight: FontWeight.w400, fontSize: 17),
-                    // ),
                   ],
                 ),
               ),
@@ -310,115 +288,98 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
       ],
     ));
   }
-}
 
-void showCustomModal(BuildContext context, List<String> subCategorie,
-    String titre, String cat, WidgetRef ref) {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true, // Pour ajuster selon le contenu
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    builder: (context) {
-      return Container(
-        width: double.infinity, // Pleine largeur
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 50,
-              height: 5,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            SizedBox(height: 10),
-            Text(
-              "${titre}".tr,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 1),
-                child: Wrap(
-                  alignment: WrapAlignment.start, // Aligner à gauche
-                  crossAxisAlignment:
-                      WrapCrossAlignment.start, // Alignement vertical en haut
-                  runAlignment:
-                      WrapAlignment.start, // Aligner les lignes à gauche
-                  spacing: 5,
-                  runSpacing: 7,
-                  children: subCategorie.map<Widget>((sub) {
-                    // ✅ Ajout du type <Widget>
-                    return InkWell(
-                      onTap: () {
-                        ref
-                            .read(marketPlaceUserStateNotifier.notifier)
-                            .SetTitleCategorieAndCategorie(titre, sub);
-                        Navigator.pop(context);
-                      },
-                      child: Stack(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                                color: Colors.blue.shade50,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                                border: Border.all(
-                                  color: Colors.blue.shade50,
-                                )),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 15),
-                              child: Text(sub.tr),
-                            ),
-                          ),
-                          if (cat == sub)
-                            Positioned(
-                                top: 0,
-                                right: 0,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    ref
-                                        .read(marketPlaceUserStateNotifier
-                                            .notifier)
-                                        .SetTitleCategorieAndCategorie("", "");
-                                    Navigator.pop(context);
-                                  },
-                                  child: Container(
-                                    width: 17,
-                                    height: 17,
-                                    decoration: BoxDecoration(
-                                        color: Colors.red,
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(30))),
-                                    child: Center(
-                                      child: FaIcon(FontAwesomeIcons.close,
-                                          color: Colors.white, size: 13),
-                                    ),
-                                  ),
-                                ))
-                        ],
-                      ),
-                    );
-                  }).toList(), // ✅ Convertir en List<Widget>
+  void showCustomModal(BuildContext context, List<String> subCategorie,
+      String titre, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // Pour ajuster selon le contenu
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          width: double.infinity, // Pleine largeur
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 50,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
-            ),
-          ],
-        ),
-      );
-    },
-  );
+              SizedBox(height: 10),
+              Text(
+                "${titre}".tr,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 20),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 1),
+                  child: Wrap(
+                    alignment: WrapAlignment.start, // Aligner à gauche
+                    crossAxisAlignment:
+                        WrapCrossAlignment.start, // Alignement vertical en haut
+                    runAlignment:
+                        WrapAlignment.start, // Aligner les lignes à gauche
+                    spacing: 5,
+                    runSpacing: 7,
+                    children: subCategorie.map<Widget>((sub) {
+                      // ✅ Ajout du type <Widget>
+                      return InkWell(
+                        onTap: () {
+                          if (mounted) {
+                            ref
+                                .read(marketPlaceUserStateNotifier.notifier)
+                                .SetCategorie(sub);
+                          }
+                          Navigator.pop(context);
+                          SlideNavigation.slideToPage(
+                              context,
+                              MarketplaceResultFiltrePage(
+                                nameTerm: "",
+                                categorieSelectionner: sub,
+                              ));
+                        },
+                        child: Stack(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.blue.shade50,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
+                                  border: Border.all(
+                                    color: Colors.blue.shade50,
+                                  )),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 15),
+                                child: Text(sub.tr),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(), // ✅ Convertir en List<Widget>
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
 
 class CategoryCard extends StatelessWidget {

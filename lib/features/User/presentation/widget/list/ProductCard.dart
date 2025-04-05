@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:natify/core/utils/colors.dart';
 
@@ -55,25 +56,54 @@ class _ProductCardState extends State<ProductCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-              child: CachedNetworkImage(
-                imageUrl: widget.imageUrl,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
-                  color: Colors.grey.shade100,
+            child: Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(5)),
+                  child: CachedNetworkImage(
+                    imageUrl: widget.imageUrl,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      color: Colors.grey.shade100,
+                    ),
+                    errorWidget: (context, url, error) => Icon(
+                      Icons.error,
+                      color: Colors.red,
+                    ),
+                  ),
                 ),
-                errorWidget: (context, url, error) => Icon(
-                  Icons.error,
-                  color: Colors.red,
-                ),
-              ),
+                Positioned(
+                    top: 10,
+                    right: 5,
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.6),
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 5, vertical: 4),
+                        child: Row(
+                          children: [
+                            Text(
+                              '1333',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            FaIcon(FontAwesomeIcons.heart,
+                                color: Colors.white, size: 18),
+                          ],
+                        ),
+                      ),
+                    ))
+              ],
             ),
           ),
           Padding(
